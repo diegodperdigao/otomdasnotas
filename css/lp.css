@@ -20,6 +20,9 @@ a{text-decoration:none;color:inherit}
 .lp-nav-links a:hover{color:var(--lp-black)}
 .lp-nav-cta{background:var(--lp-black);color:var(--lp-white)!important;padding:8px 20px;border-radius:var(--lp-radius-sm);font-weight:700!important;transition:opacity .15s!important}
 .lp-nav-cta:hover{opacity:.85}
+.lp-nav-login{color:var(--lp-gray-500)!important;border:1px solid var(--lp-gray-200);padding:7px 16px;border-radius:var(--lp-radius-sm);font-weight:700!important;font-size:.78rem!important;transition:all .15s!important}
+.lp-nav-login:hover{border-color:var(--lp-black);color:var(--lp-black)!important}
+.lp-nav-login i{margin-right:4px;font-size:.7rem}
 .lp-menu-btn{display:none;background:none;border:none;font-size:1.3rem;color:var(--lp-gray-600);cursor:pointer;padding:8px}
 
 /* Hero */

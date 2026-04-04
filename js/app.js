@@ -52,6 +52,7 @@
 
     // ========== LOGIN / SESSION ==========
     const SESSION_KEY = 'otomdasnotas_session';
+    const lpView = document.getElementById('lpView');
     const loginScreen = document.getElementById('loginScreen');
     const loginForm = document.getElementById('loginForm');
     const loginError = document.getElementById('loginError');
@@ -60,16 +61,28 @@
     function setSession(role, email) { save(SESSION_KEY, { role, email, time: Date.now() }); }
     function clearSession() { localStorage.removeItem(SESSION_KEY); }
 
-    function showLogin() {
-        loginScreen.style.display = 'flex';
+    function hideAll() {
+        lpView.style.display = 'none';
+        loginScreen.style.display = 'none';
         hub.style.display = 'none';
         app.style.display = 'none';
-        loginError.textContent = '';
     }
 
+    // Global functions (called from inline onclick in LP HTML)
+    window.showLp = function() {
+        hideAll();
+        lpView.style.display = 'block';
+        window.scrollTo(0, 0);
+    };
+
+    window.showLoginScreen = function() {
+        hideAll();
+        loginScreen.style.display = 'flex';
+        loginError.textContent = '';
+    };
+
     function showHubAdmin(email) {
-        loginScreen.style.display = 'none';
-        app.style.display = 'none';
+        hideAll();
         hub.style.display = 'flex';
         const label = document.getElementById('hubUserLabel');
         if (label) label.textContent = email || '';
@@ -84,7 +97,7 @@
         }
     }
 
-    function logout() { clearSession(); showLogin(); }
+    function logout() { clearSession(); window.showLp(); }
 
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -955,11 +968,53 @@
     seedMeetings();
     renderAll();
 
+    // LP form handling
+    var lpFormEl = document.getElementById('lpForm');
+    if (lpFormEl) {
+        lpFormEl.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var sub = {
+                id: 'sub_' + Date.now(),
+                name: document.getElementById('lpName').value.trim(),
+                email: document.getElementById('lpEmail').value.trim(),
+                phone: document.getElementById('lpPhone').value.trim(),
+                segment: document.getElementById('lpSegment').value,
+                instrument: document.getElementById('lpInstrument').value.trim(),
+                message: document.getElementById('lpMessage').value.trim(),
+                status: 'novo', createdAt: new Date().toISOString(), replies: []
+            };
+            submissions.push(sub); saveSubs();
+            document.getElementById('lpFormWrapper').style.display = 'none';
+            document.getElementById('lpFormSuccess').style.display = 'block';
+        });
+    }
+    var lpPhoneEl = document.getElementById('lpPhone');
+    if (lpPhoneEl) {
+        lpPhoneEl.addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length > 11) v = v.slice(0, 11);
+            if (v.length > 6) v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+            else if (v.length > 2) v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+            else if (v.length > 0) v = '(' + v;
+            e.target.value = v;
+        });
+    }
+    var lpMenuBtn = document.getElementById('lpMenuBtn');
+    if (lpMenuBtn) {
+        lpMenuBtn.addEventListener('click', function() {
+            document.getElementById('lpNavLinks').classList.toggle('open');
+        });
+    }
+    window.addEventListener('scroll', function() {
+        var nav = document.getElementById('lpNav');
+        if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
     // Check session on load
     const session = getSession();
     if (session && session.role === 'admin') {
         showHubAdmin(session.email);
     } else {
-        showLogin();
+        window.showLp();
     }
 })();

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O Tom das Notas — CRM</title>
+    <title>O Tom das Notas — Consultoria para Músicos</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/dXVPqQb/o-tom.png">
+    <link rel="stylesheet" href="css/lp.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/aluno.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -12,8 +13,195 @@
 </head>
 <body>
 
+    <!-- ====== LANDING PAGE ====== -->
+    <div id="lpView">
+    <!-- Nav -->
+    <nav class="lp-nav" id="lpNav">
+        <div class="lp-container lp-nav-inner">
+            <a href="#" class="lp-nav-brand" onclick="showLp();return false;">
+                <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas">
+            </a>
+            <div class="lp-nav-links" id="lpNavLinks">
+                <a href="#beneficios">Benefícios</a>
+                <a href="#como-funciona">Como Funciona</a>
+                <a href="#depoimentos">Depoimentos</a>
+                <a href="#inscricao" class="lp-nav-cta">Quero me inscrever</a>
+                <a href="#" class="lp-nav-login" onclick="showLoginScreen();return false;"><i class="fas fa-lock"></i> Área Restrita</a>
+            </div>
+            <button class="lp-menu-btn" id="lpMenuBtn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="lp-hero">
+        <div class="lp-container">
+            <div class="lp-hero-content">
+                <span class="lp-hero-badge">Consultoria Especializada</span>
+                <h1>Transforme seu<br>talento musical em<br><span class="lp-highlight">um negócio de verdade</span></h1>
+                <p>Estratégias comerciais, funil de vendas e presença digital para músicos, bandas, produtores e educadores que querem viver da música.</p>
+                <div class="lp-hero-actions">
+                    <a href="#inscricao" class="lp-btn lp-btn-primary"><i class="fas fa-rocket"></i> Quero começar</a>
+                    <a href="#como-funciona" class="lp-btn lp-btn-ghost"><i class="fas fa-play-circle"></i> Como funciona</a>
+                </div>
+                <div class="lp-hero-stats">
+                    <div class="lp-hero-stat"><strong>50+</strong><span>Músicos atendidos</span></div>
+                    <div class="lp-hero-stat"><strong>92%</strong><span>Taxa de satisfação</span></div>
+                    <div class="lp-hero-stat"><strong>3x</strong><span>Aumento médio de receita</span></div>
+                </div>
+            </div>
+            <div class="lp-hero-visual">
+                <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="lp-hero-logo">
+            </div>
+        </div>
+    </section>
+
+    <!-- Problema -->
+    <section class="lp-section lp-problem">
+        <div class="lp-container lp-text-center">
+            <h2>O problema que a maioria dos músicos enfrenta</h2>
+            <p class="lp-lead">Talento não falta. O que falta é uma estratégia comercial para transformar sua arte em renda sustentável.</p>
+            <div class="lp-problem-grid">
+                <div class="lp-problem-card">
+                    <div class="lp-problem-icon"><i class="fas fa-money-bill-wave"></i></div>
+                    <h4>Receita instável</h4>
+                    <p>Depender de cachês esporádicos e não saber como criar fontes de renda recorrentes.</p>
+                </div>
+                <div class="lp-problem-card">
+                    <div class="lp-problem-icon"><i class="fas fa-bullhorn"></i></div>
+                    <h4>Sem presença digital</h4>
+                    <p>Ter talento mas não saber se posicionar nas redes sociais para atrair oportunidades.</p>
+                </div>
+                <div class="lp-problem-card">
+                    <div class="lp-problem-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <h4>Não saber precificar</h4>
+                    <p>Cobrar menos do que deveria por shows, aulas e produções por falta de referência.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefícios -->
+    <section class="lp-section" id="beneficios">
+        <div class="lp-container">
+            <div class="lp-section-header lp-text-center">
+                <span class="lp-badge">O que você ganha</span>
+                <h2>Uma consultoria completa para sua carreira</h2>
+            </div>
+            <div class="lp-benefits-grid">
+                <div class="lp-benefit"><div class="lp-benefit-num">01</div><h4>Funil de Vendas Personalizado</h4><p>Estrutura comercial completa para atrair, qualificar e converter clientes para seus serviços musicais.</p></div>
+                <div class="lp-benefit"><div class="lp-benefit-num">02</div><h4>Estratégia de Social Selling</h4><p>Posicionamento no Instagram e LinkedIn para gerar autoridade e atrair oportunidades.</p></div>
+                <div class="lp-benefit"><div class="lp-benefit-num">03</div><h4>Plano de Ação com Acompanhamento</h4><p>Roadmap personalizado com etapas, prazos e conteúdos. Acompanhe seu progresso na plataforma.</p></div>
+                <div class="lp-benefit"><div class="lp-benefit-num">04</div><h4>Diversificação de Receita</h4><p>Monetize com shows, aulas, cursos online, streaming, merchandise e produções.</p></div>
+                <div class="lp-benefit"><div class="lp-benefit-num">05</div><h4>Mentoria Individual</h4><p>Encontros periódicos para tirar dúvidas, revisar metas e ajustar a estratégia.</p></div>
+                <div class="lp-benefit"><div class="lp-benefit-num">06</div><h4>Acesso à Plataforma</h4><p>Área do aluno exclusiva com plano de ação, agenda, chat direto e certificado.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Como Funciona -->
+    <section class="lp-section lp-how" id="como-funciona">
+        <div class="lp-container">
+            <div class="lp-section-header lp-text-center">
+                <span class="lp-badge">Passo a passo</span>
+                <h2>Como funciona a consultoria</h2>
+            </div>
+            <div class="lp-steps">
+                <div class="lp-step"><div class="lp-step-num">1</div><div class="lp-step-content"><h4>Inscrição</h4><p>Preencha o formulário com seus dados e conte sobre sua carreira musical.</p></div></div>
+                <div class="lp-step"><div class="lp-step-num">2</div><div class="lp-step-content"><h4>Diagnóstico Gratuito</h4><p>Agendamos uma conversa para entender sua situação e identificar oportunidades.</p></div></div>
+                <div class="lp-step"><div class="lp-step-num">3</div><div class="lp-step-content"><h4>Plano de Ação</h4><p>Montamos um roadmap personalizado com etapas claras para sua carreira.</p></div></div>
+                <div class="lp-step"><div class="lp-step-num">4</div><div class="lp-step-content"><h4>Execução e Acompanhamento</h4><p>Você executa com nosso suporte. Encontros periódicos, chat e conteúdos exclusivos.</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Depoimentos -->
+    <section class="lp-section" id="depoimentos">
+        <div class="lp-container">
+            <div class="lp-section-header lp-text-center">
+                <span class="lp-badge">Quem já participou</span>
+                <h2>O que dizem nossos alunos</h2>
+            </div>
+            <div class="lp-testimonials">
+                <div class="lp-testimonial">
+                    <div class="lp-testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p>"Em 3 meses de consultoria, lancei meu curso online e já captei 40 alunos."</p>
+                    <div class="lp-testimonial-author"><div class="lp-testimonial-avatar">M</div><div><strong>Maria Eduarda</strong><span>Professora de Piano</span></div></div>
+                </div>
+                <div class="lp-testimonial">
+                    <div class="lp-testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p>"Finalmente entendi como precificar meu cachê. Minha renda triplicou em 6 meses."</p>
+                    <div class="lp-testimonial-author"><div class="lp-testimonial-avatar">R</div><div><strong>Rafael Costa</strong><span>Baixista / Session Musician</span></div></div>
+                </div>
+                <div class="lp-testimonial">
+                    <div class="lp-testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+                    <p>"A estratégia de Instagram trouxe 3 contratos de produção no primeiro mês."</p>
+                    <div class="lp-testimonial-author"><div class="lp-testimonial-avatar">P</div><div><strong>Pedro Oliveira</strong><span>Produtor Musical</span></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Formulário -->
+    <section class="lp-section lp-form-section" id="inscricao">
+        <div class="lp-container">
+            <div class="lp-form-wrapper" id="lpFormWrapper">
+                <div class="lp-form-info">
+                    <span class="lp-badge">Vagas limitadas</span>
+                    <h2>Inscreva-se para a consultoria</h2>
+                    <p>Preencha o formulário e entraremos em contato para agendar seu diagnóstico gratuito.</p>
+                    <div class="lp-form-features">
+                        <div><i class="fas fa-check-circle"></i> Diagnóstico inicial gratuito</div>
+                        <div><i class="fas fa-check-circle"></i> Plano de ação personalizado</div>
+                        <div><i class="fas fa-check-circle"></i> Acesso à plataforma do aluno</div>
+                        <div><i class="fas fa-check-circle"></i> Suporte via chat direto</div>
+                    </div>
+                </div>
+                <form class="lp-form" id="lpForm">
+                    <div class="lp-form-group"><label>Nome completo *</label><input type="text" id="lpName" required placeholder="Seu nome"></div>
+                    <div class="lp-form-group"><label>E-mail *</label><input type="email" id="lpEmail" required placeholder="seu@email.com"></div>
+                    <div class="lp-form-group"><label>WhatsApp *</label><input type="tel" id="lpPhone" required placeholder="(11) 99999-9999"></div>
+                    <div class="lp-form-group"><label>Qual seu segmento? *</label>
+                        <select id="lpSegment" required>
+                            <option value="">Selecione...</option>
+                            <option value="instrumentista">Instrumentista</option>
+                            <option value="cantor">Cantor(a) / Vocalista</option>
+                            <option value="produtor">Produtor Musical</option>
+                            <option value="banda">Banda / Grupo</option>
+                            <option value="educador">Educador Musical</option>
+                            <option value="estudio">Estúdio / Gravadora</option>
+                        </select>
+                    </div>
+                    <div class="lp-form-group"><label>Instrumento / Área</label><input type="text" id="lpInstrument" placeholder="Ex: Guitarra, Vocal, Produção..."></div>
+                    <div class="lp-form-group lp-form-full"><label>Conte um pouco sobre sua situação atual</label><textarea id="lpMessage" rows="3" placeholder="O que você espera da consultoria?"></textarea></div>
+                    <button type="submit" class="lp-btn lp-btn-primary lp-btn-block"><i class="fas fa-paper-plane"></i> Enviar inscrição</button>
+                    <p class="lp-form-disclaimer">Ao enviar, você concorda em ser contatado pela equipe O Tom das Notas.</p>
+                </form>
+            </div>
+            <div class="lp-form-success" id="lpFormSuccess" style="display:none">
+                <div class="lp-success-icon"><i class="fas fa-check-circle"></i></div>
+                <h3>Inscrição enviada com sucesso!</h3>
+                <p>Obrigado pelo interesse. Entraremos em contato em breve para agendar seu diagnóstico gratuito.</p>
+                <button onclick="showLp()" class="lp-btn lp-btn-ghost">Voltar ao início</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="lp-footer">
+        <div class="lp-container lp-footer-inner">
+            <div class="lp-footer-brand"><img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas"><p>Gestão comercial para profissionais da música.</p></div>
+            <div class="lp-footer-links">
+                <a href="#" onclick="showLoginScreen();return false;">Área Restrita</a>
+                <a href="#beneficios">Benefícios</a>
+                <a href="#inscricao">Inscrição</a>
+            </div>
+        </div>
+        <div class="lp-container"><p class="lp-copyright">&copy; 2026 O Tom das Notas. Todos os direitos reservados.</p></div>
+    </footer>
+    </div>
+
     <!-- ====== LOGIN ====== -->
-    <div class="login-screen" id="loginScreen">
+    <div class="login-screen" id="loginScreen" style="display:none">
         <div class="login-card">
             <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="login-logo">
             <h2>Bem-vindo</h2>
@@ -60,6 +248,7 @@
             </div>
 
             <p class="login-hint">Demo: use qualquer e-mail e senha, ou clique em um perfil acima.</p>
+            <a href="#" class="aluno-back" onclick="showLp();return false;"><i class="fas fa-arrow-left"></i> Voltar ao site</a>
         </div>
     </div>
 
