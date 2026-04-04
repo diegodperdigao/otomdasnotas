@@ -1,0 +1,125 @@
+/* ========================================
+   Área do Aluno — O Tom das Notas
+   ======================================== */
+
+/* Login */
+.aluno-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px}
+.aluno-login-card{background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-lg);padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:var(--shadow-md)}
+.aluno-login-logo{width:160px;height:auto;mix-blend-mode:multiply;margin-bottom:24px}
+.aluno-login-card h2{font-size:1.4rem;font-weight:900;color:var(--zinc-900);margin-bottom:8px;text-transform:uppercase;letter-spacing:-.02em}
+.aluno-login-card p{font-size:.85rem;color:var(--zinc-500);margin-bottom:28px;line-height:1.6}
+.aluno-login-card select{width:100%;padding:12px 16px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.88rem;color:var(--zinc-900);outline:none;margin-bottom:16px;cursor:pointer}
+.aluno-login-card select:focus{border-color:var(--zinc-900)}
+.btn-block{width:100%;justify-content:center;padding:12px;font-size:.9rem}
+.aluno-back{display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:.82rem;color:var(--zinc-500);transition:color .15s}
+.aluno-back:hover{color:var(--zinc-900)}
+
+/* Portal */
+.aluno-portal{min-height:100vh;background:var(--bg);display:flex;flex-direction:column}
+
+/* Topbar */
+.aluno-topbar{height:64px;background:var(--white);border-bottom:1px solid var(--zinc-200);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
+.aluno-topbar-left{display:flex;align-items:center;gap:12px}
+.aluno-topbar-logo{width:32px;height:32px;object-fit:contain;mix-blend-mode:multiply}
+.aluno-topbar-title{font-family:var(--font-display);font-size:.9rem;font-weight:800;color:var(--zinc-900);text-transform:uppercase;letter-spacing:.04em}
+.aluno-topbar-right{display:flex;align-items:center;gap:14px}
+.aluno-user{display:flex;align-items:center;gap:10px}
+.aluno-avatar{width:36px;height:36px;border-radius:50%;background:var(--zinc-900);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;text-transform:uppercase}
+.aluno-name{font-size:.85rem;font-weight:700;color:var(--zinc-900)}
+
+/* Main */
+.aluno-main{flex:1;max-width:800px;width:100%;margin:0 auto;padding:32px 24px}
+
+/* Welcome */
+.aluno-welcome{display:flex;align-items:center;justify-content:space-between;gap:32px;background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-lg);padding:32px;margin-bottom:20px}
+.aluno-welcome-text{flex:1}
+.aluno-welcome-text h1{font-size:1.5rem;font-weight:900;color:var(--zinc-900);margin-bottom:6px}
+.aluno-plan-title{font-size:1rem;font-weight:700;color:var(--zinc-700);margin-bottom:4px}
+.aluno-plan-obj{font-size:.84rem;color:var(--zinc-500);line-height:1.6}
+
+/* Progress Ring */
+.aluno-progress-ring{position:relative;width:120px;height:120px;flex-shrink:0}
+.aluno-progress-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--zinc-100);stroke-width:10}
+.ring-fill{fill:none;stroke:var(--zinc-900);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-value{font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--zinc-900)}
+.ring-text{font-size:.6rem;font-weight:700;color:var(--zinc-500);text-transform:uppercase;letter-spacing:.1em}
+
+/* Stats */
+.aluno-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.aluno-stat{background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius);padding:18px 16px;text-align:center}
+.aluno-stat-value{display:block;font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:var(--zinc-900)}
+.aluno-stat-label{font-size:.68rem;font-weight:700;color:var(--zinc-500);text-transform:uppercase;letter-spacing:.08em}
+
+/* Plan Section */
+.aluno-plan-section{background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-lg);padding:28px;margin-bottom:20px}
+.aluno-plan-section h2{font-size:.85rem;font-weight:800;color:var(--zinc-900);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px;margin-bottom:24px}
+.aluno-plan-section h2 i{color:var(--zinc-500)}
+
+/* Steps */
+.aluno-steps{display:flex;flex-direction:column;gap:0}
+.aluno-step{display:flex;align-items:flex-start;gap:16px;padding:16px 0;border-bottom:1px solid var(--zinc-100);position:relative}
+.aluno-step:last-child{border-bottom:none}
+
+/* Step timeline dot */
+.step-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--zinc-300);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;background:var(--white);margin-top:2px}
+.step-check:hover{border-color:var(--zinc-900);background:var(--zinc-50)}
+.step-check i{display:none;font-size:.7rem;color:var(--white)}
+.aluno-step.done .step-check{background:var(--emerald-700);border-color:var(--emerald-700)}
+.aluno-step.done .step-check i{display:block}
+
+.step-content{flex:1;min-width:0}
+.step-title{font-size:.9rem;font-weight:700;color:var(--zinc-900);margin-bottom:3px;transition:all .2s}
+.aluno-step.done .step-title{color:var(--zinc-400);text-decoration:line-through}
+.step-meta{font-size:.72rem;color:var(--zinc-500);display:flex;align-items:center;gap:12px}
+.step-meta i{font-size:.65rem}
+.step-number{font-size:.6rem;font-weight:800;color:var(--zinc-400);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+
+/* No plan */
+.aluno-no-plan{text-align:center;padding:60px 20px}
+.aluno-no-plan-icon{width:80px;height:80px;border-radius:50%;background:var(--zinc-100);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;color:var(--zinc-300)}
+.aluno-no-plan h3{font-size:1.1rem;font-weight:800;color:var(--zinc-900);margin-bottom:8px}
+.aluno-no-plan p{font-size:.88rem;color:var(--zinc-500);max-width:360px;margin:0 auto;line-height:1.6}
+
+/* ========== Plans Grid (CRM side) ========== */
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.plan-card{background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-lg);padding:24px;transition:all .2s;cursor:pointer}
+.plan-card:hover{border-color:var(--zinc-400);box-shadow:var(--shadow-md)}
+.plan-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.plan-card-client{display:flex;align-items:center;gap:10px}
+.plan-card-avatar{width:36px;height:36px;border-radius:50%;background:var(--zinc-900);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:900;text-transform:uppercase}
+.plan-card-name{font-size:.9rem;font-weight:800;color:var(--zinc-900)}
+.plan-card-segment{font-size:.72rem;color:var(--zinc-500)}
+.plan-card-actions button{background:none;border:none;color:var(--zinc-400);cursor:pointer;padding:4px;font-size:.85rem;transition:color .15s}
+.plan-card-actions button:hover{color:var(--zinc-900)}
+.plan-card-title{font-size:.95rem;font-weight:700;color:var(--zinc-700);margin-bottom:8px}
+.plan-card-progress{display:flex;align-items:center;gap:10px}
+.plan-card-progress .progress-bar{flex:1;height:6px}
+.plan-card-pct{font-size:.78rem;font-weight:900;color:var(--zinc-900)}
+.plan-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--zinc-100);font-size:.72rem;color:var(--zinc-500)}
+.plan-card-footer span{display:flex;align-items:center;gap:4px}
+.plan-card-footer i{font-size:.65rem}
+
+/* Plan step editor */
+.plan-steps-editor{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.plan-step-row{display:flex;gap:8px;align-items:center}
+.plan-step-input{flex:1;padding:9px 12px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.84rem;color:var(--zinc-900);outline:none}
+.plan-step-input:focus{border-color:var(--zinc-900)}
+.plan-step-days{width:70px;padding:9px 10px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.84rem;color:var(--zinc-900);outline:none;text-align:center}
+.plan-step-days:focus{border-color:var(--zinc-900)}
+.btn-icon{background:none;border:none;color:var(--zinc-400);cursor:pointer;padding:6px;font-size:.82rem;transition:color .15s}
+.btn-icon:hover{color:var(--rose-700)}
+.btn-sm{font-size:.76rem;padding:7px 14px}
+
+/* Hub highlight card */
+.hub-card-highlight{grid-column:1/-1}
+.hub-card-highlight .icon-student{background:var(--emerald-700)}
+
+@media(max-width:768px){
+    .aluno-welcome{flex-direction:column;text-align:center}
+    .aluno-stats{grid-template-columns:1fr}
+    .aluno-login-card{padding:32px 24px}
+    .aluno-login-logo{width:120px}
+    .plans-grid{grid-template-columns:1fr}
+}

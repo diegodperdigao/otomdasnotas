@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Aluno — O Tom das Notas</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/dXVPqQb/o-tom.png">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/aluno.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <!-- Login / Select Client -->
+    <div class="aluno-login" id="alunoLogin">
+        <div class="aluno-login-card">
+            <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="aluno-login-logo">
+            <h2>Área do Aluno</h2>
+            <p>Selecione seu nome para acessar seu plano de ação personalizado.</p>
+            <select id="alunoSelect">
+                <option value="">Selecione seu perfil...</option>
+            </select>
+            <button class="btn btn-primary btn-block" id="btnAlunoEnter"><i class="fas fa-arrow-right"></i> Acessar</button>
+            <a href="index.html" class="aluno-back"><i class="fas fa-arrow-left"></i> Voltar ao Menu Principal</a>
+        </div>
+    </div>
+
+    <!-- Student Portal -->
+    <div class="aluno-portal" id="alunoPortal" style="display:none;">
+        <!-- Top Bar -->
+        <header class="aluno-topbar">
+            <div class="aluno-topbar-left">
+                <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom" class="aluno-topbar-logo">
+                <span class="aluno-topbar-title">Área do Aluno</span>
+            </div>
+            <div class="aluno-topbar-right">
+                <div class="aluno-user" id="alunoUser">
+                    <div class="aluno-avatar" id="alunoAvatar">?</div>
+                    <span class="aluno-name" id="alunoName">—</span>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btnAlunoLogout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </header>
+
+        <main class="aluno-main">
+            <!-- Welcome + Progress -->
+            <div class="aluno-welcome" id="alunoWelcome">
+                <div class="aluno-welcome-text">
+                    <h1 id="alunoGreeting">Olá!</h1>
+                    <p id="alunoPlanTitle" class="aluno-plan-title">—</p>
+                    <p id="alunoPlanObjective" class="aluno-plan-obj">—</p>
+                </div>
+                <div class="aluno-progress-ring" id="alunoProgressRing">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="ring-bg" cx="60" cy="60" r="52" />
+                        <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52" stroke-dasharray="327" stroke-dashoffset="327" />
+                    </svg>
+                    <div class="ring-label">
+                        <span class="ring-value" id="ringValue">0%</span>
+                        <span class="ring-text">concluído</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="aluno-stats">
+                <div class="aluno-stat">
+                    <span class="aluno-stat-value" id="statTotal">0</span>
+                    <span class="aluno-stat-label">Total de Etapas</span>
+                </div>
+                <div class="aluno-stat">
+                    <span class="aluno-stat-value" id="statDone">0</span>
+                    <span class="aluno-stat-label">Concluídas</span>
+                </div>
+                <div class="aluno-stat">
+                    <span class="aluno-stat-value" id="statPending">0</span>
+                    <span class="aluno-stat-label">Pendentes</span>
+                </div>
+            </div>
+
+            <!-- Action Plan Steps -->
+            <div class="aluno-plan-section">
+                <h2><i class="fas fa-route"></i> Seu Plano de Ação</h2>
+                <div class="aluno-steps" id="alunoSteps">
+                    <p class="empty-state">Nenhum plano de ação encontrado.</p>
+                </div>
+            </div>
+
+            <!-- No Plan State -->
+            <div class="aluno-no-plan" id="alunoNoPlan" style="display:none;">
+                <div class="aluno-no-plan-icon"><i class="fas fa-clipboard-list"></i></div>
+                <h3>Nenhum plano cadastrado ainda</h3>
+                <p>Seu consultor irá criar um plano de ação personalizado para você. Aguarde!</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/aluno.js"></script>
+</body>
+</html>

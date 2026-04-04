@@ -6,6 +6,7 @@
     <title>O Tom das Notas — CRM</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/dXVPqQb/o-tom.png">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/aluno.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -18,7 +19,7 @@
                 <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="hub-logo">
             </div>
             <p class="hub-tagline">Gestão comercial para profissionais da música</p>
-            <div class="hub-grid">
+            <div class="hub-grid hub-grid-5">
                 <a href="#" class="hub-card" data-section="dashboard">
                     <div class="hub-card-icon"><i class="fas fa-chart-bar"></i></div>
                     <h3>Painel Geral</h3>
@@ -38,6 +39,11 @@
                     <div class="hub-card-icon"><i class="fas fa-info-circle"></i></div>
                     <h3>Sobre</h3>
                     <p>Conheça a ferramenta e seus recursos</p>
+                </a>
+                <a href="aluno.html" class="hub-card hub-card-highlight">
+                    <div class="hub-card-icon icon-student"><i class="fas fa-graduation-cap"></i></div>
+                    <h3>Área do Aluno</h3>
+                    <p>Portal do cliente com plano de ação e progresso</p>
                 </a>
             </div>
         </div>
@@ -67,6 +73,9 @@
                 </a>
                 <a href="#" class="nav-item" data-section="leads">
                     <i class="fas fa-address-book"></i><span>Contatos</span>
+                </a>
+                <a href="#" class="nav-item" data-section="planos">
+                    <i class="fas fa-clipboard-list"></i><span>Planos de Ação</span>
                 </a>
                 <a href="#" class="nav-item" data-section="about">
                     <i class="fas fa-info-circle"></i><span>Sobre</span>
@@ -278,6 +287,58 @@
                     </table>
                 </div>
             </section>
+
+            <!-- Planos de Ação (Consultant side) -->
+            <section class="section" id="section-planos">
+                <div class="section-header">
+                    <div>
+                        <h1 class="section-title">Planos de Ação</h1>
+                        <p class="section-subtitle">Crie e gerencie roadmaps para seus clientes</p>
+                    </div>
+                    <button class="btn btn-primary" id="btnNewPlan"><i class="fas fa-plus"></i><span>Novo Plano</span></button>
+                </div>
+                <div class="plans-grid" id="plansGrid">
+                    <p class="empty-state">Nenhum plano criado. Clique em "Novo Plano" para começar.</p>
+                </div>
+            </section>
+
+            <!-- Modal: Novo Plano -->
+            <div class="modal-overlay" id="modalPlanOverlay">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 id="planModalTitle"><i class="fas fa-clipboard-list"></i> Novo Plano de Ação</h3>
+                        <button class="modal-close" id="planModalClose">&times;</button>
+                    </div>
+                    <form id="planForm">
+                        <div class="form-grid">
+                            <div class="form-group"><label>Cliente (Lead) *</label>
+                                <select id="planClient" required><option value="">Selecione um lead...</option></select>
+                            </div>
+                            <div class="form-group"><label>Título do Plano *</label>
+                                <input type="text" id="planTitle" required placeholder="Ex: Profissionalização Digital">
+                            </div>
+                        </div>
+                        <div class="form-group full"><label>Objetivo do Plano</label>
+                            <textarea id="planObjective" rows="2" placeholder="O que o cliente vai alcançar com este plano..."></textarea>
+                        </div>
+                        <div class="form-group full">
+                            <label>Etapas do Plano de Ação</label>
+                            <div class="plan-steps-editor" id="planStepsEditor">
+                                <div class="plan-step-row">
+                                    <input type="text" class="plan-step-input" placeholder="Descrição da etapa..." required>
+                                    <input type="number" class="plan-step-days" placeholder="Dias" min="1" value="7" title="Prazo em dias">
+                                    <button type="button" class="btn-icon btn-remove-step" title="Remover"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" id="btnAddStep"><i class="fas fa-plus"></i> Adicionar Etapa</button>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="btnCancelPlan">Cancelar</button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Salvar Plano</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
             <!-- About -->
             <section class="section" id="section-about">

@@ -48,7 +48,7 @@
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
     const sections = document.querySelectorAll('.section');
 
-    const titles = { dashboard:'Painel Geral', pipeline:'Pipeline de Vendas', leads:'Base de Contatos', about:'Sobre' };
+    const titles = { dashboard:'Painel Geral', pipeline:'Pipeline de Vendas', leads:'Base de Contatos', planos:'Planos de Ação', about:'Sobre' };
 
     function showHub() { app.style.display = 'none'; hub.style.display = 'flex'; }
     function showApp(sec) { hub.style.display = 'none'; app.style.display = 'flex'; switchSection(sec || 'dashboard'); }
@@ -220,8 +220,109 @@
         e.target.value = v;
     });
 
+    // ========== PLANS (Action Plans for clients) ==========
+    const PLANS_KEY = 'otomdasnotas_plans';
+    let plans = load(PLANS_KEY) || [];
+    function savePlans() { save(PLANS_KEY, plans); }
+    let editingPlanId = null;
+
+    const planOverlay = document.getElementById('modalPlanOverlay');
+    const planForm = document.getElementById('planForm');
+    const planModalTitle = document.getElementById('planModalTitle');
+    const planStepsEditor = document.getElementById('planStepsEditor');
+
+    function openPlanModal(plan) {
+        editingPlanId = plan ? plan.id : null;
+        planModalTitle.innerHTML = plan ? '<i class="fas fa-edit"></i> Editar Plano' : '<i class="fas fa-clipboard-list"></i> Novo Plano de Ação';
+
+        // Populate client select
+        const sel = document.getElementById('planClient');
+        sel.innerHTML = '<option value="">Selecione um lead...</option>' + leads.map(l => '<option value="' + l.id + '"' + (plan && plan.clientId === l.id ? ' selected' : '') + '>' + esc(l.name) + ' — ' + (SEGMENT_LABELS[l.segment]||'') + '</option>').join('');
+
+        document.getElementById('planTitle').value = plan ? plan.title : '';
+        document.getElementById('planObjective').value = plan ? plan.objective : '';
+
+        // Steps
+        planStepsEditor.innerHTML = '';
+        const steps = plan ? plan.steps : [{ text: '', days: 7 }];
+        steps.forEach(s => addStepRow(s.text, s.days));
+
+        planOverlay.classList.add('active');
+    }
+    function closePlanModal() { planOverlay.classList.remove('active'); editingPlanId = null; planForm.reset(); }
+
+    function addStepRow(text, days) {
+        const row = document.createElement('div');
+        row.className = 'plan-step-row';
+        row.innerHTML = '<input type="text" class="plan-step-input" placeholder="Descrição da etapa..." value="' + esc(text||'') + '" required>' +
+            '<input type="number" class="plan-step-days" placeholder="Dias" min="1" value="' + (days||7) + '" title="Prazo em dias">' +
+            '<button type="button" class="btn-icon btn-remove-step" title="Remover"><i class="fas fa-times"></i></button>';
+        row.querySelector('.btn-remove-step').addEventListener('click', () => {
+            if (planStepsEditor.children.length > 1) row.remove();
+        });
+        planStepsEditor.appendChild(row);
+    }
+
+    document.getElementById('btnAddStep').addEventListener('click', () => addStepRow('', 7));
+    document.getElementById('btnNewPlan').addEventListener('click', () => openPlanModal(null));
+    document.getElementById('planModalClose').addEventListener('click', closePlanModal);
+    document.getElementById('btnCancelPlan').addEventListener('click', closePlanModal);
+    planOverlay.addEventListener('click', (e) => { if (e.target === planOverlay) closePlanModal(); });
+
+    planForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const clientId = document.getElementById('planClient').value;
+        const title = document.getElementById('planTitle').value.trim();
+        const objective = document.getElementById('planObjective').value.trim();
+        const stepRows = planStepsEditor.querySelectorAll('.plan-step-row');
+        const steps = Array.from(stepRows).map(row => ({
+            text: row.querySelector('.plan-step-input').value.trim(),
+            days: parseInt(row.querySelector('.plan-step-days').value) || 7,
+            done: false
+        })).filter(s => s.text);
+
+        if (!clientId || !title || steps.length === 0) return;
+
+        if (editingPlanId) {
+            const i = plans.findIndex(p => p.id === editingPlanId);
+            if (i !== -1) {
+                // Preserve done status of existing steps
+                const oldSteps = plans[i].steps;
+                steps.forEach((s, idx) => { if (oldSteps[idx]) s.done = oldSteps[idx].done; });
+                plans[i] = { ...plans[i], clientId, title, objective, steps, updatedAt: new Date().toISOString() };
+            }
+        } else {
+            plans.push({ id: genId(), clientId, title, objective, steps, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+        }
+        savePlans(); closePlanModal(); renderPlans();
+    });
+
+    window._editPlan = id => { const p = plans.find(x => x.id === id); if (p) openPlanModal(p); };
+    window._delPlan = id => { const p = plans.find(x => x.id === id); if (p && confirm('Excluir este plano?')) { plans = plans.filter(x => x.id !== id); savePlans(); renderPlans(); } };
+
+    function renderPlans() {
+        const grid = document.getElementById('plansGrid');
+        if (plans.length === 0) { grid.innerHTML = '<p class="empty-state">Nenhum plano criado. Clique em "Novo Plano" para começar.</p>'; return; }
+
+        grid.innerHTML = plans.map(p => {
+            const client = leads.find(l => l.id === p.clientId);
+            const name = client ? client.name : 'Cliente removido';
+            const seg = client ? (SEGMENT_LABELS[client.segment] || '') : '';
+            const initial = name.charAt(0);
+            const done = p.steps.filter(s => s.done).length;
+            const total = p.steps.length;
+            const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+            return '<div class="plan-card">' +
+                '<div class="plan-card-top"><div class="plan-card-client"><div class="plan-card-avatar">' + initial + '</div><div><div class="plan-card-name">' + esc(name) + '</div><div class="plan-card-segment">' + seg + '</div></div></div>' +
+                '<div class="plan-card-actions"><button onclick="window._editPlan(\'' + p.id + '\')" title="Editar"><i class="fas fa-edit"></i></button><button onclick="window._delPlan(\'' + p.id + '\')" title="Excluir"><i class="fas fa-trash"></i></button></div></div>' +
+                '<div class="plan-card-title">' + esc(p.title) + '</div>' +
+                '<div class="plan-card-progress"><div class="progress-bar"><div class="progress-fill ok" style="width:' + pct + '%"></div></div><span class="plan-card-pct">' + pct + '%</span></div>' +
+                '<div class="plan-card-footer"><span><i class="fas fa-list-check"></i> ' + done + '/' + total + ' etapas</span><span><i class="fas fa-calendar"></i> ' + new Date(p.createdAt).toLocaleDateString('pt-BR') + '</span></div></div>';
+        }).join('');
+    }
+
     // ========== RENDER ALL ==========
-    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); }
+    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); renderPlans(); }
 
     function renderKPIs() {
         const total = leads.length;
@@ -374,7 +475,33 @@
         saveLeads();
     }
 
+    // Seed plans
+    function seedPlans() {
+        if (plans.length > 0) return;
+        // Find Maria Eduarda (fechamento) to give her a plan
+        const maria = leads.find(l => l.name.includes('Maria Eduarda'));
+        if (!maria) return;
+        plans.push({
+            id: genId(), clientId: maria.id,
+            title: 'Profissionalização Digital — Curso Online',
+            objective: 'Transformar aulas particulares de piano em um curso online escalável com funil de captação de alunos.',
+            steps: [
+                { text: 'Definir nicho e público-alvo do curso', days: 3, done: true },
+                { text: 'Criar perfil profissional no Instagram', days: 5, done: true },
+                { text: 'Gravar 3 aulas piloto para validação', days: 14, done: true },
+                { text: 'Montar página de vendas com depoimentos', days: 7, done: false },
+                { text: 'Configurar funil de e-mail marketing', days: 5, done: false },
+                { text: 'Lançar campanha de captação de alunos', days: 7, done: false },
+                { text: 'Analisar métricas e otimizar conversão', days: 10, done: false },
+            ],
+            createdAt: new Date(Date.now() - 10 * 86400000).toISOString(),
+            updatedAt: new Date().toISOString()
+        });
+        savePlans();
+    }
+
     // ========== INIT ==========
     seed();
+    seedPlans();
     renderAll();
 })();
