@@ -1,5 +1,6 @@
 // ========================================
-// O Tom das Notas - CRM Music Business
+// O Tom das Notas — CRM Music Business
+// Gestão Comercial para Economia Criativa
 // ========================================
 
 (function () {
@@ -21,20 +22,20 @@
 
     const SEGMENT_LABELS = {
         instrumentista: 'Instrumentista',
-        cantor: 'Cantor(a)',
+        cantor: 'Cantor(a) / Vocalista',
         produtor: 'Produtor Musical',
-        banda: 'Banda',
+        banda: 'Banda / Grupo',
         educador: 'Educador Musical',
-        estudio: 'Estúdio'
+        estudio: 'Estúdio / Gravadora'
     };
 
     const SEGMENT_COLORS = {
-        instrumentista: '#6C5CE7',
-        cantor: '#E84393',
-        produtor: '#0984E3',
-        banda: '#00B894',
-        educador: '#F39C12',
-        estudio: '#E17055'
+        instrumentista: '#1A1A1A',
+        cantor: '#404040',
+        produtor: '#666666',
+        banda: '#888888',
+        educador: '#AAAAAA',
+        estudio: '#555555'
     };
 
     const SOURCE_ICONS = {
@@ -42,7 +43,7 @@
         linkedin: 'fab fa-linkedin',
         indicacao: 'fas fa-user-friends',
         site: 'fas fa-globe',
-        evento: 'fas fa-calendar',
+        evento: 'fas fa-calendar-alt',
         outro: 'fas fa-ellipsis-h'
     };
 
@@ -51,9 +52,12 @@
         linkedin: 'LinkedIn',
         indicacao: 'Indicação',
         site: 'Site',
-        evento: 'Evento',
+        evento: 'Evento / Show',
         outro: 'Outro'
     };
+
+    // Social selling sources (for KPI)
+    const SOCIAL_SOURCES = ['instagram', 'linkedin'];
 
     // ========== STATE ==========
     let leads = loadLeads();
@@ -85,12 +89,12 @@
         localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activities));
     }
 
-    function addActivity(text, icon, color) {
+    function addActivity(text, icon, type) {
         activities.unshift({
             id: Date.now(),
             text,
             icon: icon || 'fas fa-info-circle',
-            color: color || '#6C5CE7',
+            type: type || 'system',
             time: new Date().toISOString()
         });
         if (activities.length > 50) activities = activities.slice(0, 50);
@@ -140,7 +144,6 @@
         sidebar.classList.toggle('open');
     });
 
-    // Close sidebar on outside click (mobile)
     document.addEventListener('click', (e) => {
         if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
             sidebar.classList.remove('open');
@@ -185,7 +188,7 @@
 
     function openDetailModal(lead) {
         viewingLeadId = lead.id;
-        document.getElementById('detailTitle').innerHTML = `<i class="fas fa-user"></i> ${lead.name}`;
+        document.getElementById('detailTitle').innerHTML = `<i class="fas fa-user"></i> ${escapeHtml(lead.name)}`;
 
         const content = document.getElementById('detailContent');
         content.innerHTML = `
@@ -195,11 +198,11 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">E-mail</span>
-                <span class="detail-value">${lead.email || '—'}</span>
+                <span class="detail-value">${escapeHtml(lead.email) || '—'}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Telefone</span>
-                <span class="detail-value">${lead.phone || '—'}</span>
+                <span class="detail-value">${escapeHtml(lead.phone) || '—'}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Etapa</span>
@@ -215,11 +218,11 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">Instrumento</span>
-                <span class="detail-value">${lead.instrument || '—'}</span>
+                <span class="detail-value">${escapeHtml(lead.instrument) || '—'}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Observações</span>
-                <span class="detail-value">${lead.notes || '—'}</span>
+                <span class="detail-value">${escapeHtml(lead.notes) || '—'}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Criado em</span>
@@ -227,7 +230,6 @@
             </div>
         `;
 
-        // Show/hide advance button based on stage
         const advanceBtn = document.getElementById('btnAdvanceLead');
         const stageIndex = STAGES.indexOf(lead.stage);
         advanceBtn.style.display = stageIndex < STAGES.length - 1 ? '' : 'none';
@@ -273,7 +275,7 @@
             const index = leads.findIndex(l => l.id === editingLeadId);
             if (index !== -1) {
                 leads[index] = { ...leads[index], ...leadData, updatedAt: new Date().toISOString() };
-                addActivity(`<strong>${leadData.name}</strong> foi atualizado`, 'fas fa-edit', '#F39C12');
+                addActivity(`<strong>${escapeHtml(leadData.name)}</strong> foi atualizado`, 'fas fa-edit', 'edit');
             }
         } else {
             const newLead = {
@@ -283,7 +285,7 @@
                 updatedAt: new Date().toISOString()
             };
             leads.push(newLead);
-            addActivity(`<strong>${leadData.name}</strong> adicionado em <strong>${STAGE_LABELS[leadData.stage]}</strong>`, 'fas fa-user-plus', '#6C5CE7');
+            addActivity(`<strong>${escapeHtml(leadData.name)}</strong> adicionado em <strong>${STAGE_LABELS[leadData.stage]}</strong>`, 'fas fa-user-plus', 'new');
         }
 
         saveLeads();
@@ -305,7 +307,7 @@
         if (lead && confirm(`Deseja realmente excluir "${lead.name}"?`)) {
             leads = leads.filter(l => l.id !== viewingLeadId);
             saveLeads();
-            addActivity(`<strong>${lead.name}</strong> foi removido`, 'fas fa-trash', '#E17055');
+            addActivity(`<strong>${escapeHtml(lead.name)}</strong> foi removido`, 'fas fa-trash', 'delete');
             closeDetailModal();
             renderAll();
         }
@@ -321,9 +323,9 @@
                 lead.updatedAt = new Date().toISOString();
                 saveLeads();
                 addActivity(
-                    `<strong>${lead.name}</strong> avançou de <strong>${oldStage}</strong> para <strong>${STAGE_LABELS[lead.stage]}</strong>`,
+                    `<strong>${escapeHtml(lead.name)}</strong> avançou de <strong>${oldStage}</strong> para <strong>${STAGE_LABELS[lead.stage]}</strong>`,
                     'fas fa-arrow-right',
-                    '#00B894'
+                    'advance'
                 );
                 closeDetailModal();
                 renderAll();
@@ -348,15 +350,18 @@
         const conversions = leads.filter(l => l.stage === 'fechamento').length;
         const rate = total > 0 ? Math.round((conversions / total) * 100) : 0;
         const revenue = leads.filter(l => l.stage === 'fechamento').reduce((sum, l) => sum + (l.value || 0), 0);
+        const socialSelling = leads.filter(l => SOCIAL_SOURCES.includes(l.source)).length;
 
         animateValue('kpiTotalLeads', total);
         animateValue('kpiConversions', conversions);
         document.getElementById('kpiConversionRate').textContent = rate + '%';
         document.getElementById('kpiRevenue').textContent = formatCurrency(revenue);
+        animateValue('kpiSocialSelling', socialSelling);
     }
 
     function animateValue(elementId, target) {
         const el = document.getElementById(elementId);
+        if (!el) return;
         const current = parseInt(el.textContent) || 0;
         if (current === target) return;
 
@@ -366,7 +371,7 @@
             start += step;
             el.textContent = start;
             if (start === target) clearInterval(interval);
-        }, 50);
+        }, 40);
     }
 
     function renderFunnel() {
@@ -396,9 +401,17 @@
             return;
         }
 
+        const typeClass = {
+            'new': 'act-new',
+            'advance': 'act-advance',
+            'edit': 'act-edit',
+            'delete': 'act-delete',
+            'system': 'act-system'
+        };
+
         list.innerHTML = activities.slice(0, 10).map(a => `
             <div class="activity-item">
-                <div class="activity-icon" style="background: ${a.color}">
+                <div class="activity-icon ${typeClass[a.type] || typeClass[a.color ? '' : 'system'] || 'act-system'}">
                     <i class="${a.icon}"></i>
                 </div>
                 <span class="activity-text">${a.text}</span>
@@ -415,19 +428,26 @@
         });
 
         const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+        const maxSegment = entries.length > 0 ? entries[0][1] : 1;
 
         if (entries.length === 0) {
             chart.innerHTML = '<p class="empty-state">Sem dados de segmento.</p>';
             return;
         }
 
-        chart.innerHTML = entries.map(([segment, count]) => `
-            <div class="segment-item">
-                <div class="segment-color" style="background: ${SEGMENT_COLORS[segment] || '#666'}"></div>
-                <span class="segment-name">${SEGMENT_LABELS[segment] || segment}</span>
-                <span class="segment-value">${count}</span>
-            </div>
-        `).join('');
+        chart.innerHTML = entries.map(([segment, count]) => {
+            const pct = Math.round((count / maxSegment) * 100);
+            return `
+                <div class="segment-item">
+                    <div class="segment-color" style="background: ${SEGMENT_COLORS[segment] || '#666'}"></div>
+                    <span class="segment-name">${SEGMENT_LABELS[segment] || segment}</span>
+                    <div class="segment-bar-bg">
+                        <div class="segment-bar-fill" style="width: ${pct}%"></div>
+                    </div>
+                    <span class="segment-value">${count}</span>
+                </div>
+            `;
+        }).join('');
     }
 
     function renderGoals() {
@@ -443,6 +463,7 @@
     function updateGoal(prefix, current, target) {
         const text = document.getElementById(prefix + 'Text');
         const bar = document.getElementById(prefix + 'Bar');
+        if (!text || !bar) return;
         const pct = Math.min(Math.round((current / target) * 100), 100);
         text.textContent = `${current}/${target}`;
         bar.style.width = pct + '%';
@@ -457,7 +478,7 @@
             count.textContent = stageLeads.length;
 
             if (stageLeads.length === 0) {
-                container.innerHTML = '<p class="empty-state" style="padding: 20px 0;">Nenhum lead</p>';
+                container.innerHTML = '<p class="empty-state" style="padding: 24px 0; font-size: 0.78rem;">Nenhum lead nesta etapa</p>';
                 return;
             }
 
@@ -477,9 +498,10 @@
                             ${SOURCE_LABELS[lead.source] || lead.source}
                         </span>
                         <div class="lead-card-actions">
+                            ${STAGES.indexOf(lead.stage) < STAGES.length - 1 ? `
                             <button onclick="event.stopPropagation(); window._advanceLead('${lead.id}')" title="Avançar etapa">
                                 <i class="fas fa-arrow-right"></i>
-                            </button>
+                            </button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -494,14 +516,19 @@
         const filterStage = document.getElementById('filterStage').value;
 
         let filtered = leads.filter(l => {
-            if (searchTerm && !l.name.toLowerCase().includes(searchTerm) && !(l.email || '').toLowerCase().includes(searchTerm)) return false;
+            if (searchTerm) {
+                const match = l.name.toLowerCase().includes(searchTerm)
+                    || (l.email || '').toLowerCase().includes(searchTerm)
+                    || (l.instrument || '').toLowerCase().includes(searchTerm);
+                if (!match) return false;
+            }
             if (filterSegment && l.segment !== filterSegment) return false;
             if (filterStage && l.stage !== filterStage) return false;
             return true;
         });
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr class="empty-row"><td colspan="6">${leads.length === 0 ? 'Nenhum lead cadastrado. Clique em "Novo Lead" para começar.' : 'Nenhum lead encontrado com os filtros atuais.'}</td></tr>`;
+            tbody.innerHTML = `<tr class="empty-row"><td colspan="7">${leads.length === 0 ? 'Nenhum lead cadastrado. Clique em "Novo Lead" para iniciar a prospecção.' : 'Nenhum lead encontrado com os filtros atuais.'}</td></tr>`;
             return;
         }
 
@@ -509,9 +536,10 @@
             <tr>
                 <td><strong>${escapeHtml(lead.name)}</strong></td>
                 <td>${SEGMENT_LABELS[lead.segment] || lead.segment}</td>
-                <td>${lead.email || lead.phone || '—'}</td>
+                <td>${escapeHtml(lead.email || lead.phone) || '—'}</td>
                 <td><span class="stage-badge ${lead.stage}">${STAGE_LABELS[lead.stage]}</span></td>
                 <td>${lead.value ? formatCurrency(lead.value) : '—'}</td>
+                <td><i class="${SOURCE_ICONS[lead.source] || ''}" style="margin-right:4px;opacity:0.6"></i>${SOURCE_LABELS[lead.source] || lead.source}</td>
                 <td>
                     <div class="table-actions">
                         <button onclick="window._openDetail('${lead.id}')" title="Ver detalhes"><i class="fas fa-eye"></i></button>
@@ -539,7 +567,7 @@
         if (lead && confirm(`Deseja realmente excluir "${lead.name}"?`)) {
             leads = leads.filter(l => l.id !== id);
             saveLeads();
-            addActivity(`<strong>${lead.name}</strong> foi removido`, 'fas fa-trash', '#E17055');
+            addActivity(`<strong>${escapeHtml(lead.name)}</strong> foi removido`, 'fas fa-trash', 'delete');
             renderAll();
         }
     };
@@ -554,9 +582,9 @@
                 lead.updatedAt = new Date().toISOString();
                 saveLeads();
                 addActivity(
-                    `<strong>${lead.name}</strong> avançou de <strong>${oldStage}</strong> para <strong>${STAGE_LABELS[lead.stage]}</strong>`,
+                    `<strong>${escapeHtml(lead.name)}</strong> avançou de <strong>${oldStage}</strong> para <strong>${STAGE_LABELS[lead.stage]}</strong>`,
                     'fas fa-arrow-right',
-                    '#00B894'
+                    'advance'
                 );
                 renderAll();
             }
@@ -596,6 +624,7 @@
     }
 
     function escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
@@ -615,36 +644,46 @@
         e.target.value = v;
     });
 
-    // ========== SEED DATA (for demo) ==========
+    // ========== SEED DATA ==========
     function seedDemoData() {
         if (leads.length > 0) return;
 
         const demoLeads = [
-            { name: 'Lucas Mendes', email: 'lucas@email.com', phone: '(11) 98765-4321', segment: 'instrumentista', stage: 'prospeccao', value: 1500, source: 'instagram', instrument: 'Guitarra', notes: 'Guitarrista profissional buscando aumentar presença digital.' },
-            { name: 'Ana Clara Souza', email: 'anaclara@email.com', phone: '(21) 99876-5432', segment: 'cantor', stage: 'qualificacao', value: 2500, source: 'linkedin', instrument: 'Vocal / MPB', notes: 'Cantora com 50k seguidores, quer monetizar shows.' },
-            { name: 'Banda Frequência', email: 'contato@frequencia.com', phone: '(31) 97654-3210', segment: 'banda', stage: 'proposta', value: 5000, source: 'indicacao', instrument: 'Rock Alternativo', notes: 'Banda com 3 álbuns, precisa de estratégia comercial para turnê.' },
-            { name: 'Pedro Oliveira', email: 'pedro.prod@email.com', phone: '(41) 99123-4567', segment: 'produtor', stage: 'negociacao', value: 3500, source: 'site', instrument: 'Produção / Beatmaker', notes: 'Produtor que quer vender beats online e precisa de funil.' },
-            { name: 'Maria Eduarda', email: 'meduarda@email.com', phone: '(51) 98234-5678', segment: 'educador', stage: 'fechamento', value: 2000, source: 'evento', instrument: 'Piano / Teoria Musical', notes: 'Professora particular, quer criar curso online.' },
-            { name: 'Studio Som Livre', email: 'contato@somlivre.com', phone: '(11) 93456-7890', segment: 'estudio', stage: 'prospeccao', value: 8000, source: 'linkedin', instrument: 'Estúdio de Gravação', notes: 'Estúdio que quer atrair mais artistas independentes.' },
-            { name: 'Rafael Costa', email: 'rafa.costa@email.com', phone: '(21) 97890-1234', segment: 'instrumentista', stage: 'qualificacao', value: 1800, source: 'instagram', instrument: 'Baixo', notes: 'Baixista session musician, quer criar marca pessoal.' },
-            { name: 'Juliana Ferreira', email: 'ju.ferreira@email.com', phone: '(85) 99567-8901', segment: 'cantor', stage: 'prospeccao', value: 3000, source: 'instagram', instrument: 'Vocal / Sertanejo', notes: 'Cantora regional querendo expandir para streaming.' },
+            // Prospecção — leads identificados via Social Selling
+            { name: 'Lucas Mendes', email: 'lucas.mendes@email.com', phone: '(11) 98765-4321', segment: 'instrumentista', stage: 'prospeccao', value: 1500, source: 'instagram', instrument: 'Guitarra', notes: 'Guitarrista profissional com 12k seguidores. Busca aumentar presença digital e monetizar conteúdo educacional.' },
+            { name: 'Juliana Ferreira', email: 'ju.ferreira@email.com', phone: '(85) 99567-8901', segment: 'cantor', stage: 'prospeccao', value: 3000, source: 'instagram', instrument: 'Vocal / Sertanejo', notes: 'Cantora regional com público fiel. Quer expandir para streaming e criar estratégia de lançamento.' },
+            { name: 'Studio Som Criativo', email: 'contato@somcriativo.com', phone: '(11) 93456-7890', segment: 'estudio', stage: 'prospeccao', value: 8000, source: 'linkedin', instrument: 'Gravação e Mixagem', notes: 'Estúdio com 5 anos de mercado. Precisa atrair artistas independentes e criar pacotes comerciais.' },
+
+            // Qualificação — leads que demonstraram interesse real
+            { name: 'Ana Clara Souza', email: 'anaclara@email.com', phone: '(21) 99876-5432', segment: 'cantor', stage: 'qualificacao', value: 2500, source: 'linkedin', instrument: 'Vocal / MPB', notes: 'Cantora com 50k seguidores no Instagram. Quer monetizar shows e criar funil de vendas para merch.' },
+            { name: 'Rafael Costa', email: 'rafa.costa@email.com', phone: '(21) 97890-1234', segment: 'instrumentista', stage: 'qualificacao', value: 1800, source: 'instagram', instrument: 'Baixo Elétrico', notes: 'Baixista session musician. Quer criar marca pessoal e vender cursos online de técnicas avançadas.' },
+
+            // Proposta — consultoria comercial apresentada
+            { name: 'Banda Frequência', email: 'mgmt@frequencia.com.br', phone: '(31) 97654-3210', segment: 'banda', stage: 'proposta', value: 5000, source: 'indicacao', instrument: 'Rock Alternativo', notes: 'Banda com 3 álbuns lançados. Proposta de estruturação comercial para turnê nacional e monetização digital.' },
+
+            // Negociação — ajustando termos do contrato
+            { name: 'Pedro Oliveira', email: 'pedro.prod@email.com', phone: '(41) 99123-4567', segment: 'produtor', stage: 'negociacao', value: 3500, source: 'site', instrument: 'Beatmaker / Produção', notes: 'Produtor quer vender beats online. Negociando pacote de consultoria com funil de vendas + automação.' },
+
+            // Fechamento — contrato assinado
+            { name: 'Maria Eduarda Lima', email: 'meduarda@email.com', phone: '(51) 98234-5678', segment: 'educador', stage: 'fechamento', value: 2000, source: 'evento', instrument: 'Piano / Teoria Musical', notes: 'Professora particular. Contrato fechado para criação de curso online + estratégia de captação de alunos.' },
         ];
 
         demoLeads.forEach(data => {
             leads.push({
                 id: generateId(),
                 ...data,
-                createdAt: new Date(Date.now() - Math.random() * 7 * 86400000).toISOString(),
+                createdAt: new Date(Date.now() - Math.random() * 14 * 86400000).toISOString(),
                 updatedAt: new Date().toISOString()
             });
         });
 
         saveLeads();
 
-        addActivity('<strong>Sistema</strong> inicializado com dados de demonstração', 'fas fa-rocket', '#6C5CE7');
-        addActivity('<strong>Maria Eduarda</strong> fechou contrato de curso online', 'fas fa-trophy', '#00B894');
-        addActivity('<strong>Pedro Oliveira</strong> entrou em negociação', 'fas fa-comments', '#E84393');
-        addActivity('<strong>Banda Frequência</strong> recebeu proposta comercial', 'fas fa-file-alt', '#F39C12');
+        addActivity('<strong>CRM</strong> inicializado — dados de demonstração carregados', 'fas fa-rocket', 'system');
+        addActivity('<strong>Maria Eduarda Lima</strong> — contrato fechado (Curso Online)', 'fas fa-check-circle', 'advance');
+        addActivity('<strong>Pedro Oliveira</strong> entrou em negociação (Funil de Beats)', 'fas fa-comments', 'advance');
+        addActivity('<strong>Banda Frequência</strong> recebeu proposta comercial (Turnê)', 'fas fa-file-alt', 'advance');
+        addActivity('<strong>Ana Clara Souza</strong> qualificada via LinkedIn', 'fab fa-linkedin', 'new');
     }
 
     // ========== INIT ==========

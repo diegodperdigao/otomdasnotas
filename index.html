@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O Tom das Notas - CRM Music Business</title>
+    <title>O Tom das Notas — CRM Music Business</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/dXVPqQb/o-tom.png">
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -18,25 +18,25 @@
         </div>
         <nav class="sidebar-nav">
             <a href="#" class="nav-item active" data-section="dashboard">
-                <i class="fas fa-chart-line"></i>
+                <i class="fas fa-chart-bar"></i>
                 <span>Dashboard</span>
             </a>
             <a href="#" class="nav-item" data-section="pipeline">
-                <i class="fas fa-filter"></i>
+                <i class="fas fa-columns"></i>
                 <span>Pipeline</span>
             </a>
             <a href="#" class="nav-item" data-section="leads">
-                <i class="fas fa-users"></i>
+                <i class="fas fa-address-book"></i>
                 <span>Leads</span>
             </a>
             <a href="#" class="nav-item" data-section="about">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-file-alt"></i>
                 <span>Sobre o Projeto</span>
             </a>
         </nav>
         <div class="sidebar-footer">
             <p>Music Business Digital</p>
-            <small>Fase 1 - Extensionista</small>
+            <small>Atividade Extensionista — Fase 1</small>
         </div>
     </aside>
 
@@ -62,7 +62,7 @@
         <section class="section active" id="section-dashboard">
             <div class="kpi-grid">
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--gradient-primary);">
+                    <div class="kpi-icon icon-leads">
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="kpi-info">
@@ -71,16 +71,16 @@
                     </div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--gradient-success);">
+                    <div class="kpi-icon icon-conversions">
                         <i class="fas fa-handshake"></i>
                     </div>
                     <div class="kpi-info">
                         <span class="kpi-value" id="kpiConversions">0</span>
-                        <span class="kpi-label">Conversões</span>
+                        <span class="kpi-label">Contratos Fechados</span>
                     </div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--gradient-warning);">
+                    <div class="kpi-icon icon-rate">
                         <i class="fas fa-percentage"></i>
                     </div>
                     <div class="kpi-info">
@@ -89,19 +89,28 @@
                     </div>
                 </div>
                 <div class="kpi-card">
-                    <div class="kpi-icon" style="background: var(--gradient-info);">
+                    <div class="kpi-icon icon-revenue">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
                     <div class="kpi-info">
                         <span class="kpi-value" id="kpiRevenue">R$ 0</span>
-                        <span class="kpi-label">Receita Estimada</span>
+                        <span class="kpi-label">Faturamento Estimado</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon icon-social">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpiSocialSelling">0</span>
+                        <span class="kpi-label">Leads via Social Selling</span>
                     </div>
                 </div>
             </div>
 
             <div class="dashboard-grid">
                 <div class="card funnel-card">
-                    <h3><i class="fas fa-filter"></i> Funil de Vendas</h3>
+                    <h3><i class="fas fa-filter"></i> Funil de Vendas — Economia Criativa</h3>
                     <div class="funnel-chart" id="funnelChart"></div>
                 </div>
                 <div class="card">
@@ -111,15 +120,15 @@
                     </div>
                 </div>
                 <div class="card">
-                    <h3><i class="fas fa-music"></i> Leads por Segmento</h3>
+                    <h3><i class="fas fa-music"></i> Leads por Segmento Musical</h3>
                     <div class="segment-chart" id="segmentChart"></div>
                 </div>
                 <div class="card">
-                    <h3><i class="fas fa-bullseye"></i> Metas do Mês</h3>
+                    <h3><i class="fas fa-bullseye"></i> Metas Comerciais</h3>
                     <div class="goals-list" id="goalsList">
                         <div class="goal-item">
                             <div class="goal-header">
-                                <span>Novos Leads</span>
+                                <span>Prospecção Ativa</span>
                                 <span class="goal-progress-text" id="goalLeadsText">0/20</span>
                             </div>
                             <div class="progress-bar">
@@ -137,7 +146,7 @@
                         </div>
                         <div class="goal-item">
                             <div class="goal-header">
-                                <span>Fechamentos</span>
+                                <span>Contratos Fechados</span>
                                 <span class="goal-progress-text" id="goalClosedText">0/5</span>
                             </div>
                             <div class="progress-bar">
@@ -182,7 +191,7 @@
                 </div>
                 <div class="pipeline-column" data-stage="fechamento">
                     <div class="column-header fechamento">
-                        <h3><i class="fas fa-trophy"></i> Fechamento</h3>
+                        <h3><i class="fas fa-check-circle"></i> Fechamento</h3>
                         <span class="column-count" id="countFechamento">0</span>
                     </div>
                     <div class="column-cards" id="cardsFechamento"></div>
@@ -195,17 +204,17 @@
             <div class="leads-toolbar">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchLeads" placeholder="Buscar leads...">
+                    <input type="text" id="searchLeads" placeholder="Buscar por nome, e-mail ou instrumento...">
                 </div>
                 <div class="filter-group">
                     <select id="filterSegment">
                         <option value="">Todos os Segmentos</option>
                         <option value="instrumentista">Instrumentista</option>
-                        <option value="cantor">Cantor(a)</option>
+                        <option value="cantor">Cantor(a) / Vocalista</option>
                         <option value="produtor">Produtor Musical</option>
-                        <option value="banda">Banda</option>
+                        <option value="banda">Banda / Grupo</option>
                         <option value="educador">Educador Musical</option>
-                        <option value="estudio">Estúdio</option>
+                        <option value="estudio">Estúdio / Gravadora</option>
                     </select>
                     <select id="filterStage">
                         <option value="">Todas as Etapas</option>
@@ -225,13 +234,14 @@
                             <th>Segmento</th>
                             <th>Contato</th>
                             <th>Etapa</th>
-                            <th>Valor Estimado</th>
-                            <th>Ações</th>
+                            <th>Valor Est.</th>
+                            <th>Origem</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="leadsTableBody">
                         <tr class="empty-row">
-                            <td colspan="6">Nenhum lead cadastrado. Clique em "Novo Lead" para começar.</td>
+                            <td colspan="7">Nenhum lead cadastrado. Clique em "Novo Lead" para iniciar a prospecção.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -250,31 +260,34 @@
                 <div class="about-grid">
                     <div class="about-card">
                         <div class="about-card-icon"><i class="fas fa-bullseye"></i></div>
-                        <h4>Objetivo</h4>
-                        <p>Capacitar a microempresa parceira na implementação de um ecossistema de gestão comercial digital, estabelecendo processos de prospecção ativa e funis de vendas específicos para o setor musical.</p>
+                        <h4>Objetivo Geral</h4>
+                        <p>Capacitar a microempresa parceira na implementação de um ecossistema de gestão comercial digital, estabelecendo processos de prospecção ativa e funis de vendas específicos para o setor musical. Transformar o conhecimento técnico de músicos em modelos de negócios sustentáveis.</p>
                     </div>
                     <div class="about-card">
                         <div class="about-card-icon"><i class="fas fa-globe"></i></div>
-                        <h4>ODS 8</h4>
-                        <p>Trabalho Decente e Crescimento Econômico — apoiando atividades produtivas, empreendedorismo e criatividade no setor da economia criativa.</p>
+                        <h4>ODS 8 — Trabalho Decente</h4>
+                        <p>Alinhado ao Objetivo de Desenvolvimento Sustentável 8: apoiar atividades produtivas, empreendedorismo e criatividade, incentivando a formalização e o crescimento de microempresas através da inovação em processos comerciais digitais.</p>
                     </div>
                     <div class="about-card">
                         <div class="about-card-icon"><i class="fas fa-laptop-code"></i></div>
-                        <h4>Tecnologia</h4>
-                        <p>Ferramentas de CRM e automação para profissionalizar a gestão comercial do nicho musical, transformando conhecimento técnico em modelos de negócios sustentáveis.</p>
+                        <h4>Tecnologia e Produção</h4>
+                        <p>Ferramentas de CRM e automação para profissionalizar a gestão comercial do nicho musical. Utilização de Social Selling (LinkedIn/Instagram) para gerar autoridade no Music Business e otimizar a conversão de leads.</p>
                     </div>
                     <div class="about-card">
                         <div class="about-card-icon"><i class="fas fa-users"></i></div>
                         <h4>Beneficiários</h4>
-                        <p>Músicos, instrumentistas e educadores da região que necessitam de profissionalização comercial para suas carreiras na economia criativa.</p>
+                        <p>Músicos, instrumentistas, cantores, produtores musicais, bandas, educadores e estúdios da região que necessitam de profissionalização comercial para garantir viabilidade econômica de suas carreiras na economia criativa.</p>
                     </div>
                 </div>
 
                 <div class="about-info">
-                    <h3><i class="fas fa-graduation-cap"></i> Atividade Extensionista - Fase 1</h3>
+                    <h3><i class="fas fa-graduation-cap"></i> Proposta de Atividade Extensionista — Fase 1</h3>
                     <p><strong>Curso:</strong> Gestão Comercial de Negócios Digitais</p>
                     <p><strong>Disciplina:</strong> Empreendedorismo e Modelagem de Soluções</p>
-                    <p><strong>Área Temática:</strong> Tecnologia e Produção</p>
+                    <p><strong>Área Temática:</strong> Tecnologia e Produção — empreendedorismo, inovação tecnológica e capacitação de gestores</p>
+                    <p><strong>Classificação ODS:</strong> Objetivo 8 — Trabalho Decente e Crescimento Econômico</p>
+                    <p><strong>Instituição Parceira:</strong> Microempresa (ME) — Consultoria em Gestão Comercial e Marketing Digital</p>
+                    <p><strong>Beneficiários:</strong> 01 direto (CNPJ da microempresa) + impacto indireto em profissionais da música da região</p>
                 </div>
             </div>
         </section>
@@ -306,11 +319,11 @@
                         <select id="leadSegment" required>
                             <option value="">Selecione...</option>
                             <option value="instrumentista">Instrumentista</option>
-                            <option value="cantor">Cantor(a)</option>
+                            <option value="cantor">Cantor(a) / Vocalista</option>
                             <option value="produtor">Produtor Musical</option>
-                            <option value="banda">Banda</option>
+                            <option value="banda">Banda / Grupo</option>
                             <option value="educador">Educador Musical</option>
-                            <option value="estudio">Estúdio</option>
+                            <option value="estudio">Estúdio / Gravadora</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -328,13 +341,13 @@
                         <input type="number" id="leadValue" placeholder="0,00" step="0.01" min="0">
                     </div>
                     <div class="form-group">
-                        <label for="leadSource">Origem</label>
+                        <label for="leadSource">Origem (Social Selling)</label>
                         <select id="leadSource">
                             <option value="instagram">Instagram</option>
                             <option value="linkedin">LinkedIn</option>
                             <option value="indicacao">Indicação</option>
                             <option value="site">Site</option>
-                            <option value="evento">Evento</option>
+                            <option value="evento">Evento / Show</option>
                             <option value="outro">Outro</option>
                         </select>
                     </div>
@@ -345,12 +358,12 @@
                 </div>
                 <div class="form-group full-width">
                     <label for="leadNotes">Observações</label>
-                    <textarea id="leadNotes" rows="3" placeholder="Informações adicionais sobre o lead..."></textarea>
+                    <textarea id="leadNotes" rows="3" placeholder="Informações sobre necessidade comercial, dor do cliente, potencial..."></textarea>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="btnCancelLead">Cancelar</button>
                     <button type="submit" class="btn btn-primary" id="btnSaveLead">
-                        <i class="fas fa-save"></i> Salvar Lead
+                        <i class="fas fa-check"></i> Salvar
                     </button>
                 </div>
             </form>
@@ -368,7 +381,7 @@
             <div class="detail-actions">
                 <button class="btn btn-secondary" id="btnEditLead"><i class="fas fa-edit"></i> Editar</button>
                 <button class="btn btn-danger" id="btnDeleteLead"><i class="fas fa-trash"></i> Excluir</button>
-                <button class="btn btn-primary" id="btnAdvanceLead"><i class="fas fa-arrow-right"></i> Avançar Etapa</button>
+                <button class="btn btn-primary" id="btnAdvanceLead"><i class="fas fa-arrow-right"></i> Avançar</button>
             </div>
         </div>
     </div>
