@@ -287,36 +287,51 @@
     function openPlanModal(plan) {
         editingPlanId = plan ? plan.id : null;
         planModalTitle.innerHTML = plan ? '<i class="fas fa-edit"></i> Editar Plano' : '<i class="fas fa-clipboard-list"></i> Novo Plano de Ação';
-
-        // Populate client select
         const sel = document.getElementById('planClient');
         sel.innerHTML = '<option value="">Selecione um lead...</option>' + leads.map(l => '<option value="' + l.id + '"' + (plan && plan.clientId === l.id ? ' selected' : '') + '>' + esc(l.name) + ' — ' + (SEGMENT_LABELS[l.segment]||'') + '</option>').join('');
-
         document.getElementById('planTitle').value = plan ? plan.title : '';
         document.getElementById('planObjective').value = plan ? plan.objective : '';
-
-        // Steps
         planStepsEditor.innerHTML = '';
-        const steps = plan ? plan.steps : [{ text: '', days: 7 }];
-        steps.forEach(s => addStepRow(s.text, s.days));
-
+        const steps = plan ? plan.steps : [{ text: '', days: 7, resources: [] }];
+        steps.forEach(s => addStepRow(s.text, s.days, s.resources));
         planOverlay.classList.add('active');
     }
     function closePlanModal() { planOverlay.classList.remove('active'); editingPlanId = null; planForm.reset(); }
 
-    function addStepRow(text, days) {
+    function addStepRow(text, days, resources) {
         const row = document.createElement('div');
         row.className = 'plan-step-row';
-        row.innerHTML = '<input type="text" class="plan-step-input" placeholder="Descrição da etapa..." value="' + esc(text||'') + '" required>' +
-            '<input type="number" class="plan-step-days" placeholder="Dias" min="1" value="' + (days||7) + '" title="Prazo em dias">' +
-            '<button type="button" class="btn-icon btn-remove-step" title="Remover"><i class="fas fa-times"></i></button>';
+        row.innerHTML = '<div class="step-main">' +
+            '<input type="text" class="plan-step-input" placeholder="Descrição da etapa..." value="'+esc(text||'')+'" required>' +
+            '<input type="number" class="plan-step-days" placeholder="Dias" min="1" value="'+(days||7)+'" title="Prazo em dias">' +
+            '<button type="button" class="btn-icon btn-add-resource" title="Adicionar conteúdo"><i class="fas fa-paperclip"></i></button>' +
+            '<button type="button" class="btn-icon btn-remove-step" title="Remover"><i class="fas fa-times"></i></button></div>' +
+            '<div class="step-resources-editor"></div>';
         row.querySelector('.btn-remove-step').addEventListener('click', () => {
             if (planStepsEditor.children.length > 1) row.remove();
         });
+        row.querySelector('.btn-add-resource').addEventListener('click', () => {
+            addResourceRow(row.querySelector('.step-resources-editor'), '', '', '');
+        });
         planStepsEditor.appendChild(row);
+        if (resources && resources.length > 0) {
+            const resEditor = row.querySelector('.step-resources-editor');
+            resources.forEach(r => addResourceRow(resEditor, r.type, r.title, r.url));
+        }
     }
 
-    document.getElementById('btnAddStep').addEventListener('click', () => addStepRow('', 7));
+    function addResourceRow(container, type, title, url) {
+        const row = document.createElement('div');
+        row.className = 'step-resource-row';
+        row.innerHTML = '<select class="res-type"><option value="video"'+(type==='video'?' selected':'')+'>Vídeo</option><option value="article"'+(type==='article'?' selected':'')+'>Matéria</option><option value="podcast"'+(type==='podcast'?' selected':'')+'>Podcast</option></select>' +
+            '<input type="text" class="res-title" placeholder="Título" value="'+esc(title||'')+'">' +
+            '<input type="url" class="res-url" placeholder="URL" value="'+esc(url||'')+'">' +
+            '<button type="button" class="btn-icon" title="Remover"><i class="fas fa-times"></i></button>';
+        row.querySelector('.btn-icon').addEventListener('click', () => row.remove());
+        container.appendChild(row);
+    }
+
+    document.getElementById('btnAddStep').addEventListener('click', () => addStepRow('', 7, []));
     document.getElementById('btnNewPlan').addEventListener('click', () => openPlanModal(null));
     document.getElementById('planModalClose').addEventListener('click', closePlanModal);
     document.getElementById('btnCancelPlan').addEventListener('click', closePlanModal);
@@ -328,24 +343,33 @@
         const title = document.getElementById('planTitle').value.trim();
         const objective = document.getElementById('planObjective').value.trim();
         const stepRows = planStepsEditor.querySelectorAll('.plan-step-row');
-        const steps = Array.from(stepRows).map(row => ({
-            text: row.querySelector('.plan-step-input').value.trim(),
-            days: parseInt(row.querySelector('.plan-step-days').value) || 7,
-            done: false
-        })).filter(s => s.text);
+        const steps = Array.from(stepRows).map(row => {
+            const resources = Array.from(row.querySelectorAll('.step-resource-row')).map(r => ({
+                type: r.querySelector('.res-type').value,
+                title: r.querySelector('.res-title').value.trim(),
+                url: r.querySelector('.res-url').value.trim()
+            })).filter(r => r.url);
+            return {
+                text: row.querySelector('.plan-step-input').value.trim(),
+                days: parseInt(row.querySelector('.plan-step-days').value) || 7,
+                done: false,
+                resources,
+                notes: ''
+            };
+        }).filter(s => s.text);
 
         if (!clientId || !title || steps.length === 0) return;
 
         if (editingPlanId) {
             const i = plans.findIndex(p => p.id === editingPlanId);
             if (i !== -1) {
-                // Preserve done status of existing steps
                 const oldSteps = plans[i].steps;
-                steps.forEach((s, idx) => { if (oldSteps[idx]) s.done = oldSteps[idx].done; });
+                steps.forEach((s, idx) => { if (oldSteps[idx]) { s.done = oldSteps[idx].done; s.notes = oldSteps[idx].notes || ''; } });
                 plans[i] = { ...plans[i], clientId, title, objective, steps, updatedAt: new Date().toISOString() };
             }
         } else {
             plans.push({ id: genId(), clientId, title, objective, steps, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+            addNotification(clientId, 'content', 'Novo plano de ação criado: ' + title);
         }
         savePlans(); closePlanModal(); renderPlans();
     });
@@ -375,7 +399,7 @@
     }
 
     // ========== RENDER ALL ==========
-    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); renderPlans(); }
+    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); renderPlans(); renderUsers(); renderMeetings(); renderChatContacts(); }
 
     function renderKPIs() {
         const total = leads.length;
@@ -724,103 +748,6 @@
         });
     }
 
-    // ========== ENHANCED PLAN STEP EDITOR (with resources) ==========
-    // Override addStepRow to support resources
-    const origAddStepRow = addStepRow;
-    function addStepRowEnhanced(text, days, resources) {
-        const row = document.createElement('div');
-        row.className = 'plan-step-row';
-        row.innerHTML = '<div class="step-main">' +
-            '<input type="text" class="plan-step-input" placeholder="Descrição da etapa..." value="'+esc(text||'')+'" required>' +
-            '<input type="number" class="plan-step-days" placeholder="Dias" min="1" value="'+(days||7)+'" title="Prazo em dias">' +
-            '<button type="button" class="btn-icon btn-add-resource" title="Adicionar conteúdo"><i class="fas fa-paperclip"></i></button>' +
-            '<button type="button" class="btn-icon btn-remove-step" title="Remover"><i class="fas fa-times"></i></button></div>' +
-            '<div class="step-resources-editor"></div>';
-
-        row.querySelector('.btn-remove-step').addEventListener('click', () => {
-            if (planStepsEditor.children.length > 1) row.remove();
-        });
-        row.querySelector('.btn-add-resource').addEventListener('click', () => {
-            addResourceRow(row.querySelector('.step-resources-editor'), '', '', '');
-        });
-        planStepsEditor.appendChild(row);
-
-        // Add existing resources
-        if (resources && resources.length > 0) {
-            const resEditor = row.querySelector('.step-resources-editor');
-            resources.forEach(r => addResourceRow(resEditor, r.type, r.title, r.url));
-        }
-    }
-
-    function addResourceRow(container, type, title, url) {
-        const row = document.createElement('div');
-        row.className = 'step-resource-row';
-        row.innerHTML = '<select class="res-type"><option value="video"'+(type==='video'?' selected':'')+'>Video</option><option value="article"'+(type==='article'?' selected':'')+'>Matéria</option><option value="podcast"'+(type==='podcast'?' selected':'')+'>Podcast</option></select>' +
-            '<input type="text" class="res-title" placeholder="Título" value="'+esc(title||'')+'">' +
-            '<input type="url" class="res-url" placeholder="URL" value="'+esc(url||'')+'">' +
-            '<button type="button" class="btn-icon" onclick="this.parentElement.remove()" title="Remover"><i class="fas fa-times"></i></button>';
-        container.appendChild(row);
-    }
-
-    // Override plan modal open to use enhanced step rows
-    const origOpenPlanModal = openPlanModal;
-    openPlanModal = function(plan) {
-        editingPlanId = plan ? plan.id : null;
-        planModalTitle.innerHTML = plan ? '<i class="fas fa-edit"></i> Editar Plano' : '<i class="fas fa-clipboard-list"></i> Novo Plano de Ação';
-        const sel = document.getElementById('planClient');
-        sel.innerHTML = '<option value="">Selecione um lead...</option>' + leads.map(l => '<option value="'+l.id+'"'+(plan&&plan.clientId===l.id?' selected':'')+'>'+esc(l.name)+' — '+(SEGMENT_LABELS[l.segment]||'')+'</option>').join('');
-        document.getElementById('planTitle').value = plan ? plan.title : '';
-        document.getElementById('planObjective').value = plan ? plan.objective : '';
-        planStepsEditor.innerHTML = '';
-        const steps = plan ? plan.steps : [{ text: '', days: 7, resources: [] }];
-        steps.forEach(s => addStepRowEnhanced(s.text, s.days, s.resources));
-        planOverlay.classList.add('active');
-    };
-
-    // Override plan form submit to collect resources
-    planForm.removeEventListener('submit', planForm._handler);
-    planForm._handler2 = function(e) {
-        e.preventDefault();
-        const clientId = document.getElementById('planClient').value;
-        const title = document.getElementById('planTitle').value.trim();
-        const objective = document.getElementById('planObjective').value.trim();
-        const stepRows = planStepsEditor.querySelectorAll('.plan-step-row');
-        const steps = Array.from(stepRows).map(row => {
-            const resources = Array.from(row.querySelectorAll('.step-resource-row')).map(r => ({
-                type: r.querySelector('.res-type').value,
-                title: r.querySelector('.res-title').value.trim(),
-                url: r.querySelector('.res-url').value.trim()
-            })).filter(r => r.url);
-            return {
-                text: row.querySelector('.plan-step-input').value.trim(),
-                days: parseInt(row.querySelector('.plan-step-days').value) || 7,
-                done: false,
-                resources,
-                notes: ''
-            };
-        }).filter(s => s.text);
-        if (!clientId || !title || steps.length === 0) return;
-        if (editingPlanId) {
-            const i = plans.findIndex(p => p.id === editingPlanId);
-            if (i !== -1) {
-                const oldSteps = plans[i].steps;
-                steps.forEach((s, idx) => { if (oldSteps[idx]) { s.done = oldSteps[idx].done; s.notes = oldSteps[idx].notes || ''; } });
-                plans[i] = { ...plans[i], clientId, title, objective, steps, updatedAt: new Date().toISOString() };
-            }
-        } else {
-            plans.push({ id: genId(), clientId, title, objective, steps, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
-            addNotification(clientId, 'content', 'Novo plano de ação criado: ' + title);
-        }
-        savePlans(); closePlanModal(); renderPlans();
-    };
-    planForm.addEventListener('submit', planForm._handler2);
-
-    // Override addStep button
-    document.getElementById('btnAddStep').removeEventListener('click', document.getElementById('btnAddStep')._handler);
-    document.getElementById('btnAddStep').addEventListener('click', () => addStepRowEnhanced('', 7, []));
-
-    // ========== RENDER ALL (updated) ==========
-    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); renderPlans(); renderUsers(); renderMeetings(); renderChatContacts(); }
 
     // ========== SEED DATA ==========
     function seed() {
