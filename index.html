@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O Tom das Notas — CRM Music Business</title>
+    <title>O Tom das Notas — CRM</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/dXVPqQb/o-tom.png">
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
-    <!-- ==================== HUB (Home) ==================== -->
+    <!-- ====== HUB ====== -->
     <div class="hub" id="hub">
         <div class="hub-content">
-            <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="hub-logo">
+            <div class="hub-logo-wrap">
+                <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="hub-logo">
+            </div>
             <p class="hub-tagline">Gestão comercial para profissionais da música</p>
             <div class="hub-grid">
                 <a href="#" class="hub-card" data-section="dashboard">
                     <div class="hub-card-icon"><i class="fas fa-chart-bar"></i></div>
-                    <h3>Dashboard</h3>
+                    <h3>Painel Geral</h3>
                     <p>KPIs, funil de vendas e metas comerciais</p>
                 </a>
                 <a href="#" class="hub-card" data-section="pipeline">
@@ -29,8 +31,8 @@
                 </a>
                 <a href="#" class="hub-card" data-section="leads">
                     <div class="hub-card-icon"><i class="fas fa-address-book"></i></div>
-                    <h3>Leads</h3>
-                    <p>Gestão completa de contatos e prospecção</p>
+                    <h3>Contatos</h3>
+                    <p>Gestão completa de leads e prospecção</p>
                 </a>
                 <a href="#" class="hub-card" data-section="about">
                     <div class="hub-card-icon"><i class="fas fa-info-circle"></i></div>
@@ -41,231 +43,227 @@
         </div>
     </div>
 
-    <!-- ==================== APP (CRM) ==================== -->
-    <div class="app" id="app" style="display: none;">
+    <!-- ====== APP ====== -->
+    <div class="app" id="app" style="display:none;">
 
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand" id="sidebarBrand">
-                <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="logo">
+                <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom" class="logo">
+                <div class="brand-text">
+                    <span class="brand-name">O TOM</span>
+                    <span class="brand-sub">CRM</span>
+                </div>
             </div>
+
             <nav class="sidebar-nav">
+                <p class="nav-label">Menu Principal</p>
                 <a href="#" class="nav-item active" data-section="dashboard">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Dashboard</span>
+                    <i class="fas fa-chart-bar"></i><span>Painel Geral</span>
                 </a>
                 <a href="#" class="nav-item" data-section="pipeline">
-                    <i class="fas fa-columns"></i>
-                    <span>Pipeline</span>
+                    <i class="fas fa-columns"></i><span>Pipeline</span>
+                    <span class="nav-badge" id="navBadgePipeline"></span>
                 </a>
                 <a href="#" class="nav-item" data-section="leads">
-                    <i class="fas fa-address-book"></i>
-                    <span>Leads</span>
+                    <i class="fas fa-address-book"></i><span>Contatos</span>
                 </a>
                 <a href="#" class="nav-item" data-section="about">
-                    <i class="fas fa-info-circle"></i>
-                    <span>Sobre</span>
+                    <i class="fas fa-info-circle"></i><span>Sobre</span>
                 </a>
             </nav>
+
             <div class="sidebar-footer">
                 <a href="#" class="nav-back" id="backToHub">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Menu Principal</span>
+                    <i class="fas fa-arrow-left"></i><span>Menu Principal</span>
                 </a>
             </div>
         </aside>
 
-        <!-- Main Content -->
+        <!-- Main -->
         <main class="main-content">
-            <!-- Top Bar -->
             <header class="topbar">
-                <button class="menu-toggle" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="topbar-title">
-                    <h1 id="pageTitle">Dashboard</h1>
+                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Buscar leads, negócios...">
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-primary" id="btnNewLead" title="Novo Lead">
-                        <i class="fas fa-plus"></i>
-                        <span>Novo Lead</span>
+                    <button class="btn btn-primary" id="btnNewLead">
+                        <i class="fas fa-plus"></i><span>Novo Lead</span>
                     </button>
                 </div>
             </header>
 
-            <!-- Dashboard Section -->
+            <!-- Dashboard -->
             <section class="section active" id="section-dashboard">
+                <div class="section-header">
+                    <div>
+                        <h1 class="section-title">Visão Geral</h1>
+                        <p class="section-subtitle">Resumo do seu pipeline no <strong>O Tom das Notas</strong></p>
+                    </div>
+                </div>
+
                 <div class="kpi-grid">
                     <div class="kpi-card">
-                        <div class="kpi-icon icon-leads">
-                            <i class="fas fa-users"></i>
-                        </div>
+                        <div class="kpi-icon icon-leads"><i class="fas fa-users"></i></div>
                         <div class="kpi-info">
-                            <span class="kpi-value" id="kpiTotalLeads">0</span>
                             <span class="kpi-label">Total de Leads</span>
+                            <span class="kpi-value" id="kpiTotalLeads">0</span>
                         </div>
+                        <span class="kpi-trend up" id="kpiTrendLeads">—</span>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-icon icon-conversions">
-                            <i class="fas fa-handshake"></i>
-                        </div>
+                        <div class="kpi-icon icon-conversions"><i class="fas fa-handshake"></i></div>
                         <div class="kpi-info">
-                            <span class="kpi-value" id="kpiConversions">0</span>
                             <span class="kpi-label">Contratos Fechados</span>
+                            <span class="kpi-value" id="kpiConversions">0</span>
                         </div>
+                        <span class="kpi-trend" id="kpiTrendConversions">—</span>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-icon icon-rate">
-                            <i class="fas fa-percentage"></i>
-                        </div>
+                        <div class="kpi-icon icon-rate"><i class="fas fa-percentage"></i></div>
                         <div class="kpi-info">
-                            <span class="kpi-value" id="kpiConversionRate">0%</span>
                             <span class="kpi-label">Taxa de Conversão</span>
+                            <span class="kpi-value" id="kpiConversionRate">0%</span>
                         </div>
+                        <span class="kpi-trend" id="kpiTrendRate">—</span>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-icon icon-revenue">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
+                        <div class="kpi-icon icon-revenue"><i class="fas fa-dollar-sign"></i></div>
                         <div class="kpi-info">
-                            <span class="kpi-value" id="kpiRevenue">R$ 0</span>
                             <span class="kpi-label">Faturamento Estimado</span>
+                            <span class="kpi-value" id="kpiRevenue">R$ 0</span>
                         </div>
+                        <span class="kpi-trend up" id="kpiTrendRevenue">—</span>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-icon icon-social">
-                            <i class="fas fa-share-alt"></i>
-                        </div>
+                        <div class="kpi-icon icon-social"><i class="fas fa-share-alt"></i></div>
                         <div class="kpi-info">
+                            <span class="kpi-label">Social Selling</span>
                             <span class="kpi-value" id="kpiSocialSelling">0</span>
-                            <span class="kpi-label">Leads via Social Selling</span>
                         </div>
+                        <span class="kpi-trend" id="kpiTrendSocial">—</span>
                     </div>
                 </div>
 
                 <div class="dashboard-grid">
                     <div class="card funnel-card">
-                        <h3><i class="fas fa-filter"></i> Funil de Vendas</h3>
+                        <div class="card-header">
+                            <h3>Funil de Vendas</h3>
+                        </div>
                         <div class="funnel-chart" id="funnelChart"></div>
                     </div>
                     <div class="card">
-                        <h3><i class="fas fa-clock"></i> Atividades Recentes</h3>
+                        <div class="card-header">
+                            <h3>Negócios Recentes</h3>
+                            <a href="#" class="card-link" data-section="leads">Ver todos</a>
+                        </div>
                         <div class="activity-list" id="activityList">
                             <p class="empty-state">Nenhuma atividade registrada.</p>
                         </div>
                     </div>
                     <div class="card">
-                        <h3><i class="fas fa-music"></i> Leads por Segmento</h3>
+                        <div class="card-header">
+                            <h3>Leads por Segmento</h3>
+                        </div>
                         <div class="segment-chart" id="segmentChart"></div>
                     </div>
                     <div class="card">
-                        <h3><i class="fas fa-bullseye"></i> Metas Comerciais</h3>
-                        <div class="goals-list" id="goalsList">
+                        <div class="card-header">
+                            <h3>Metas Comerciais</h3>
+                        </div>
+                        <div class="goals-list">
                             <div class="goal-item">
-                                <div class="goal-header">
-                                    <span>Prospecção Ativa</span>
-                                    <span class="goal-progress-text" id="goalLeadsText">0/20</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="goalLeadsBar" style="width: 0%"></div>
-                                </div>
+                                <div class="goal-header"><span>Prospecção Ativa</span><span class="goal-val" id="goalLeadsText">0/20</span></div>
+                                <div class="progress-bar"><div class="progress-fill" id="goalLeadsBar" style="width:0%"></div></div>
                             </div>
                             <div class="goal-item">
-                                <div class="goal-header">
-                                    <span>Propostas Enviadas</span>
-                                    <span class="goal-progress-text" id="goalProposalsText">0/10</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill warning" id="goalProposalsBar" style="width: 0%"></div>
-                                </div>
+                                <div class="goal-header"><span>Propostas Enviadas</span><span class="goal-val" id="goalProposalsText">0/10</span></div>
+                                <div class="progress-bar"><div class="progress-fill warn" id="goalProposalsBar" style="width:0%"></div></div>
                             </div>
                             <div class="goal-item">
-                                <div class="goal-header">
-                                    <span>Contratos Fechados</span>
-                                    <span class="goal-progress-text" id="goalClosedText">0/5</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill success" id="goalClosedBar" style="width: 0%"></div>
-                                </div>
+                                <div class="goal-header"><span>Contratos Fechados</span><span class="goal-val" id="goalClosedText">0/5</span></div>
+                                <div class="progress-bar"><div class="progress-fill ok" id="goalClosedBar" style="width:0%"></div></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Pipeline Section -->
+            <!-- Pipeline -->
             <section class="section" id="section-pipeline">
+                <div class="section-header">
+                    <div>
+                        <h1 class="section-title">Pipeline de Vendas</h1>
+                        <p class="section-subtitle">Acompanhe e mova seus negócios através do funil</p>
+                    </div>
+                    <button class="btn btn-primary" id="btnNewLeadPipeline"><i class="fas fa-plus"></i><span>Nova Oportunidade</span></button>
+                </div>
                 <div class="pipeline-board" id="pipelineBoard">
                     <div class="pipeline-column" data-stage="prospeccao">
-                        <div class="column-header prospeccao">
-                            <h3><i class="fas fa-search"></i> Prospecção</h3>
-                            <span class="column-count" id="countProspeccao">0</span>
-                        </div>
+                        <div class="column-header"><div class="col-bar bar-1"></div><h3>Prospecção</h3><span class="column-count" id="countProspeccao">0</span></div>
                         <div class="column-cards" id="cardsProspeccao"></div>
                     </div>
                     <div class="pipeline-column" data-stage="qualificacao">
-                        <div class="column-header qualificacao">
-                            <h3><i class="fas fa-star"></i> Qualificação</h3>
-                            <span class="column-count" id="countQualificacao">0</span>
-                        </div>
+                        <div class="column-header"><div class="col-bar bar-2"></div><h3>Qualificação</h3><span class="column-count" id="countQualificacao">0</span></div>
                         <div class="column-cards" id="cardsQualificacao"></div>
                     </div>
                     <div class="pipeline-column" data-stage="proposta">
-                        <div class="column-header proposta">
-                            <h3><i class="fas fa-file-alt"></i> Proposta</h3>
-                            <span class="column-count" id="countProposta">0</span>
-                        </div>
+                        <div class="column-header"><div class="col-bar bar-3"></div><h3>Proposta</h3><span class="column-count" id="countProposta">0</span></div>
                         <div class="column-cards" id="cardsProposta"></div>
                     </div>
                     <div class="pipeline-column" data-stage="negociacao">
-                        <div class="column-header negociacao">
-                            <h3><i class="fas fa-comments"></i> Negociação</h3>
-                            <span class="column-count" id="countNegociacao">0</span>
-                        </div>
+                        <div class="column-header"><div class="col-bar bar-4"></div><h3>Negociação</h3><span class="column-count" id="countNegociacao">0</span></div>
                         <div class="column-cards" id="cardsNegociacao"></div>
                     </div>
                     <div class="pipeline-column" data-stage="fechamento">
-                        <div class="column-header fechamento">
-                            <h3><i class="fas fa-check-circle"></i> Fechamento</h3>
-                            <span class="column-count" id="countFechamento">0</span>
-                        </div>
+                        <div class="column-header"><div class="col-bar bar-5"></div><h3>Fechamento</h3><span class="column-count" id="countFechamento">0</span></div>
                         <div class="column-cards" id="cardsFechamento"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- Leads Section -->
+            <!-- Leads -->
             <section class="section" id="section-leads">
-                <div class="leads-toolbar">
+                <div class="section-header">
+                    <div>
+                        <h1 class="section-title">Base de Contatos</h1>
+                        <p class="section-subtitle">Gerencie seus leads e parceiros</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" id="btnFilterToggle"><i class="fas fa-filter"></i><span>Filtros</span></button>
+                        <button class="btn btn-primary" id="btnNewLeadTable"><i class="fas fa-plus"></i><span>Novo Contato</span></button>
+                    </div>
+                </div>
+                <div class="leads-filters" id="leadsFilters">
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" id="searchLeads" placeholder="Buscar por nome, e-mail ou instrumento...">
                     </div>
-                    <div class="filter-group">
-                        <select id="filterSegment">
-                            <option value="">Todos os Segmentos</option>
-                            <option value="instrumentista">Instrumentista</option>
-                            <option value="cantor">Cantor(a) / Vocalista</option>
-                            <option value="produtor">Produtor Musical</option>
-                            <option value="banda">Banda / Grupo</option>
-                            <option value="educador">Educador Musical</option>
-                            <option value="estudio">Estúdio / Gravadora</option>
-                        </select>
-                        <select id="filterStage">
-                            <option value="">Todas as Etapas</option>
-                            <option value="prospeccao">Prospecção</option>
-                            <option value="qualificacao">Qualificação</option>
-                            <option value="proposta">Proposta</option>
-                            <option value="negociacao">Negociação</option>
-                            <option value="fechamento">Fechamento</option>
-                        </select>
-                    </div>
+                    <select id="filterSegment">
+                        <option value="">Todos os Segmentos</option>
+                        <option value="instrumentista">Instrumentista</option>
+                        <option value="cantor">Cantor(a) / Vocalista</option>
+                        <option value="produtor">Produtor Musical</option>
+                        <option value="banda">Banda / Grupo</option>
+                        <option value="educador">Educador Musical</option>
+                        <option value="estudio">Estúdio / Gravadora</option>
+                    </select>
+                    <select id="filterStage">
+                        <option value="">Todas as Etapas</option>
+                        <option value="prospeccao">Prospecção</option>
+                        <option value="qualificacao">Qualificação</option>
+                        <option value="proposta">Proposta</option>
+                        <option value="negociacao">Negociação</option>
+                        <option value="fechamento">Fechamento</option>
+                    </select>
                 </div>
-                <div class="leads-table-wrapper">
+                <div class="leads-table-wrap">
                     <table class="leads-table">
                         <thead>
                             <tr>
-                                <th>Nome</th>
+                                <th>Nome do Contato</th>
                                 <th>Segmento</th>
                                 <th>Contato</th>
                                 <th>Etapa</th>
@@ -275,15 +273,13 @@
                             </tr>
                         </thead>
                         <tbody id="leadsTableBody">
-                            <tr class="empty-row">
-                                <td colspan="7">Nenhum lead cadastrado. Clique em "Novo Lead" para iniciar a prospecção.</td>
-                            </tr>
+                            <tr class="empty-row"><td colspan="7">Nenhum lead cadastrado.</td></tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- About Section -->
+            <!-- About -->
             <section class="section" id="section-about">
                 <div class="about-container">
                     <div class="about-hero">
@@ -291,27 +287,26 @@
                         <h2>O Tom das Notas</h2>
                         <p class="about-subtitle">CRM especializado para profissionais da economia criativa. Gerencie leads, acompanhe seu funil de vendas e transforme talento em negócio.</p>
                     </div>
-
                     <div class="about-grid">
                         <div class="about-card">
                             <div class="about-card-icon"><i class="fas fa-filter"></i></div>
                             <h4>Pipeline Inteligente</h4>
-                            <p>Funil de vendas em 5 etapas desenhado para o mercado musical. Acompanhe cada lead desde a prospecção até o fechamento do contrato com visão Kanban.</p>
+                            <p>Funil de vendas em 5 etapas desenhado para o mercado musical. Visão Kanban completa.</p>
                         </div>
                         <div class="about-card">
                             <div class="about-card-icon"><i class="fas fa-share-alt"></i></div>
                             <h4>Social Selling</h4>
-                            <p>Rastreie a origem dos seus leads por canal — Instagram, LinkedIn, indicações, eventos. Descubra de onde vêm suas melhores oportunidades.</p>
+                            <p>Rastreie a origem dos seus leads — Instagram, LinkedIn, indicações e eventos.</p>
                         </div>
                         <div class="about-card">
                             <div class="about-card-icon"><i class="fas fa-chart-bar"></i></div>
                             <h4>KPIs em Tempo Real</h4>
-                            <p>Dashboard com métricas essenciais: taxa de conversão, faturamento estimado, metas comerciais e distribuição por segmento musical.</p>
+                            <p>Dashboard com métricas essenciais: conversão, faturamento, metas e segmentos.</p>
                         </div>
                         <div class="about-card">
                             <div class="about-card-icon"><i class="fas fa-music"></i></div>
                             <h4>Feito para Música</h4>
-                            <p>Segmentos específicos para instrumentistas, cantores, produtores, bandas, educadores e estúdios. Cada profissional da música tem suas necessidades.</p>
+                            <p>Segmentos específicos para instrumentistas, cantores, produtores, bandas e estúdios.</p>
                         </div>
                     </div>
                 </div>
@@ -319,29 +314,19 @@
         </main>
     </div>
 
-    <!-- Modal: Novo Lead -->
+    <!-- Modal: Lead Form -->
     <div class="modal-overlay" id="modalOverlay">
-        <div class="modal" id="modalLead">
+        <div class="modal">
             <div class="modal-header">
                 <h3 id="modalTitle"><i class="fas fa-user-plus"></i> Novo Lead</h3>
                 <button class="modal-close" id="modalClose">&times;</button>
             </div>
             <form id="leadForm">
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label for="leadName">Nome Completo *</label>
-                        <input type="text" id="leadName" required placeholder="Ex: João Silva">
-                    </div>
-                    <div class="form-group">
-                        <label for="leadEmail">E-mail</label>
-                        <input type="email" id="leadEmail" placeholder="joao@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="leadPhone">Telefone</label>
-                        <input type="tel" id="leadPhone" placeholder="(11) 99999-9999">
-                    </div>
-                    <div class="form-group">
-                        <label for="leadSegment">Segmento *</label>
+                    <div class="form-group"><label>Nome Completo *</label><input type="text" id="leadName" required placeholder="Ex: João Silva"></div>
+                    <div class="form-group"><label>E-mail</label><input type="email" id="leadEmail" placeholder="joao@email.com"></div>
+                    <div class="form-group"><label>Telefone</label><input type="tel" id="leadPhone" placeholder="(11) 99999-9999"></div>
+                    <div class="form-group"><label>Segmento *</label>
                         <select id="leadSegment" required>
                             <option value="">Selecione...</option>
                             <option value="instrumentista">Instrumentista</option>
@@ -352,8 +337,7 @@
                             <option value="estudio">Estúdio / Gravadora</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="leadStage">Etapa do Funil *</label>
+                    <div class="form-group"><label>Etapa do Funil *</label>
                         <select id="leadStage" required>
                             <option value="prospeccao">Prospecção</option>
                             <option value="qualificacao">Qualificação</option>
@@ -362,12 +346,8 @@
                             <option value="fechamento">Fechamento</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="leadValue">Valor Estimado (R$)</label>
-                        <input type="number" id="leadValue" placeholder="0,00" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="leadSource">Origem (Social Selling)</label>
+                    <div class="form-group"><label>Valor Estimado (R$)</label><input type="number" id="leadValue" placeholder="0,00" step="0.01" min="0"></div>
+                    <div class="form-group"><label>Origem</label>
                         <select id="leadSource">
                             <option value="instagram">Instagram</option>
                             <option value="linkedin">LinkedIn</option>
@@ -377,30 +357,22 @@
                             <option value="outro">Outro</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="leadInstrument">Instrumento / Área</label>
-                        <input type="text" id="leadInstrument" placeholder="Ex: Guitarra, Vocal, Produção...">
-                    </div>
+                    <div class="form-group"><label>Instrumento / Área</label><input type="text" id="leadInstrument" placeholder="Ex: Guitarra, Vocal..."></div>
                 </div>
-                <div class="form-group full-width">
-                    <label for="leadNotes">Observações</label>
-                    <textarea id="leadNotes" rows="3" placeholder="Informações sobre necessidade comercial, dor do cliente, potencial..."></textarea>
-                </div>
+                <div class="form-group full"><label>Observações</label><textarea id="leadNotes" rows="3" placeholder="Necessidade comercial, dor do cliente..."></textarea></div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="btnCancelLead">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="btnSaveLead">
-                        <i class="fas fa-check"></i> Salvar
-                    </button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Salvar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Detalhes do Lead -->
+    <!-- Modal: Lead Detail -->
     <div class="modal-overlay" id="modalDetailOverlay">
-        <div class="modal modal-detail" id="modalDetail">
+        <div class="modal modal-sm">
             <div class="modal-header">
-                <h3 id="detailTitle"><i class="fas fa-user"></i> Detalhes do Lead</h3>
+                <h3 id="detailTitle"><i class="fas fa-user"></i> Detalhes</h3>
                 <button class="modal-close" id="detailClose">&times;</button>
             </div>
             <div class="detail-content" id="detailContent"></div>
