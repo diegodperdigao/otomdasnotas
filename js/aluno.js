@@ -7,10 +7,17 @@
 
     const LEADS_KEY = 'otomdasnotas_leads';
     const PLANS_KEY = 'otomdasnotas_plans';
+    const SESSION_KEY = 'otomdasnotas_session';
 
     function load(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
     function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
     function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+    // Check session
+    const session = load(SESSION_KEY);
+    if (!session || session.role !== 'aluno') {
+        // No valid aluno session — show login screen with select
+    }
 
     const leads = load(LEADS_KEY) || [];
     let plans = load(PLANS_KEY) || [];
@@ -21,13 +28,13 @@
 
     let currentClientId = null;
 
-    // Populate select with leads that have plans
+    // Populate select — only show leads that have plans
     const clientsWithPlans = new Set(plans.map(p => p.clientId));
-    // Show all leads, but mark which ones have plans
     leads.forEach(l => {
+        if (!clientsWithPlans.has(l.id)) return; // only show clients with plans
         const opt = document.createElement('option');
         opt.value = l.id;
-        opt.textContent = l.name + (clientsWithPlans.has(l.id) ? '' : ' (sem plano)');
+        opt.textContent = l.name;
         alunoSelect.appendChild(opt);
     });
 
@@ -39,9 +46,8 @@
     });
 
     document.getElementById('btnAlunoLogout').addEventListener('click', () => {
-        currentClientId = null;
-        portal.style.display = 'none';
-        loginScreen.style.display = 'flex';
+        localStorage.removeItem(SESSION_KEY);
+        window.location.href = 'index.html';
     });
 
     function enterPortal() {
@@ -95,7 +101,7 @@
         document.getElementById('statPending').textContent = pending;
 
         // Progress ring
-        const circ = 2 * Math.PI * 52; // ~327
+        const circ = 2 * Math.PI * 52;
         const offset = circ - (pct / 100) * circ;
         document.getElementById('ringFill').style.strokeDashoffset = offset;
         document.getElementById('ringValue').textContent = pct + '%';

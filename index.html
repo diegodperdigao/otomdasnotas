@@ -12,14 +12,69 @@
 </head>
 <body>
 
+    <!-- ====== LOGIN ====== -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="login-logo">
+            <h2>Bem-vindo</h2>
+            <p class="login-subtitle">Faça login para acessar a plataforma</p>
+
+            <form id="loginForm" autocomplete="off">
+                <div class="login-field">
+                    <label>E-mail</label>
+                    <div class="login-input-wrap">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+                    </div>
+                </div>
+                <div class="login-field">
+                    <label>Senha</label>
+                    <div class="login-input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Digite sua senha" required>
+                    </div>
+                </div>
+                <div class="login-error" id="loginError"></div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
+            </form>
+
+            <div class="login-divider"><span>ou acesse como</span></div>
+
+            <div class="login-roles">
+                <button class="login-role-btn" id="loginAsAdmin">
+                    <div class="login-role-icon"><i class="fas fa-briefcase"></i></div>
+                    <div>
+                        <strong>Consultor</strong>
+                        <span>Acesso ao CRM completo</span>
+                    </div>
+                </button>
+                <button class="login-role-btn" id="loginAsAluno">
+                    <div class="login-role-icon icon-student"><i class="fas fa-graduation-cap"></i></div>
+                    <div>
+                        <strong>Aluno / Cliente</strong>
+                        <span>Plano de ação e progresso</span>
+                    </div>
+                </button>
+            </div>
+
+            <p class="login-hint">Demo: use qualquer e-mail e senha, ou clique em um perfil acima.</p>
+        </div>
+    </div>
+
     <!-- ====== HUB ====== -->
-    <div class="hub" id="hub">
+    <div class="hub" id="hub" style="display:none;">
+        <div class="hub-header">
+            <span class="hub-user-label" id="hubUserLabel"></span>
+            <button class="btn btn-secondary btn-sm" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
         <div class="hub-content">
             <div class="hub-logo-wrap">
                 <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="hub-logo">
             </div>
             <p class="hub-tagline">Gestão comercial para profissionais da música</p>
-            <div class="hub-grid hub-grid-5">
+            <div class="hub-grid">
                 <a href="#" class="hub-card" data-section="dashboard">
                     <div class="hub-card-icon"><i class="fas fa-chart-bar"></i></div>
                     <h3>Painel Geral</h3>
@@ -35,15 +90,15 @@
                     <h3>Contatos</h3>
                     <p>Gestão completa de leads e prospecção</p>
                 </a>
+                <a href="#" class="hub-card" data-section="planos">
+                    <div class="hub-card-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h3>Planos de Ação</h3>
+                    <p>Roadmaps personalizados para clientes</p>
+                </a>
                 <a href="#" class="hub-card" data-section="about">
                     <div class="hub-card-icon"><i class="fas fa-info-circle"></i></div>
                     <h3>Sobre</h3>
                     <p>Conheça a ferramenta e seus recursos</p>
-                </a>
-                <a href="aluno.html" class="hub-card hub-card-highlight">
-                    <div class="hub-card-icon icon-student"><i class="fas fa-graduation-cap"></i></div>
-                    <h3>Área do Aluno</h3>
-                    <p>Portal do cliente com plano de ação e progresso</p>
                 </a>
             </div>
         </div>
@@ -84,7 +139,10 @@
 
             <div class="sidebar-footer">
                 <a href="#" class="nav-back" id="backToHub">
-                    <i class="fas fa-arrow-left"></i><span>Menu Principal</span>
+                    <i class="fas fa-th-large"></i><span>Menu Principal</span>
+                </a>
+                <a href="#" class="nav-back nav-logout" id="sidebarLogout">
+                    <i class="fas fa-sign-out-alt"></i><span>Sair</span>
                 </a>
             </div>
         </aside>

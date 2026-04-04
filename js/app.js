@@ -37,7 +37,7 @@
         saveActivities();
     }
 
-    // ========== HUB / APP NAVIGATION ==========
+    // ========== DOM REFS ==========
     const hub = document.getElementById('hub');
     const app = document.getElementById('app');
     const hubCards = document.querySelectorAll('.hub-card');
@@ -50,11 +50,61 @@
 
     const titles = { dashboard:'Painel Geral', pipeline:'Pipeline de Vendas', leads:'Base de Contatos', planos:'Planos de Ação', about:'Sobre' };
 
+    // ========== LOGIN / SESSION ==========
+    const SESSION_KEY = 'otomdasnotas_session';
+    const loginScreen = document.getElementById('loginScreen');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+
+    function getSession() { return load(SESSION_KEY); }
+    function setSession(role, email) { save(SESSION_KEY, { role, email, time: Date.now() }); }
+    function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+    function showLogin() {
+        loginScreen.style.display = 'flex';
+        hub.style.display = 'none';
+        app.style.display = 'none';
+        loginError.textContent = '';
+    }
+
+    function showHubAdmin(email) {
+        loginScreen.style.display = 'none';
+        app.style.display = 'none';
+        hub.style.display = 'flex';
+        const label = document.getElementById('hubUserLabel');
+        if (label) label.textContent = email || '';
+    }
+
+    function loginAs(role, email) {
+        setSession(role, email || 'demo@otom.com');
+        if (role === 'aluno') {
+            window.location.href = 'aluno.html';
+        } else {
+            showHubAdmin(email || 'demo@otom.com');
+        }
+    }
+
+    function logout() { clearSession(); showLogin(); }
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const pass = document.getElementById('loginPassword').value;
+        if (!email || !pass) { loginError.textContent = 'Preencha todos os campos.'; return; }
+        loginAs('admin', email);
+    });
+
+    document.getElementById('loginAsAdmin').addEventListener('click', () => loginAs('admin', 'consultor@otom.com'));
+    document.getElementById('loginAsAluno').addEventListener('click', () => loginAs('aluno', 'aluno@otom.com'));
+    document.getElementById('btnLogout').addEventListener('click', logout);
+    document.getElementById('sidebarLogout').addEventListener('click', function(e) { e.preventDefault(); logout(); });
+
+    // ========== HUB / APP NAVIGATION ==========
     function showHub() { app.style.display = 'none'; hub.style.display = 'flex'; }
     function showApp(sec) { hub.style.display = 'none'; app.style.display = 'flex'; switchSection(sec || 'dashboard'); }
 
     hubCards.forEach(c => c.addEventListener('click', function(e) {
-        if (!this.dataset.section) return; // let normal links (like aluno.html) navigate
+        if (!this.dataset.section) return;
         e.preventDefault(); showApp(this.dataset.section);
     }));
     sidebarBrand.addEventListener('click', showHub);
@@ -507,4 +557,12 @@
     seed();
     seedPlans();
     renderAll();
+
+    // Check session on load
+    const session = getSession();
+    if (session && session.role === 'admin') {
+        showHubAdmin(session.email);
+    } else {
+        showLogin();
+    }
 })();
