@@ -1,5 +1,6 @@
 /* ========================================
-   Área do Aluno — O Tom das Notas
+   Área do Aluno + Admin Extras — O Tom das Notas
+   Tabs, Agenda, Chat, Certificate, Resources, Users
    ======================================== */
 
 /* Login */
@@ -8,8 +9,6 @@
 .aluno-login-logo{width:160px;height:auto;mix-blend-mode:multiply;margin-bottom:24px}
 .aluno-login-card h2{font-size:1.4rem;font-weight:900;color:var(--zinc-900);margin-bottom:8px;text-transform:uppercase;letter-spacing:-.02em}
 .aluno-login-card p{font-size:.85rem;color:var(--zinc-500);margin-bottom:28px;line-height:1.6}
-.aluno-login-card select{width:100%;padding:12px 16px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.88rem;color:var(--zinc-900);outline:none;margin-bottom:16px;cursor:pointer}
-.aluno-login-card select:focus{border-color:var(--zinc-900)}
 .btn-block{width:100%;justify-content:center;padding:12px;font-size:.9rem}
 .aluno-back{display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:.82rem;color:var(--zinc-500);transition:color .15s}
 .aluno-back:hover{color:var(--zinc-900)}
@@ -27,8 +26,39 @@
 .aluno-avatar{width:36px;height:36px;border-radius:50%;background:var(--zinc-900);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;text-transform:uppercase}
 .aluno-name{font-size:.85rem;font-weight:700;color:var(--zinc-900)}
 
+/* Notifications */
+.notif-btn{position:relative;background:none;border:none;color:var(--zinc-500);font-size:1.1rem;cursor:pointer;padding:8px;border-radius:50%;transition:all .15s}
+.notif-btn:hover{background:var(--zinc-100);color:var(--zinc-900)}
+.notif-badge{position:absolute;top:2px;right:2px;background:var(--zinc-900);color:var(--white);font-size:.55rem;font-weight:900;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--white)}
+.notif-dropdown{position:fixed;top:64px;right:16px;width:320px;background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:60;max-height:400px;overflow-y:auto}
+.notif-dropdown-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--zinc-100)}
+.notif-dropdown-header h4{font-size:.82rem;font-weight:800;color:var(--zinc-900);text-transform:uppercase;letter-spacing:.05em}
+.notif-dropdown-header button{background:none;border:none;color:var(--zinc-500);font-size:.72rem;font-weight:700;cursor:pointer}
+.notif-dropdown-header button:hover{color:var(--zinc-900)}
+.notif-list{padding:8px}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 8px;border-radius:var(--radius-sm);transition:background .1s}
+.notif-item:hover{background:var(--zinc-50)}
+.notif-item-icon{width:32px;height:32px;border-radius:50%;background:var(--zinc-100);display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--zinc-600);flex-shrink:0}
+.notif-item-icon.notif-meeting{background:var(--blue-50);color:var(--blue-700)}
+.notif-item-icon.notif-content{background:var(--amber-50);color:var(--amber-700)}
+.notif-item-icon.notif-chat{background:var(--emerald-50);color:var(--emerald-700)}
+.notif-item-text{flex:1;font-size:.78rem;color:var(--zinc-700);line-height:1.4}
+.notif-item-text strong{color:var(--zinc-900)}
+.notif-item-time{font-size:.65rem;color:var(--zinc-400);white-space:nowrap;margin-top:2px}
+
+/* Tabs */
+.aluno-tabs{display:flex;background:var(--white);border-bottom:1px solid var(--zinc-200);padding:0 24px;gap:0;position:sticky;top:64px;z-index:40}
+.aluno-tab{padding:14px 20px;font-size:.8rem;font-weight:700;color:var(--zinc-500);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px;font-family:var(--font)}
+.aluno-tab:hover{color:var(--zinc-900)}
+.aluno-tab.active{color:var(--zinc-900);border-bottom-color:var(--zinc-900)}
+.aluno-tab i{font-size:.75rem}
+.aluno-tab-content{display:none}
+.aluno-tab-content.active{display:block}
+
 /* Main */
 .aluno-main{flex:1;max-width:800px;width:100%;margin:0 auto;padding:32px 24px}
+.tab-section-title{font-size:.85rem;font-weight:800;color:var(--zinc-900);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px;margin-bottom:24px}
+.tab-section-title i{color:var(--zinc-500)}
 
 /* Welcome */
 .aluno-welcome{display:flex;align-items:center;justify-content:space-between;gap:32px;background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-lg);padding:32px;margin-bottom:20px}
@@ -61,26 +91,129 @@
 .aluno-steps{display:flex;flex-direction:column;gap:0}
 .aluno-step{display:flex;align-items:flex-start;gap:16px;padding:16px 0;border-bottom:1px solid var(--zinc-100);position:relative}
 .aluno-step:last-child{border-bottom:none}
-
-/* Step timeline dot */
 .step-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--zinc-300);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;background:var(--white);margin-top:2px}
 .step-check:hover{border-color:var(--zinc-900);background:var(--zinc-50)}
 .step-check i{display:none;font-size:.7rem;color:var(--white)}
 .aluno-step.done .step-check{background:var(--emerald-700);border-color:var(--emerald-700)}
 .aluno-step.done .step-check i{display:block}
-
 .step-content{flex:1;min-width:0}
 .step-title{font-size:.9rem;font-weight:700;color:var(--zinc-900);margin-bottom:3px;transition:all .2s}
 .aluno-step.done .step-title{color:var(--zinc-400);text-decoration:line-through}
-.step-meta{font-size:.72rem;color:var(--zinc-500);display:flex;align-items:center;gap:12px}
+.step-meta{font-size:.72rem;color:var(--zinc-500);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .step-meta i{font-size:.65rem}
 .step-number{font-size:.6rem;font-weight:800;color:var(--zinc-400);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+
+/* Step Resources (aluno side) */
+.step-resources{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.step-resource-link{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-size:.7rem;font-weight:600;color:var(--zinc-700);cursor:pointer;transition:all .15s}
+.step-resource-link:hover{background:var(--zinc-900);color:var(--white);border-color:var(--zinc-900)}
+.step-resource-link i{font-size:.65rem}
+
+/* Step Notes (aluno side) */
+.step-notes{margin-top:8px}
+.step-notes textarea{width:100%;padding:8px 10px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.78rem;color:var(--zinc-900);outline:none;resize:vertical;min-height:40px;transition:border-color .15s}
+.step-notes textarea:focus{border-color:var(--zinc-900)}
+.step-notes-label{font-size:.62rem;font-weight:700;color:var(--zinc-400);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
 
 /* No plan */
 .aluno-no-plan{text-align:center;padding:60px 20px}
 .aluno-no-plan-icon{width:80px;height:80px;border-radius:50%;background:var(--zinc-100);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;color:var(--zinc-300)}
 .aluno-no-plan h3{font-size:1.1rem;font-weight:800;color:var(--zinc-900);margin-bottom:8px}
 .aluno-no-plan p{font-size:.88rem;color:var(--zinc-500);max-width:360px;margin:0 auto;line-height:1.6}
+
+/* Certificate Banner */
+.certificate-banner{display:flex;align-items:center;gap:20px;background:var(--emerald-50);border:1px solid var(--emerald-200);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px}
+.certificate-banner-icon{width:50px;height:50px;border-radius:50%;background:var(--emerald-700);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.certificate-banner h3{font-size:.95rem;font-weight:800;color:var(--emerald-700);margin-bottom:2px}
+.certificate-banner p{font-size:.78rem;color:var(--zinc-600)}
+.certificate-banner .btn{margin-left:auto;flex-shrink:0;background:var(--emerald-700)}
+.certificate-banner .btn:hover{opacity:.9}
+
+/* Certificate Modal */
+.certificate-modal{max-width:650px}
+.cert-body{text-align:center;padding:48px 40px;border:3px solid var(--zinc-900);margin:24px;border-radius:var(--radius)}
+.cert-logo{width:100px;height:auto;mix-blend-mode:multiply;margin-bottom:16px}
+.cert-body h2{font-size:1.4rem;font-weight:900;color:var(--zinc-900);text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px}
+.cert-text{font-size:.85rem;color:var(--zinc-600);margin-bottom:6px}
+.cert-name{font-size:1.5rem;font-weight:900;color:var(--zinc-900);margin:12px 0;border-bottom:2px solid var(--zinc-900);display:inline-block;padding-bottom:4px}
+.cert-plan{font-size:1rem;font-weight:700;color:var(--zinc-700);margin:12px 0 16px;font-style:italic}
+.cert-date{font-size:.78rem;color:var(--zinc-500);margin:20px 0}
+.cert-footer{margin-top:32px}
+.cert-signature{display:inline-block}
+.cert-line{width:200px;height:1px;background:var(--zinc-900);margin-bottom:6px}
+.cert-signature span{font-size:.75rem;font-weight:800;color:var(--zinc-900);text-transform:uppercase;letter-spacing:.1em}
+
+/* Resource Viewer */
+.modal-lg{max-width:750px}
+.resource-content{padding:24px}
+.resource-content iframe{width:100%;aspect-ratio:16/9;border:none;border-radius:var(--radius-sm)}
+.resource-content a{display:inline-flex;align-items:center;gap:6px;color:var(--zinc-900);font-weight:700;font-size:.88rem}
+.resource-content a:hover{text-decoration:underline}
+
+/* ========== Meetings (both sides) ========== */
+.meetings-list{display:flex;flex-direction:column;gap:12px}
+.meeting-card{background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius);padding:20px;display:flex;gap:16px;align-items:flex-start;transition:all .15s}
+.meeting-card:hover{border-color:var(--zinc-400);box-shadow:var(--shadow)}
+.meeting-date-box{background:var(--zinc-900);color:var(--white);border-radius:var(--radius-sm);padding:10px 14px;text-align:center;flex-shrink:0;min-width:56px}
+.meeting-date-day{font-family:var(--font-display);font-size:1.4rem;font-weight:900;line-height:1}
+.meeting-date-month{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.meeting-info{flex:1}
+.meeting-title{font-size:.9rem;font-weight:800;color:var(--zinc-900);margin-bottom:4px}
+.meeting-detail{font-size:.78rem;color:var(--zinc-500);display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.meeting-detail i{font-size:.7rem;width:14px;text-align:center}
+.meeting-type-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.meeting-type-badge.online{background:var(--blue-50);color:var(--blue-700);border:1px solid var(--blue-200)}
+.meeting-type-badge.presencial{background:var(--amber-50);color:var(--amber-700);border:1px solid var(--amber-200)}
+.meeting-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:5px 12px;background:var(--zinc-900);color:var(--white);border-radius:var(--radius-sm);font-size:.72rem;font-weight:700;transition:opacity .15s}
+.meeting-link:hover{opacity:.8}
+.meeting-actions{display:flex;gap:4px;flex-shrink:0}
+.meeting-actions button{background:none;border:none;color:var(--zinc-400);cursor:pointer;padding:4px;font-size:.82rem;transition:color .15s}
+.meeting-actions button:hover{color:var(--zinc-900)}
+
+/* ========== Chat ========== */
+/* Admin chat layout */
+.chat-layout{display:flex;background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-lg);overflow:hidden;height:calc(100vh - 220px);min-height:400px}
+.chat-contacts{width:280px;border-right:1px solid var(--zinc-200);display:flex;flex-direction:column;flex-shrink:0}
+.chat-contacts-header{padding:12px;border-bottom:1px solid var(--zinc-100);display:flex;align-items:center;gap:8px;color:var(--zinc-400)}
+.chat-contacts-header i{font-size:.82rem}
+.chat-contacts-header input{flex:1;background:none;border:none;font-family:var(--font);font-size:.82rem;color:var(--zinc-900);outline:none}
+.chat-contacts-header input::placeholder{color:var(--zinc-400)}
+.chat-contacts-list{flex:1;overflow-y:auto}
+.chat-contact{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--zinc-50)}
+.chat-contact:hover{background:var(--zinc-50)}
+.chat-contact.active{background:var(--zinc-100)}
+.chat-contact-avatar{width:36px;height:36px;border-radius:50%;background:var(--zinc-200);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:900;color:var(--zinc-700);flex-shrink:0}
+.chat-contact-info{flex:1;min-width:0}
+.chat-contact-name{font-size:.82rem;font-weight:700;color:var(--zinc-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-contact-last{font-size:.7rem;color:var(--zinc-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-contact-badge{width:8px;height:8px;border-radius:50%;background:var(--zinc-900);flex-shrink:0}
+.chat-main{flex:1;display:flex;flex-direction:column}
+.chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--zinc-300);gap:8px;font-size:.88rem}
+.chat-empty i{font-size:2rem}
+.chat-empty p{color:var(--zinc-400);font-size:.82rem}
+.chat-header-bar{padding:14px 18px;border-bottom:1px solid var(--zinc-100);display:flex;align-items:center;gap:10px}
+.chat-header-bar span{font-size:.88rem;font-weight:800;color:var(--zinc-900)}
+.chat-messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:75%;padding:10px 14px;border-radius:var(--radius);font-size:.82rem;line-height:1.5;position:relative}
+.chat-msg.sent{align-self:flex-end;background:var(--zinc-900);color:var(--white);border-bottom-right-radius:2px}
+.chat-msg.received{align-self:flex-start;background:var(--zinc-100);color:var(--zinc-900);border-bottom-left-radius:2px}
+.chat-msg-time{font-size:.58rem;color:var(--zinc-500);margin-top:4px;display:block}
+.chat-msg.sent .chat-msg-time{color:var(--zinc-400)}
+.chat-input-bar{padding:12px 16px;border-top:1px solid var(--zinc-100);display:flex;gap:8px}
+.chat-input-bar input{flex:1;padding:10px 14px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:20px;font-family:var(--font);font-size:.82rem;color:var(--zinc-900);outline:none}
+.chat-input-bar input:focus{border-color:var(--zinc-900)}
+.chat-input-bar button{width:38px;height:38px;border-radius:50%;background:var(--zinc-900);color:var(--white);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:opacity .15s;flex-shrink:0}
+.chat-input-bar button:hover{opacity:.8}
+
+/* Aluno chat (simpler, full-width) */
+.aluno-chat-box{background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column;height:500px}
+.aluno-chat-header{padding:14px 18px;border-bottom:1px solid var(--zinc-100);display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:800;color:var(--zinc-900)}
+.aluno-chat-header i{color:var(--zinc-500)}
+.aluno-chat-messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+.aluno-chat-input{padding:12px 16px;border-top:1px solid var(--zinc-100);display:flex;gap:8px}
+.aluno-chat-input input{flex:1;padding:10px 14px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:20px;font-family:var(--font);font-size:.82rem;color:var(--zinc-900);outline:none}
+.aluno-chat-input input:focus{border-color:var(--zinc-900)}
+.aluno-chat-input button{width:38px;height:38px;border-radius:50%;background:var(--zinc-900);color:var(--white);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
 
 /* ========== Plans Grid (CRM side) ========== */
 .plans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
@@ -102,19 +235,31 @@
 .plan-card-footer i{font-size:.65rem}
 
 /* Plan step editor */
-.plan-steps-editor{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
-.plan-step-row{display:flex;gap:8px;align-items:center}
-.plan-step-input{flex:1;padding:9px 12px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.84rem;color:var(--zinc-900);outline:none}
+.plan-steps-editor{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.plan-step-row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;padding:10px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm)}
+.plan-step-row .step-main{display:flex;gap:8px;align-items:center;width:100%}
+.plan-step-input{flex:1;padding:9px 12px;background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.84rem;color:var(--zinc-900);outline:none}
 .plan-step-input:focus{border-color:var(--zinc-900)}
-.plan-step-days{width:70px;padding:9px 10px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.84rem;color:var(--zinc-900);outline:none;text-align:center}
+.plan-step-days{width:70px;padding:9px 10px;background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.84rem;color:var(--zinc-900);outline:none;text-align:center}
 .plan-step-days:focus{border-color:var(--zinc-900)}
 .btn-icon{background:none;border:none;color:var(--zinc-400);cursor:pointer;padding:6px;font-size:.82rem;transition:color .15s}
 .btn-icon:hover{color:var(--rose-700)}
+.btn-icon.btn-add-resource{color:var(--zinc-500)}
+.btn-icon.btn-add-resource:hover{color:var(--zinc-900)}
 .btn-sm{font-size:.76rem;padding:7px 14px}
 
-/* Hub highlight card */
-.hub-card-highlight{grid-column:1/-1}
-.hub-card-highlight .icon-student{background:var(--emerald-700)}
+/* Step resources editor (admin) */
+.step-resources-editor{width:100%;display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.step-resource-row{display:flex;gap:6px;align-items:center}
+.step-resource-row select{padding:6px 8px;background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.76rem;outline:none;width:100px}
+.step-resource-row input{flex:1;padding:6px 8px;background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.76rem;color:var(--zinc-900);outline:none}
+.step-resource-row input:focus,.step-resource-row select:focus{border-color:var(--zinc-900)}
+
+/* Users table extras */
+.users-table-wrap{overflow-x:auto}
+.role-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.role-badge.admin{background:var(--zinc-900);color:var(--white)}
+.role-badge.aluno{background:var(--emerald-50);color:var(--emerald-700);border:1px solid var(--emerald-200)}
 
 @media(max-width:768px){
     .aluno-welcome{flex-direction:column;text-align:center}
@@ -122,4 +267,12 @@
     .aluno-login-card{padding:32px 24px}
     .aluno-login-logo{width:120px}
     .plans-grid{grid-template-columns:1fr}
+    .chat-layout{flex-direction:column;height:auto}
+    .chat-contacts{width:100%;max-height:200px;border-right:none;border-bottom:1px solid var(--zinc-200)}
+    .aluno-tabs{overflow-x:auto}
+    .aluno-tab{white-space:nowrap;padding:12px 14px;font-size:.74rem}
+    .certificate-banner{flex-direction:column;text-align:center}
+    .certificate-banner .btn{margin-left:0}
+    .cert-body{padding:32px 20px;margin:16px}
+    .notif-dropdown{width:calc(100vw - 32px);right:16px}
 }

@@ -48,7 +48,7 @@
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
     const sections = document.querySelectorAll('.section');
 
-    const titles = { dashboard:'Painel Geral', pipeline:'Pipeline de Vendas', leads:'Base de Contatos', planos:'Planos de Ação', about:'Sobre' };
+    const titles = { dashboard:'Painel Geral', pipeline:'Pipeline de Vendas', leads:'Base de Contatos', planos:'Planos de Ação', agenda:'Agenda', mensagens:'Mensagens', usuarios:'Gestão de Usuários', about:'Sobre' };
 
     // ========== LOGIN / SESSION ==========
     const SESSION_KEY = 'otomdasnotas_session';
@@ -511,6 +511,317 @@
         }).join('');
     }
 
+    // ========== USERS MANAGEMENT ==========
+    const USERS_KEY = 'otomdasnotas_users';
+    let users = load(USERS_KEY) || [];
+    function saveUsers() { save(USERS_KEY, users); }
+    let editingUserId = null;
+
+    const userOverlay = document.getElementById('modalUserOverlay');
+    const userForm = document.getElementById('userForm');
+
+    function openUserModal(user) {
+        editingUserId = user ? user.id : null;
+        document.getElementById('userModalTitle').innerHTML = user ? '<i class="fas fa-edit"></i> Editar Usuário' : '<i class="fas fa-user-plus"></i> Novo Usuário';
+        document.getElementById('userName').value = user ? user.name : '';
+        document.getElementById('userEmail').value = user ? user.email : '';
+        document.getElementById('userPassword').value = user ? user.password : '';
+        document.getElementById('userRole').value = user ? user.role : 'admin';
+        const leadSel = document.getElementById('userLeadId');
+        leadSel.innerHTML = '<option value="">Nenhum</option>' + leads.map(l => '<option value="'+l.id+'"'+(user&&user.leadId===l.id?' selected':'')+'>'+esc(l.name)+'</option>').join('');
+        toggleUserLeadGroup();
+        userOverlay.classList.add('active');
+    }
+    function closeUserModal() { userOverlay.classList.remove('active'); editingUserId = null; userForm.reset(); }
+    function toggleUserLeadGroup() {
+        document.getElementById('userLeadGroup').style.display = document.getElementById('userRole').value === 'aluno' ? '' : 'none';
+    }
+
+    document.getElementById('btnNewUser').addEventListener('click', () => openUserModal(null));
+    document.getElementById('userModalClose').addEventListener('click', closeUserModal);
+    document.getElementById('btnCancelUser').addEventListener('click', closeUserModal);
+    userOverlay.addEventListener('click', e => { if (e.target === userOverlay) closeUserModal(); });
+    document.getElementById('userRole').addEventListener('change', toggleUserLeadGroup);
+
+    userForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const data = {
+            name: document.getElementById('userName').value.trim(),
+            email: document.getElementById('userEmail').value.trim(),
+            password: document.getElementById('userPassword').value,
+            role: document.getElementById('userRole').value,
+            leadId: document.getElementById('userRole').value === 'aluno' ? document.getElementById('userLeadId').value : ''
+        };
+        if (editingUserId) {
+            const i = users.findIndex(u => u.id === editingUserId);
+            if (i !== -1) users[i] = { ...users[i], ...data };
+        } else {
+            users.push({ id: genId(), ...data, createdAt: new Date().toISOString() });
+        }
+        saveUsers(); closeUserModal(); renderUsers();
+    });
+
+    window._editUser = id => { const u = users.find(x => x.id === id); if (u) openUserModal(u); };
+    window._delUser = id => { if (confirm('Excluir este usuário?')) { users = users.filter(x => x.id !== id); saveUsers(); renderUsers(); } };
+
+    function renderUsers() {
+        const tbody = document.getElementById('usersTableBody');
+        if (users.length === 0) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Nenhum usuário cadastrado.</td></tr>'; return; }
+        tbody.innerHTML = users.map(u => {
+            const lead = u.leadId ? leads.find(l => l.id === u.leadId) : null;
+            return '<tr><td><strong>'+esc(u.name)+'</strong></td><td>'+esc(u.email)+'</td>' +
+                '<td><span class="role-badge '+u.role+'">'+(u.role==='admin'?'Administrador':'Aluno')+'</span></td>' +
+                '<td>'+(lead?esc(lead.name):'—')+'</td>' +
+                '<td>'+new Date(u.createdAt).toLocaleDateString('pt-BR')+'</td>' +
+                '<td><div class="table-actions"><button onclick="window._editUser(\''+u.id+'\')" title="Editar"><i class="fas fa-edit"></i></button>' +
+                '<button onclick="window._delUser(\''+u.id+'\')" title="Excluir"><i class="fas fa-trash"></i></button></div></td></tr>';
+        }).join('');
+    }
+
+    // ========== MEETINGS ==========
+    const MEETINGS_KEY = 'otomdasnotas_meetings';
+    let meetings = load(MEETINGS_KEY) || [];
+    function saveMeetings() { save(MEETINGS_KEY, meetings); }
+    let editingMeetingId = null;
+
+    const meetingOverlay = document.getElementById('modalMeetingOverlay');
+    const meetingForm = document.getElementById('meetingForm');
+
+    function openMeetingModal(m) {
+        editingMeetingId = m ? m.id : null;
+        document.getElementById('meetingModalTitle').innerHTML = m ? '<i class="fas fa-edit"></i> Editar Encontro' : '<i class="fas fa-calendar-plus"></i> Novo Encontro';
+        const sel = document.getElementById('meetingClient');
+        sel.innerHTML = '<option value="">Selecione...</option>' + leads.map(l => '<option value="'+l.id+'"'+(m&&m.clientId===l.id?' selected':'')+'>'+esc(l.name)+'</option>').join('');
+        document.getElementById('meetingTitle').value = m ? m.title : '';
+        document.getElementById('meetingDate').value = m ? m.date : '';
+        document.getElementById('meetingTime').value = m ? m.time : '';
+        document.getElementById('meetingType').value = m ? m.type : 'online';
+        document.getElementById('meetingLink').value = m ? m.link : '';
+        document.getElementById('meetingDetails').value = m ? m.details : '';
+        meetingOverlay.classList.add('active');
+    }
+    function closeMeetingModal() { meetingOverlay.classList.remove('active'); editingMeetingId = null; meetingForm.reset(); }
+
+    document.getElementById('btnNewMeeting').addEventListener('click', () => openMeetingModal(null));
+    document.getElementById('meetingModalClose').addEventListener('click', closeMeetingModal);
+    document.getElementById('btnCancelMeeting').addEventListener('click', closeMeetingModal);
+    meetingOverlay.addEventListener('click', e => { if (e.target === meetingOverlay) closeMeetingModal(); });
+
+    meetingForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const data = {
+            clientId: document.getElementById('meetingClient').value,
+            title: document.getElementById('meetingTitle').value.trim(),
+            date: document.getElementById('meetingDate').value,
+            time: document.getElementById('meetingTime').value,
+            type: document.getElementById('meetingType').value,
+            link: document.getElementById('meetingLink').value.trim(),
+            details: document.getElementById('meetingDetails').value.trim()
+        };
+        if (editingMeetingId) {
+            const i = meetings.findIndex(m => m.id === editingMeetingId);
+            if (i !== -1) meetings[i] = { ...meetings[i], ...data };
+        } else {
+            meetings.push({ id: genId(), ...data, createdAt: new Date().toISOString() });
+            // Add notification for the client
+            addNotification(data.clientId, 'meeting', 'Novo encontro agendado: ' + data.title + ' em ' + formatDateBR(data.date));
+        }
+        saveMeetings(); closeMeetingModal(); renderMeetings();
+    });
+
+    window._editMeeting = id => { const m = meetings.find(x => x.id === id); if (m) openMeetingModal(m); };
+    window._delMeeting = id => { if (confirm('Excluir este encontro?')) { meetings = meetings.filter(x => x.id !== id); saveMeetings(); renderMeetings(); } };
+
+    function formatDateBR(d) { if (!d) return ''; const [y,m,dd] = d.split('-'); return dd+'/'+m+'/'+y; }
+    const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+    function renderMeetings() {
+        const list = document.getElementById('meetingsList');
+        if (meetings.length === 0) { list.innerHTML = '<p class="empty-state">Nenhum encontro agendado.</p>'; return; }
+        const sorted = [...meetings].sort((a,b) => a.date.localeCompare(b.date));
+        list.innerHTML = sorted.map(m => {
+            const client = leads.find(l => l.id === m.clientId);
+            const d = new Date(m.date + 'T00:00');
+            return '<div class="meeting-card"><div class="meeting-date-box"><div class="meeting-date-day">'+d.getDate()+'</div><div class="meeting-date-month">'+MONTHS[d.getMonth()]+'</div></div>' +
+                '<div class="meeting-info"><div class="meeting-title">'+esc(m.title)+'</div>' +
+                '<div class="meeting-detail"><i class="fas fa-user"></i> '+(client?esc(client.name):'—')+'</div>' +
+                '<div class="meeting-detail"><i class="fas fa-clock"></i> '+m.time+'</div>' +
+                '<span class="meeting-type-badge '+m.type+'"><i class="fas fa-'+(m.type==='online'?'video':'map-marker-alt')+'"></i> '+m.type+'</span>' +
+                (m.link?'<a href="'+esc(m.link)+'" target="_blank" class="meeting-link"><i class="fas fa-video"></i> Acessar reunião</a>':'') +
+                (m.details?'<div class="meeting-detail" style="margin-top:6px"><i class="fas fa-info-circle"></i> '+esc(m.details)+'</div>':'') +
+                '</div><div class="meeting-actions"><button onclick="window._editMeeting(\''+m.id+'\')" title="Editar"><i class="fas fa-edit"></i></button><button onclick="window._delMeeting(\''+m.id+'\')" title="Excluir"><i class="fas fa-trash"></i></button></div></div>';
+        }).join('');
+    }
+
+    // ========== NOTIFICATIONS ==========
+    const NOTIF_KEY = 'otomdasnotas_notifications';
+    let notifications = load(NOTIF_KEY) || [];
+    function saveNotifications() { save(NOTIF_KEY, notifications); }
+    function addNotification(clientId, type, message) {
+        notifications.push({ id: genId(), clientId, type, message, read: false, time: new Date().toISOString() });
+        saveNotifications();
+    }
+
+    // ========== CHAT (Admin side) ==========
+    const CHAT_KEY = 'otomdasnotas_chat';
+    let chatMessages = load(CHAT_KEY) || [];
+    function saveChat() { save(CHAT_KEY, chatMessages); }
+    let activeChatClient = null;
+
+    function renderChatContacts() {
+        const list = document.getElementById('chatContactsList');
+        // Show leads that have plans (active clients)
+        const clientIds = [...new Set(plans.map(p => p.clientId))];
+        if (clientIds.length === 0) { list.innerHTML = '<p class="empty-state" style="padding:20px;font-size:.78rem">Nenhum cliente com plano ativo.</p>'; return; }
+        list.innerHTML = clientIds.map(cid => {
+            const client = leads.find(l => l.id === cid);
+            if (!client) return '';
+            const msgs = chatMessages.filter(m => m.clientId === cid);
+            const last = msgs.length > 0 ? msgs[msgs.length-1] : null;
+            const unread = msgs.filter(m => m.senderRole === 'aluno' && !m.readByAdmin).length;
+            return '<div class="chat-contact'+(activeChatClient===cid?' active':'')+'" data-cid="'+cid+'">' +
+                '<div class="chat-contact-avatar">'+client.name.charAt(0)+'</div>' +
+                '<div class="chat-contact-info"><div class="chat-contact-name">'+esc(client.name)+'</div>' +
+                '<div class="chat-contact-last">'+(last?esc(last.text.substring(0,30)):'Sem mensagens')+'</div></div>' +
+                (unread>0?'<div class="chat-contact-badge"></div>':'') +
+                '</div>';
+        }).join('');
+        list.querySelectorAll('.chat-contact').forEach(el => {
+            el.addEventListener('click', function() {
+                activeChatClient = this.dataset.cid;
+                renderChatContacts();
+                renderChatWindow();
+            });
+        });
+    }
+
+    function renderChatWindow() {
+        const main = document.getElementById('chatMain');
+        if (!activeChatClient) { main.innerHTML = '<div class="chat-empty"><i class="fas fa-comments"></i><p>Selecione um contato</p></div>'; return; }
+        const client = leads.find(l => l.id === activeChatClient);
+        const msgs = chatMessages.filter(m => m.clientId === activeChatClient);
+        // Mark as read by admin
+        msgs.forEach(m => { if (m.senderRole === 'aluno') m.readByAdmin = true; });
+        saveChat();
+
+        main.innerHTML = '<div class="chat-header-bar"><div class="chat-contact-avatar" style="width:30px;height:30px;font-size:.7rem">'+client.name.charAt(0)+'</div><span>'+esc(client.name)+'</span></div>' +
+            '<div class="chat-messages" id="chatMsgs">' + (msgs.length === 0 ? '<p class="empty-state">Nenhuma mensagem.</p>' :
+            msgs.map(m => '<div class="chat-msg '+(m.senderRole==='admin'?'sent':'received')+'">'+esc(m.text)+'<span class="chat-msg-time">'+timeAgo(m.time)+'</span></div>').join('')) +
+            '</div><form class="chat-input-bar" id="adminChatForm"><input type="text" id="adminChatText" placeholder="Mensagem..." required autocomplete="off"><button type="submit"><i class="fas fa-paper-plane"></i></button></form>';
+
+        const msgsDiv = document.getElementById('chatMsgs');
+        msgsDiv.scrollTop = msgsDiv.scrollHeight;
+
+        document.getElementById('adminChatForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const text = document.getElementById('adminChatText').value.trim();
+            if (!text) return;
+            chatMessages.push({ id: genId(), clientId: activeChatClient, senderRole: 'admin', text, time: new Date().toISOString(), readByAdmin: true });
+            saveChat();
+            addNotification(activeChatClient, 'chat', 'Nova mensagem do consultor');
+            renderChatWindow();
+            renderChatContacts();
+        });
+    }
+
+    // ========== ENHANCED PLAN STEP EDITOR (with resources) ==========
+    // Override addStepRow to support resources
+    const origAddStepRow = addStepRow;
+    function addStepRowEnhanced(text, days, resources) {
+        const row = document.createElement('div');
+        row.className = 'plan-step-row';
+        row.innerHTML = '<div class="step-main">' +
+            '<input type="text" class="plan-step-input" placeholder="Descrição da etapa..." value="'+esc(text||'')+'" required>' +
+            '<input type="number" class="plan-step-days" placeholder="Dias" min="1" value="'+(days||7)+'" title="Prazo em dias">' +
+            '<button type="button" class="btn-icon btn-add-resource" title="Adicionar conteúdo"><i class="fas fa-paperclip"></i></button>' +
+            '<button type="button" class="btn-icon btn-remove-step" title="Remover"><i class="fas fa-times"></i></button></div>' +
+            '<div class="step-resources-editor"></div>';
+
+        row.querySelector('.btn-remove-step').addEventListener('click', () => {
+            if (planStepsEditor.children.length > 1) row.remove();
+        });
+        row.querySelector('.btn-add-resource').addEventListener('click', () => {
+            addResourceRow(row.querySelector('.step-resources-editor'), '', '', '');
+        });
+        planStepsEditor.appendChild(row);
+
+        // Add existing resources
+        if (resources && resources.length > 0) {
+            const resEditor = row.querySelector('.step-resources-editor');
+            resources.forEach(r => addResourceRow(resEditor, r.type, r.title, r.url));
+        }
+    }
+
+    function addResourceRow(container, type, title, url) {
+        const row = document.createElement('div');
+        row.className = 'step-resource-row';
+        row.innerHTML = '<select class="res-type"><option value="video"'+(type==='video'?' selected':'')+'>Video</option><option value="article"'+(type==='article'?' selected':'')+'>Matéria</option><option value="podcast"'+(type==='podcast'?' selected':'')+'>Podcast</option></select>' +
+            '<input type="text" class="res-title" placeholder="Título" value="'+esc(title||'')+'">' +
+            '<input type="url" class="res-url" placeholder="URL" value="'+esc(url||'')+'">' +
+            '<button type="button" class="btn-icon" onclick="this.parentElement.remove()" title="Remover"><i class="fas fa-times"></i></button>';
+        container.appendChild(row);
+    }
+
+    // Override plan modal open to use enhanced step rows
+    const origOpenPlanModal = openPlanModal;
+    openPlanModal = function(plan) {
+        editingPlanId = plan ? plan.id : null;
+        planModalTitle.innerHTML = plan ? '<i class="fas fa-edit"></i> Editar Plano' : '<i class="fas fa-clipboard-list"></i> Novo Plano de Ação';
+        const sel = document.getElementById('planClient');
+        sel.innerHTML = '<option value="">Selecione um lead...</option>' + leads.map(l => '<option value="'+l.id+'"'+(plan&&plan.clientId===l.id?' selected':'')+'>'+esc(l.name)+' — '+(SEGMENT_LABELS[l.segment]||'')+'</option>').join('');
+        document.getElementById('planTitle').value = plan ? plan.title : '';
+        document.getElementById('planObjective').value = plan ? plan.objective : '';
+        planStepsEditor.innerHTML = '';
+        const steps = plan ? plan.steps : [{ text: '', days: 7, resources: [] }];
+        steps.forEach(s => addStepRowEnhanced(s.text, s.days, s.resources));
+        planOverlay.classList.add('active');
+    };
+
+    // Override plan form submit to collect resources
+    planForm.removeEventListener('submit', planForm._handler);
+    planForm._handler2 = function(e) {
+        e.preventDefault();
+        const clientId = document.getElementById('planClient').value;
+        const title = document.getElementById('planTitle').value.trim();
+        const objective = document.getElementById('planObjective').value.trim();
+        const stepRows = planStepsEditor.querySelectorAll('.plan-step-row');
+        const steps = Array.from(stepRows).map(row => {
+            const resources = Array.from(row.querySelectorAll('.step-resource-row')).map(r => ({
+                type: r.querySelector('.res-type').value,
+                title: r.querySelector('.res-title').value.trim(),
+                url: r.querySelector('.res-url').value.trim()
+            })).filter(r => r.url);
+            return {
+                text: row.querySelector('.plan-step-input').value.trim(),
+                days: parseInt(row.querySelector('.plan-step-days').value) || 7,
+                done: false,
+                resources,
+                notes: ''
+            };
+        }).filter(s => s.text);
+        if (!clientId || !title || steps.length === 0) return;
+        if (editingPlanId) {
+            const i = plans.findIndex(p => p.id === editingPlanId);
+            if (i !== -1) {
+                const oldSteps = plans[i].steps;
+                steps.forEach((s, idx) => { if (oldSteps[idx]) { s.done = oldSteps[idx].done; s.notes = oldSteps[idx].notes || ''; } });
+                plans[i] = { ...plans[i], clientId, title, objective, steps, updatedAt: new Date().toISOString() };
+            }
+        } else {
+            plans.push({ id: genId(), clientId, title, objective, steps, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+            addNotification(clientId, 'content', 'Novo plano de ação criado: ' + title);
+        }
+        savePlans(); closePlanModal(); renderPlans();
+    };
+    planForm.addEventListener('submit', planForm._handler2);
+
+    // Override addStep button
+    document.getElementById('btnAddStep').removeEventListener('click', document.getElementById('btnAddStep')._handler);
+    document.getElementById('btnAddStep').addEventListener('click', () => addStepRowEnhanced('', 7, []));
+
+    // ========== RENDER ALL (updated) ==========
+    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); renderPlans(); renderUsers(); renderMeetings(); renderChatContacts(); }
+
     // ========== SEED DATA ==========
     function seed() {
         if (leads.length > 0) return;
@@ -539,13 +850,13 @@
             title: 'Profissionalização Digital — Curso Online',
             objective: 'Transformar aulas particulares de piano em um curso online escalável com funil de captação de alunos.',
             steps: [
-                { text: 'Definir nicho e público-alvo do curso', days: 3, done: true },
-                { text: 'Criar perfil profissional no Instagram', days: 5, done: true },
-                { text: 'Gravar 3 aulas piloto para validação', days: 14, done: true },
-                { text: 'Montar página de vendas com depoimentos', days: 7, done: false },
-                { text: 'Configurar funil de e-mail marketing', days: 5, done: false },
-                { text: 'Lançar campanha de captação de alunos', days: 7, done: false },
-                { text: 'Analisar métricas e otimizar conversão', days: 10, done: false },
+                { text: 'Definir nicho e público-alvo do curso', days: 3, done: true, resources: [{ type:'video', title:'Como definir seu nicho musical', url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }], notes:'' },
+                { text: 'Criar perfil profissional no Instagram', days: 5, done: true, resources: [{ type:'article', title:'Guia de Instagram para músicos', url:'https://example.com/guia-instagram' }], notes:'' },
+                { text: 'Gravar 3 aulas piloto para validação', days: 14, done: true, resources: [], notes:'' },
+                { text: 'Montar página de vendas com depoimentos', days: 7, done: false, resources: [{ type:'video', title:'Como criar uma página de vendas', url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }], notes:'' },
+                { text: 'Configurar funil de e-mail marketing', days: 5, done: false, resources: [{ type:'podcast', title:'Marketing Digital para Músicos', url:'https://example.com/podcast' }], notes:'' },
+                { text: 'Lançar campanha de captação de alunos', days: 7, done: false, resources: [], notes:'' },
+                { text: 'Analisar métricas e otimizar conversão', days: 10, done: false, resources: [], notes:'' },
             ],
             createdAt: new Date(Date.now() - 10 * 86400000).toISOString(),
             updatedAt: new Date().toISOString()
@@ -553,9 +864,35 @@
         savePlans();
     }
 
+    // Seed users
+    function seedUsers() {
+        if (users.length > 0) return;
+        const maria = leads.find(l => l.name.includes('Maria Eduarda'));
+        users.push({ id: genId(), name: 'Admin', email: 'admin@otom.com', password: '1234', role: 'admin', leadId: '', createdAt: new Date().toISOString() });
+        if (maria) users.push({ id: genId(), name: maria.name, email: maria.email, password: '1234', role: 'aluno', leadId: maria.id, createdAt: new Date().toISOString() });
+        saveUsers();
+    }
+
+    // Seed meetings
+    function seedMeetings() {
+        if (meetings.length > 0) return;
+        const maria = leads.find(l => l.name.includes('Maria Eduarda'));
+        if (!maria) return;
+        const today = new Date();
+        const next = new Date(today); next.setDate(today.getDate() + 3);
+        const fmt2 = d => d.toISOString().split('T')[0];
+        meetings.push(
+            { id: genId(), clientId: maria.id, title: 'Revisão do Plano de Ação', date: fmt2(next), time: '14:00', type: 'online', link: 'https://meet.google.com/abc-defg-hij', details: 'Revisão das 3 primeiras etapas concluídas', createdAt: new Date().toISOString() },
+            { id: genId(), clientId: maria.id, title: 'Workshop de Gravação', date: fmt2(new Date(today.getTime() + 10*86400000)), time: '10:00', type: 'presencial', link: '', details: 'Estúdio Central, Sala 3 — Rua das Flores, 123', createdAt: new Date().toISOString() }
+        );
+        saveMeetings();
+    }
+
     // ========== INIT ==========
     seed();
     seedPlans();
+    seedUsers();
+    seedMeetings();
     renderAll();
 
     // Check session on load

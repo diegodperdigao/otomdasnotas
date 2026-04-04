@@ -49,7 +49,11 @@
                 <span class="aluno-topbar-title">Área do Aluno</span>
             </div>
             <div class="aluno-topbar-right">
-                <div class="aluno-user" id="alunoUser">
+                <button class="notif-btn" id="notifBtn" title="Notificações">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+                </button>
+                <div class="aluno-user">
                     <div class="aluno-avatar" id="alunoAvatar">?</div>
                     <span class="aluno-name" id="alunoName">—</span>
                 </div>
@@ -57,57 +61,139 @@
             </div>
         </header>
 
+        <!-- Notifications Dropdown -->
+        <div class="notif-dropdown" id="notifDropdown" style="display:none">
+            <div class="notif-dropdown-header"><h4>Notificações</h4><button id="notifClearAll">Limpar</button></div>
+            <div class="notif-list" id="notifList"><p class="empty-state">Sem notificações.</p></div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <nav class="aluno-tabs">
+            <button class="aluno-tab active" data-tab="plano"><i class="fas fa-route"></i> Plano de Ação</button>
+            <button class="aluno-tab" data-tab="agenda"><i class="fas fa-calendar-alt"></i> Agenda</button>
+            <button class="aluno-tab" data-tab="chat"><i class="fas fa-comments"></i> Mensagens</button>
+        </nav>
+
         <main class="aluno-main">
-            <!-- Welcome + Progress -->
-            <div class="aluno-welcome" id="alunoWelcome">
-                <div class="aluno-welcome-text">
-                    <h1 id="alunoGreeting">Olá!</h1>
-                    <p id="alunoPlanTitle" class="aluno-plan-title">—</p>
-                    <p id="alunoPlanObjective" class="aluno-plan-obj">—</p>
+
+            <!-- TAB: Plano de Ação -->
+            <div class="aluno-tab-content active" id="tab-plano">
+                <!-- Welcome + Progress -->
+                <div class="aluno-welcome" id="alunoWelcome">
+                    <div class="aluno-welcome-text">
+                        <h1 id="alunoGreeting">Olá!</h1>
+                        <p id="alunoPlanTitle" class="aluno-plan-title">—</p>
+                        <p id="alunoPlanObjective" class="aluno-plan-obj">—</p>
+                    </div>
+                    <div class="aluno-progress-ring" id="alunoProgressRing">
+                        <svg viewBox="0 0 120 120">
+                            <circle class="ring-bg" cx="60" cy="60" r="52" />
+                            <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52" stroke-dasharray="327" stroke-dashoffset="327" />
+                        </svg>
+                        <div class="ring-label">
+                            <span class="ring-value" id="ringValue">0%</span>
+                            <span class="ring-text">concluído</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="aluno-progress-ring" id="alunoProgressRing">
-                    <svg viewBox="0 0 120 120">
-                        <circle class="ring-bg" cx="60" cy="60" r="52" />
-                        <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52" stroke-dasharray="327" stroke-dashoffset="327" />
-                    </svg>
-                    <div class="ring-label">
-                        <span class="ring-value" id="ringValue">0%</span>
-                        <span class="ring-text">concluído</span>
+
+                <!-- Stats -->
+                <div class="aluno-stats">
+                    <div class="aluno-stat"><span class="aluno-stat-value" id="statTotal">0</span><span class="aluno-stat-label">Total</span></div>
+                    <div class="aluno-stat"><span class="aluno-stat-value" id="statDone">0</span><span class="aluno-stat-label">Concluídas</span></div>
+                    <div class="aluno-stat"><span class="aluno-stat-value" id="statPending">0</span><span class="aluno-stat-label">Pendentes</span></div>
+                </div>
+
+                <!-- Steps -->
+                <div class="aluno-plan-section">
+                    <h2><i class="fas fa-route"></i> Seu Plano de Ação</h2>
+                    <div class="aluno-steps" id="alunoSteps">
+                        <p class="empty-state">Nenhum plano de ação encontrado.</p>
+                    </div>
+                </div>
+
+                <!-- Certificate Banner (shows when 100%) -->
+                <div class="certificate-banner" id="certificateBanner" style="display:none">
+                    <div class="certificate-banner-icon"><i class="fas fa-award"></i></div>
+                    <div>
+                        <h3>Parabéns! Plano 100% concluído!</h3>
+                        <p>Você completou todas as etapas do seu plano de ação.</p>
+                    </div>
+                    <button class="btn btn-primary" id="btnViewCertificate"><i class="fas fa-certificate"></i> Ver Certificado</button>
+                </div>
+
+                <!-- No Plan State -->
+                <div class="aluno-no-plan" id="alunoNoPlan" style="display:none;">
+                    <div class="aluno-no-plan-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h3>Nenhum plano cadastrado ainda</h3>
+                    <p>Seu consultor irá criar um plano de ação personalizado para você. Aguarde!</p>
+                </div>
+            </div>
+
+            <!-- TAB: Agenda -->
+            <div class="aluno-tab-content" id="tab-agenda">
+                <h2 class="tab-section-title"><i class="fas fa-calendar-alt"></i> Seus Encontros</h2>
+                <div class="aluno-meetings" id="alunoMeetings">
+                    <p class="empty-state">Nenhum encontro agendado pelo seu consultor.</p>
+                </div>
+            </div>
+
+            <!-- TAB: Chat -->
+            <div class="aluno-tab-content" id="tab-chat">
+                <div class="aluno-chat-box">
+                    <div class="aluno-chat-header">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat com seu consultor</span>
+                    </div>
+                    <div class="aluno-chat-messages" id="alunoChatMessages">
+                        <p class="empty-state">Nenhuma mensagem ainda. Envie a primeira!</p>
+                    </div>
+                    <form class="aluno-chat-input" id="alunoChatForm">
+                        <input type="text" id="alunoChatText" placeholder="Digite sua mensagem..." required autocomplete="off">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Certificate Modal -->
+    <div class="modal-overlay" id="certOverlay">
+        <div class="modal certificate-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-award"></i> Certificado de Conclusão</h3>
+                <button class="modal-close" id="certClose">&times;</button>
+            </div>
+            <div class="certificate-content" id="certificateContent">
+                <div class="cert-body">
+                    <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom" class="cert-logo">
+                    <h2>Certificado de Conclusão</h2>
+                    <p class="cert-text">Certificamos que</p>
+                    <h3 class="cert-name" id="certName">—</h3>
+                    <p class="cert-text">concluiu com êxito o plano de ação</p>
+                    <h4 class="cert-plan" id="certPlan">—</h4>
+                    <p class="cert-text">completando todas as etapas propostas na plataforma O Tom das Notas.</p>
+                    <div class="cert-date" id="certDate">—</div>
+                    <div class="cert-footer">
+                        <div class="cert-signature">
+                            <div class="cert-line"></div>
+                            <span>O Tom das Notas</span>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Stats -->
-            <div class="aluno-stats">
-                <div class="aluno-stat">
-                    <span class="aluno-stat-value" id="statTotal">0</span>
-                    <span class="aluno-stat-label">Total de Etapas</span>
-                </div>
-                <div class="aluno-stat">
-                    <span class="aluno-stat-value" id="statDone">0</span>
-                    <span class="aluno-stat-label">Concluídas</span>
-                </div>
-                <div class="aluno-stat">
-                    <span class="aluno-stat-value" id="statPending">0</span>
-                    <span class="aluno-stat-label">Pendentes</span>
-                </div>
+    <!-- Resource Viewer Modal -->
+    <div class="modal-overlay" id="resourceOverlay">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3 id="resourceTitle"><i class="fas fa-play-circle"></i> Conteúdo</h3>
+                <button class="modal-close" id="resourceClose">&times;</button>
             </div>
-
-            <!-- Action Plan Steps -->
-            <div class="aluno-plan-section">
-                <h2><i class="fas fa-route"></i> Seu Plano de Ação</h2>
-                <div class="aluno-steps" id="alunoSteps">
-                    <p class="empty-state">Nenhum plano de ação encontrado.</p>
-                </div>
-            </div>
-
-            <!-- No Plan State -->
-            <div class="aluno-no-plan" id="alunoNoPlan" style="display:none;">
-                <div class="aluno-no-plan-icon"><i class="fas fa-clipboard-list"></i></div>
-                <h3>Nenhum plano cadastrado ainda</h3>
-                <p>Seu consultor irá criar um plano de ação personalizado para você. Aguarde!</p>
-            </div>
-        </main>
+            <div class="resource-content" id="resourceContent"></div>
+        </div>
     </div>
 
     <script src="js/aluno.js"></script>
