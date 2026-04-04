@@ -1,6 +1,6 @@
 // ========================================
 // Área do Aluno — O Tom das Notas
-// Student portal: view plan, check off steps
+// Student portal: login by email, view plan, check off steps
 // ========================================
 (function () {
     'use strict';
@@ -13,38 +13,56 @@
     function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
     function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 
-    // Check session
-    const session = load(SESSION_KEY);
-    if (!session || session.role !== 'aluno') {
-        // No valid aluno session — show login screen with select
-    }
-
     const leads = load(LEADS_KEY) || [];
     let plans = load(PLANS_KEY) || [];
 
     const loginScreen = document.getElementById('alunoLogin');
     const portal = document.getElementById('alunoPortal');
-    const alunoSelect = document.getElementById('alunoSelect');
+    const loginForm = document.getElementById('alunoLoginForm');
+    const loginError = document.getElementById('alunoLoginError');
 
     let currentClientId = null;
 
-    // Populate select — only show leads that have plans
-    const clientsWithPlans = new Set(plans.map(p => p.clientId));
-    leads.forEach(l => {
-        if (!clientsWithPlans.has(l.id)) return; // only show clients with plans
-        const opt = document.createElement('option');
-        opt.value = l.id;
-        opt.textContent = l.name;
-        alunoSelect.appendChild(opt);
-    });
+    // Check if already logged in as aluno
+    const session = load(SESSION_KEY);
+    if (session && session.role === 'aluno' && session.clientId) {
+        currentClientId = session.clientId;
+        enterPortal();
+    }
 
-    document.getElementById('btnAlunoEnter').addEventListener('click', () => {
-        const id = alunoSelect.value;
-        if (!id) return;
-        currentClientId = id;
+    // Login form
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('alunoEmail').value.trim().toLowerCase();
+        const pass = document.getElementById('alunoPassword').value;
+
+        if (!email || !pass) {
+            loginError.textContent = 'Preencha todos os campos.';
+            return;
+        }
+
+        // Find lead by email
+        const lead = leads.find(l => (l.email || '').toLowerCase() === email);
+        if (!lead) {
+            loginError.textContent = 'E-mail não encontrado. Verifique com seu consultor.';
+            return;
+        }
+
+        // Check if lead has a plan
+        const plan = plans.find(p => p.clientId === lead.id);
+        if (!plan) {
+            loginError.textContent = 'Nenhum plano de ação cadastrado para este e-mail ainda.';
+            return;
+        }
+
+        // Success — save session and enter
+        currentClientId = lead.id;
+        save(SESSION_KEY, { role: 'aluno', email: lead.email, clientId: lead.id, time: Date.now() });
+        loginError.textContent = '';
         enterPortal();
     });
 
+    // Logout
     document.getElementById('btnAlunoLogout').addEventListener('click', () => {
         localStorage.removeItem(SESSION_KEY);
         window.location.href = 'index.html';
@@ -60,12 +78,10 @@
         const client = leads.find(l => l.id === currentClientId);
         if (!client) return;
 
-        // User info
         document.getElementById('alunoAvatar').textContent = client.name.charAt(0);
         document.getElementById('alunoName').textContent = client.name;
         document.getElementById('alunoGreeting').textContent = 'Olá, ' + client.name.split(' ')[0] + '!';
 
-        // Find plan for this client
         const plan = plans.find(p => p.clientId === currentClientId);
 
         const noPlanEl = document.getElementById('alunoNoPlan');
@@ -86,11 +102,9 @@
         statsEl.style.display = 'grid';
         planSection.style.display = 'block';
 
-        // Plan info
         document.getElementById('alunoPlanTitle').textContent = plan.title;
         document.getElementById('alunoPlanObjective').textContent = plan.objective || '';
 
-        // Stats
         const total = plan.steps.length;
         const done = plan.steps.filter(s => s.done).length;
         const pending = total - done;
@@ -120,7 +134,6 @@
                 '</div></div>';
         }).join('');
 
-        // Bind step check clicks
         stepsContainer.querySelectorAll('.step-check').forEach(check => {
             check.addEventListener('click', function () {
                 const stepEl = this.closest('.aluno-step');

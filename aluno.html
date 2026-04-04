@@ -12,17 +12,31 @@
 </head>
 <body>
 
-    <!-- Login / Select Client -->
+    <!-- Login -->
     <div class="aluno-login" id="alunoLogin">
         <div class="aluno-login-card">
             <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="aluno-login-logo">
             <h2>Área do Aluno</h2>
-            <p>Selecione seu nome para acessar seu plano de ação personalizado.</p>
-            <select id="alunoSelect">
-                <option value="">Selecione seu perfil...</option>
-            </select>
-            <button class="btn btn-primary btn-block" id="btnAlunoEnter"><i class="fas fa-arrow-right"></i> Acessar</button>
-            <a href="index.html" class="aluno-back"><i class="fas fa-arrow-left"></i> Voltar ao Menu Principal</a>
+            <p>Faça login com o e-mail cadastrado pelo seu consultor para acessar seu plano de ação.</p>
+            <form id="alunoLoginForm" autocomplete="off">
+                <div class="login-field">
+                    <label>E-mail</label>
+                    <div class="login-input-wrap">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="alunoEmail" placeholder="seu@email.com" required>
+                    </div>
+                </div>
+                <div class="login-field">
+                    <label>Senha</label>
+                    <div class="login-input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="alunoPassword" placeholder="Digite sua senha" required>
+                    </div>
+                </div>
+                <div class="login-error" id="alunoLoginError"></div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+            </form>
+            <a href="index.html" class="aluno-back"><i class="fas fa-arrow-left"></i> Voltar ao Login Principal</a>
         </div>
     </div>
 
