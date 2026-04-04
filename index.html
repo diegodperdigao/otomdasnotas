@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Tom das Notas - CRM Music Business</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/dXVPqQb/o-tom.png">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="logo">
+            <h2>O Tom das Notas</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-section="pipeline">
+                <i class="fas fa-filter"></i>
+                <span>Pipeline</span>
+            </a>
+            <a href="#" class="nav-item" data-section="leads">
+                <i class="fas fa-users"></i>
+                <span>Leads</span>
+            </a>
+            <a href="#" class="nav-item" data-section="about">
+                <i class="fas fa-info-circle"></i>
+                <span>Sobre o Projeto</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <p>Music Business Digital</p>
+            <small>Fase 1 - Extensionista</small>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topbar-title">
+                <h1 id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn btn-primary" id="btnNewLead" title="Novo Lead">
+                    <i class="fas fa-plus"></i>
+                    <span>Novo Lead</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section class="section active" id="section-dashboard">
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: var(--gradient-primary);">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpiTotalLeads">0</span>
+                        <span class="kpi-label">Total de Leads</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: var(--gradient-success);">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpiConversions">0</span>
+                        <span class="kpi-label">Conversões</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: var(--gradient-warning);">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpiConversionRate">0%</span>
+                        <span class="kpi-label">Taxa de Conversão</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background: var(--gradient-info);">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-value" id="kpiRevenue">R$ 0</span>
+                        <span class="kpi-label">Receita Estimada</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card funnel-card">
+                    <h3><i class="fas fa-filter"></i> Funil de Vendas</h3>
+                    <div class="funnel-chart" id="funnelChart"></div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-clock"></i> Atividades Recentes</h3>
+                    <div class="activity-list" id="activityList">
+                        <p class="empty-state">Nenhuma atividade registrada.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-music"></i> Leads por Segmento</h3>
+                    <div class="segment-chart" id="segmentChart"></div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-bullseye"></i> Metas do Mês</h3>
+                    <div class="goals-list" id="goalsList">
+                        <div class="goal-item">
+                            <div class="goal-header">
+                                <span>Novos Leads</span>
+                                <span class="goal-progress-text" id="goalLeadsText">0/20</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="goalLeadsBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <div class="goal-header">
+                                <span>Propostas Enviadas</span>
+                                <span class="goal-progress-text" id="goalProposalsText">0/10</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill warning" id="goalProposalsBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <div class="goal-header">
+                                <span>Fechamentos</span>
+                                <span class="goal-progress-text" id="goalClosedText">0/5</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill success" id="goalClosedBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pipeline Section -->
+        <section class="section" id="section-pipeline">
+            <div class="pipeline-board" id="pipelineBoard">
+                <div class="pipeline-column" data-stage="prospeccao">
+                    <div class="column-header prospeccao">
+                        <h3><i class="fas fa-search"></i> Prospecção</h3>
+                        <span class="column-count" id="countProspeccao">0</span>
+                    </div>
+                    <div class="column-cards" id="cardsProspeccao"></div>
+                </div>
+                <div class="pipeline-column" data-stage="qualificacao">
+                    <div class="column-header qualificacao">
+                        <h3><i class="fas fa-star"></i> Qualificação</h3>
+                        <span class="column-count" id="countQualificacao">0</span>
+                    </div>
+                    <div class="column-cards" id="cardsQualificacao"></div>
+                </div>
+                <div class="pipeline-column" data-stage="proposta">
+                    <div class="column-header proposta">
+                        <h3><i class="fas fa-file-alt"></i> Proposta</h3>
+                        <span class="column-count" id="countProposta">0</span>
+                    </div>
+                    <div class="column-cards" id="cardsProposta"></div>
+                </div>
+                <div class="pipeline-column" data-stage="negociacao">
+                    <div class="column-header negociacao">
+                        <h3><i class="fas fa-comments"></i> Negociação</h3>
+                        <span class="column-count" id="countNegociacao">0</span>
+                    </div>
+                    <div class="column-cards" id="cardsNegociacao"></div>
+                </div>
+                <div class="pipeline-column" data-stage="fechamento">
+                    <div class="column-header fechamento">
+                        <h3><i class="fas fa-trophy"></i> Fechamento</h3>
+                        <span class="column-count" id="countFechamento">0</span>
+                    </div>
+                    <div class="column-cards" id="cardsFechamento"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Leads Section -->
+        <section class="section" id="section-leads">
+            <div class="leads-toolbar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchLeads" placeholder="Buscar leads...">
+                </div>
+                <div class="filter-group">
+                    <select id="filterSegment">
+                        <option value="">Todos os Segmentos</option>
+                        <option value="instrumentista">Instrumentista</option>
+                        <option value="cantor">Cantor(a)</option>
+                        <option value="produtor">Produtor Musical</option>
+                        <option value="banda">Banda</option>
+                        <option value="educador">Educador Musical</option>
+                        <option value="estudio">Estúdio</option>
+                    </select>
+                    <select id="filterStage">
+                        <option value="">Todas as Etapas</option>
+                        <option value="prospeccao">Prospecção</option>
+                        <option value="qualificacao">Qualificação</option>
+                        <option value="proposta">Proposta</option>
+                        <option value="negociacao">Negociação</option>
+                        <option value="fechamento">Fechamento</option>
+                    </select>
+                </div>
+            </div>
+            <div class="leads-table-wrapper">
+                <table class="leads-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Segmento</th>
+                            <th>Contato</th>
+                            <th>Etapa</th>
+                            <th>Valor Estimado</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leadsTableBody">
+                        <tr class="empty-row">
+                            <td colspan="6">Nenhum lead cadastrado. Clique em "Novo Lead" para começar.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="section" id="section-about">
+            <div class="about-container">
+                <div class="about-hero">
+                    <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom das Notas" class="about-logo">
+                    <h2>Music Business Digital</h2>
+                    <p class="about-subtitle">Estruturação de Processos Comerciais e Gestão de Leads para Profissionais da Economia Criativa</p>
+                </div>
+
+                <div class="about-grid">
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-bullseye"></i></div>
+                        <h4>Objetivo</h4>
+                        <p>Capacitar a microempresa parceira na implementação de um ecossistema de gestão comercial digital, estabelecendo processos de prospecção ativa e funis de vendas específicos para o setor musical.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-globe"></i></div>
+                        <h4>ODS 8</h4>
+                        <p>Trabalho Decente e Crescimento Econômico — apoiando atividades produtivas, empreendedorismo e criatividade no setor da economia criativa.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-laptop-code"></i></div>
+                        <h4>Tecnologia</h4>
+                        <p>Ferramentas de CRM e automação para profissionalizar a gestão comercial do nicho musical, transformando conhecimento técnico em modelos de negócios sustentáveis.</p>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-icon"><i class="fas fa-users"></i></div>
+                        <h4>Beneficiários</h4>
+                        <p>Músicos, instrumentistas e educadores da região que necessitam de profissionalização comercial para suas carreiras na economia criativa.</p>
+                    </div>
+                </div>
+
+                <div class="about-info">
+                    <h3><i class="fas fa-graduation-cap"></i> Atividade Extensionista - Fase 1</h3>
+                    <p><strong>Curso:</strong> Gestão Comercial de Negócios Digitais</p>
+                    <p><strong>Disciplina:</strong> Empreendedorismo e Modelagem de Soluções</p>
+                    <p><strong>Área Temática:</strong> Tecnologia e Produção</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal: Novo Lead -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalLead">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-user-plus"></i> Novo Lead</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <form id="leadForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="leadName">Nome Completo *</label>
+                        <input type="text" id="leadName" required placeholder="Ex: João Silva">
+                    </div>
+                    <div class="form-group">
+                        <label for="leadEmail">E-mail</label>
+                        <input type="email" id="leadEmail" placeholder="joao@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="leadPhone">Telefone</label>
+                        <input type="tel" id="leadPhone" placeholder="(11) 99999-9999">
+                    </div>
+                    <div class="form-group">
+                        <label for="leadSegment">Segmento *</label>
+                        <select id="leadSegment" required>
+                            <option value="">Selecione...</option>
+                            <option value="instrumentista">Instrumentista</option>
+                            <option value="cantor">Cantor(a)</option>
+                            <option value="produtor">Produtor Musical</option>
+                            <option value="banda">Banda</option>
+                            <option value="educador">Educador Musical</option>
+                            <option value="estudio">Estúdio</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="leadStage">Etapa do Funil *</label>
+                        <select id="leadStage" required>
+                            <option value="prospeccao">Prospecção</option>
+                            <option value="qualificacao">Qualificação</option>
+                            <option value="proposta">Proposta</option>
+                            <option value="negociacao">Negociação</option>
+                            <option value="fechamento">Fechamento</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="leadValue">Valor Estimado (R$)</label>
+                        <input type="number" id="leadValue" placeholder="0,00" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="leadSource">Origem</label>
+                        <select id="leadSource">
+                            <option value="instagram">Instagram</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="indicacao">Indicação</option>
+                            <option value="site">Site</option>
+                            <option value="evento">Evento</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="leadInstrument">Instrumento / Área</label>
+                        <input type="text" id="leadInstrument" placeholder="Ex: Guitarra, Vocal, Produção...">
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label for="leadNotes">Observações</label>
+                    <textarea id="leadNotes" rows="3" placeholder="Informações adicionais sobre o lead..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancelLead">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveLead">
+                        <i class="fas fa-save"></i> Salvar Lead
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Detalhes do Lead -->
+    <div class="modal-overlay" id="modalDetailOverlay">
+        <div class="modal modal-detail" id="modalDetail">
+            <div class="modal-header">
+                <h3 id="detailTitle"><i class="fas fa-user"></i> Detalhes do Lead</h3>
+                <button class="modal-close" id="detailClose">&times;</button>
+            </div>
+            <div class="detail-content" id="detailContent"></div>
+            <div class="detail-actions">
+                <button class="btn btn-secondary" id="btnEditLead"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn btn-danger" id="btnDeleteLead"><i class="fas fa-trash"></i> Excluir</button>
+                <button class="btn btn-primary" id="btnAdvanceLead"><i class="fas fa-arrow-right"></i> Avançar Etapa</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
