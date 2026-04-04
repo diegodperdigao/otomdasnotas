@@ -105,8 +105,39 @@
         return 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
     }
 
-    // ========== NAVIGATION ==========
-    const navItems = document.querySelectorAll('.nav-item');
+    // ========== HUB / APP NAVIGATION ==========
+    const hub = document.getElementById('hub');
+    const app = document.getElementById('app');
+    const hubCards = document.querySelectorAll('.hub-card');
+    const sidebarBrand = document.getElementById('sidebarBrand');
+    const backToHub = document.getElementById('backToHub');
+
+    function showHub() {
+        app.style.display = 'none';
+        hub.style.display = 'flex';
+    }
+
+    function showApp(sectionName) {
+        hub.style.display = 'none';
+        app.style.display = 'flex';
+        switchSection(sectionName || 'dashboard');
+    }
+
+    hubCards.forEach(card => {
+        card.addEventListener('click', function (e) {
+            e.preventDefault();
+            showApp(this.dataset.section);
+        });
+    });
+
+    sidebarBrand.addEventListener('click', showHub);
+    backToHub.addEventListener('click', function (e) {
+        e.preventDefault();
+        showHub();
+    });
+
+    // ========== SECTION NAVIGATION ==========
+    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
     const sections = document.querySelectorAll('.section');
     const pageTitle = document.getElementById('pageTitle');
     const sidebar = document.getElementById('sidebar');
@@ -132,7 +163,7 @@
         navItems.forEach(n => n.classList.remove('active'));
         sections.forEach(s => s.classList.remove('active'));
 
-        const activeNav = document.querySelector(`[data-section="${sectionName}"]`);
+        const activeNav = document.querySelector(`.sidebar-nav [data-section="${sectionName}"]`);
         const activeSection = document.getElementById(`section-${sectionName}`);
 
         if (activeNav) activeNav.classList.add('active');
