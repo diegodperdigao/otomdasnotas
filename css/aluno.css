@@ -285,18 +285,46 @@
 .reply-info-grid strong{color:var(--zinc-500);font-size:.72rem}
 .reply-info-msg{grid-column:1/-1;margin-top:6px;padding-top:8px;border-top:1px solid var(--zinc-200);white-space:pre-wrap}
 
+/* Fix cert-name overflow */
+.cert-name{word-break:break-word;max-width:100%}
+
+/* Bigger touch targets for step checks */
+.step-check{position:relative}
+.step-check::before{content:'';position:absolute;inset:-8px;border-radius:50%}
+
 @media(max-width:768px){
     .aluno-welcome{flex-direction:column;text-align:center}
-    .aluno-stats{grid-template-columns:1fr}
+    .aluno-stats{grid-template-columns:repeat(3,1fr)}
     .aluno-login-card{padding:32px 24px}
     .aluno-login-logo{width:120px}
     .plans-grid{grid-template-columns:1fr}
+    /* Chat fixes */
     .chat-layout{flex-direction:column;height:auto}
     .chat-contacts{width:100%;max-height:200px;border-right:none;border-bottom:1px solid var(--zinc-200)}
-    .aluno-tabs{overflow-x:auto}
+    .chat-main{min-height:400px}
+    /* Tab scrollbar hidden */
+    .aluno-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .aluno-tabs::-webkit-scrollbar{display:none}
     .aluno-tab{white-space:nowrap;padding:12px 14px;font-size:.74rem}
+    /* Certificate */
     .certificate-banner{flex-direction:column;text-align:center}
     .certificate-banner .btn{margin-left:0}
     .cert-body{padding:32px 20px;margin:16px}
+    /* Notifications */
     .notif-dropdown{width:calc(100vw - 32px);right:16px}
+    /* Meeting cards */
+    .meeting-card{flex-wrap:wrap}
+    .meeting-actions{width:100%;justify-content:flex-end;padding-top:8px;border-top:1px solid var(--zinc-100);margin-top:4px}
+    /* Reply info grid */
+    .reply-info-grid{grid-template-columns:1fr}
+    /* Aluno main */
+    .aluno-main{padding:20px 16px}
+    .aluno-plan-section{padding:20px}
+}
+@media(max-width:480px){
+    .aluno-name{display:none}
+    .aluno-topbar{padding:0 12px}
+    .aluno-topbar-title{font-size:.78rem}
+    .aluno-stats{grid-template-columns:1fr}
+    .aluno-chat-box{height:400px}
 }

@@ -126,7 +126,7 @@
     navItems.forEach(item => item.addEventListener('click', function(e) {
         e.preventDefault();
         switchSection(this.dataset.section);
-        if (window.innerWidth <= 768) sidebar.classList.remove('open');
+        if (window.innerWidth <= 768) toggleSidebar(false);
     }));
 
     // Card links inside dashboard (e.g. "Ver todos")
@@ -143,11 +143,14 @@
         if (sec) sec.classList.add('active');
     }
 
-    menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
-    document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuToggle.contains(e.target))
-            sidebar.classList.remove('open');
-    });
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    function toggleSidebar(open) {
+        const isOpen = open !== undefined ? open : !sidebar.classList.contains('open');
+        sidebar.classList.toggle('open', isOpen);
+        if (sidebarOverlay) sidebarOverlay.classList.toggle('active', isOpen);
+    }
+    menuToggle.addEventListener('click', () => toggleSidebar());
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', () => toggleSidebar(false));
 
     // ========== GLOBAL SEARCH ==========
     const globalSearch = document.getElementById('globalSearch');
