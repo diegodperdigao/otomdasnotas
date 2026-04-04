@@ -116,7 +116,7 @@
         dashboard: 'Dashboard',
         pipeline: 'Pipeline de Vendas',
         leads: 'Gestão de Leads',
-        about: 'Sobre o Projeto'
+        about: 'Sobre'
     };
 
     navItems.forEach(item => {
