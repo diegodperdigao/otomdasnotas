@@ -261,6 +261,30 @@
 .role-badge.admin{background:var(--zinc-900);color:var(--white)}
 .role-badge.aluno{background:var(--emerald-50);color:var(--emerald-700);border:1px solid var(--emerald-200)}
 
+/* Submissions / Inscricoes */
+.subs-list{display:flex;flex-direction:column;gap:14px}
+.sub-card{background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius);padding:20px;transition:all .15s}
+.sub-card:hover{border-color:var(--zinc-400)}
+.sub-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:12px}
+.sub-card-info{display:flex;align-items:center;gap:10px}
+.sub-card-info strong{font-size:.9rem;color:var(--zinc-900)}
+.sub-card-meta{font-size:.72rem;color:var(--zinc-500)}
+.sub-card-msg{font-size:.82rem;color:var(--zinc-600);line-height:1.6;padding:10px 0;border-top:1px solid var(--zinc-100);margin-top:4px}
+.sub-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--zinc-100)}
+.sub-card-date{font-size:.7rem;color:var(--zinc-500);display:flex;align-items:center;gap:4px}
+.sub-card-date i{font-size:.62rem}
+.sub-card-actions{display:flex;gap:6px}
+.sub-card-replies{margin-top:12px;padding-top:12px;border-top:1px solid var(--zinc-100)}
+.sub-card-replies strong{font-size:.72rem;color:var(--zinc-500);text-transform:uppercase;letter-spacing:.05em}
+.sub-reply{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:.78rem;color:var(--zinc-700)}
+.sub-reply small{color:var(--zinc-400);font-size:.68rem}
+
+/* Reply modal extras */
+.reply-info{padding:16px 24px;background:var(--zinc-50);border-bottom:1px solid var(--zinc-100)}
+.reply-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.82rem;color:var(--zinc-700)}
+.reply-info-grid strong{color:var(--zinc-500);font-size:.72rem}
+.reply-info-msg{grid-column:1/-1;margin-top:6px;padding-top:8px;border-top:1px solid var(--zinc-200);white-space:pre-wrap}
+
 @media(max-width:768px){
     .aluno-welcome{flex-direction:column;text-align:center}
     .aluno-stats{grid-template-columns:1fr}

@@ -48,7 +48,7 @@
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
     const sections = document.querySelectorAll('.section');
 
-    const titles = { dashboard:'Painel Geral', pipeline:'Pipeline de Vendas', leads:'Base de Contatos', planos:'Planos de Ação', agenda:'Agenda', mensagens:'Mensagens', usuarios:'Gestão de Usuários', about:'Sobre' };
+    const titles = { dashboard:'Painel Geral', pipeline:'Pipeline de Vendas', leads:'Base de Contatos', planos:'Planos de Ação', inscricoes:'Inscrições', agenda:'Agenda', mensagens:'Mensagens', usuarios:'Gestão de Usuários', about:'Sobre' };
 
     // ========== LOGIN / SESSION ==========
     const SESSION_KEY = 'otomdasnotas_session';
@@ -399,7 +399,7 @@
     }
 
     // ========== RENDER ALL ==========
-    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); renderPlans(); renderUsers(); renderMeetings(); renderChatContacts(); }
+    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); renderPlans(); renderSubmissions(); renderUsers(); renderMeetings(); renderChatContacts(); }
 
     function renderKPIs() {
         const total = leads.length;
@@ -532,6 +532,139 @@
                     '<button onclick="window._edit(\'' + l.id + '\')" title="Editar"><i class="fas fa-edit"></i></button>' +
                     '<button onclick="window._del(\'' + l.id + '\')" title="Excluir"><i class="fas fa-trash"></i></button>' +
                 '</div></td></tr>';
+        }).join('');
+    }
+
+    // ========== INSCRIPTIONS (from LP) ==========
+    const SUBS_KEY = 'otomdasnotas_submissions';
+    let submissions = load(SUBS_KEY) || [];
+    function saveSubs() { save(SUBS_KEY, submissions); }
+    let replyingSubId = null;
+
+    const TEMPLATES = {
+        welcome: {
+            subject: 'Bem-vindo ao O Tom das Notas!',
+            message: 'Olá {nome}!\n\nObrigado pelo seu interesse na consultoria O Tom das Notas.\n\nFicamos muito felizes em saber que você quer profissionalizar sua carreira como {segmento}.\n\nGostaria de agendar uma conversa inicial (gratuita) para entendermos melhor sua situação e como podemos ajudar?\n\nSugestão de horários:\n- [Dia/horário 1]\n- [Dia/horário 2]\n\nAguardamos seu retorno!\n\nAbraços,\nEquipe O Tom das Notas'
+        },
+        info: {
+            subject: 'Mais informações sobre a consultoria',
+            message: 'Olá {nome}!\n\nObrigado pela inscrição. Seguem mais detalhes sobre nossa consultoria:\n\nO que oferecemos:\n- Diagnóstico inicial gratuito da sua carreira\n- Plano de ação personalizado\n- Acompanhamento semanal com reuniões\n- Acesso à plataforma do aluno com conteúdos exclusivos\n- Chat direto com seu consultor\n\nInvestimento:\n- Consulte valores e condições na nossa conversa inicial.\n\nTem alguma dúvida? Responda este e-mail!\n\nAbraços,\nEquipe O Tom das Notas'
+        },
+        waitlist: {
+            subject: 'Você está na nossa lista de espera',
+            message: 'Olá {nome}!\n\nObrigado pelo interesse na consultoria O Tom das Notas.\n\nNo momento estamos com todas as vagas preenchidas, mas adicionamos você à nossa lista de espera prioritária.\n\nAssim que uma vaga abrir, você será o(a) primeiro(a) a ser contatado(a).\n\nEnquanto isso, acompanhe nossas dicas no Instagram!\n\nAbraços,\nEquipe O Tom das Notas'
+        },
+        reject: {
+            subject: 'Sobre sua inscrição',
+            message: 'Olá {nome}!\n\nObrigado pelo interesse na consultoria O Tom das Notas.\n\nApós analisar seu perfil, acreditamos que neste momento nosso programa pode não ser o melhor fit para suas necessidades.\n\nRecomendamos:\n- [Sugestão alternativa 1]\n- [Sugestão alternativa 2]\n\nDesejamos muito sucesso na sua carreira!\n\nAbraços,\nEquipe O Tom das Notas'
+        }
+    };
+
+    const replyOverlay = document.getElementById('modalReplyOverlay');
+    const replyForm = document.getElementById('replyForm');
+
+    function openReplyModal(sub) {
+        replyingSubId = sub.id;
+        document.getElementById('replyModalTitle').innerHTML = '<i class="fas fa-reply"></i> Responder — ' + esc(sub.name);
+        document.getElementById('replyInfo').innerHTML = '<div class="reply-info-grid">' +
+            '<div><strong>Nome:</strong> '+esc(sub.name)+'</div>' +
+            '<div><strong>E-mail:</strong> '+esc(sub.email)+'</div>' +
+            '<div><strong>WhatsApp:</strong> '+esc(sub.phone)+'</div>' +
+            '<div><strong>Segmento:</strong> '+(SEGMENT_LABELS[sub.segment]||sub.segment)+'</div>' +
+            (sub.instrument?'<div><strong>Instrumento:</strong> '+esc(sub.instrument)+'</div>':'') +
+            (sub.message?'<div class="reply-info-msg"><strong>Mensagem:</strong><br>'+esc(sub.message)+'</div>':'') +
+            '</div>';
+        document.getElementById('replyTemplate').value = '';
+        document.getElementById('replySubject').value = '';
+        document.getElementById('replyMessage').value = '';
+        replyOverlay.classList.add('active');
+    }
+    function closeReplyModal() { replyOverlay.classList.remove('active'); replyingSubId = null; }
+
+    document.getElementById('replyModalClose').addEventListener('click', closeReplyModal);
+    replyOverlay.addEventListener('click', e => { if (e.target === replyOverlay) closeReplyModal(); });
+
+    // Template selection
+    document.getElementById('replyTemplate').addEventListener('change', function() {
+        const tpl = TEMPLATES[this.value];
+        if (!tpl) return;
+        const sub = submissions.find(s => s.id === replyingSubId);
+        if (!sub) return;
+        const segLabel = SEGMENT_LABELS[sub.segment] || sub.segment;
+        document.getElementById('replySubject').value = tpl.subject;
+        document.getElementById('replyMessage').value = tpl.message.replace(/\{nome\}/g, sub.name.split(' ')[0]).replace(/\{segmento\}/g, segLabel);
+    });
+
+    // Send reply
+    replyForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const sub = submissions.find(s => s.id === replyingSubId);
+        if (!sub) return;
+        const subject = document.getElementById('replySubject').value.trim();
+        const message = document.getElementById('replyMessage').value.trim();
+        if (!message) return;
+        sub.status = 'respondido';
+        sub.replies = sub.replies || [];
+        sub.replies.push({ subject, message, sentAt: new Date().toISOString() });
+        saveSubs(); closeReplyModal(); renderSubmissions();
+    });
+
+    // Convert to Lead
+    document.getElementById('btnConvertLead').addEventListener('click', function() {
+        const sub = submissions.find(s => s.id === replyingSubId);
+        if (!sub) return;
+        // Check if lead already exists
+        if (leads.find(l => l.email === sub.email)) {
+            alert('Um lead com este e-mail já existe.');
+            return;
+        }
+        leads.push({
+            id: genId(), name: sub.name, email: sub.email, phone: sub.phone,
+            segment: sub.segment, stage: 'prospeccao', value: 0, source: 'site',
+            instrument: sub.instrument || '', notes: sub.message || '',
+            createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+        });
+        saveLeads();
+        sub.status = 'convertido';
+        saveSubs();
+        closeReplyModal();
+        renderAll();
+        alert('Lead "' + sub.name + '" criado com sucesso na etapa Prospecção!');
+    });
+
+    window._replySub = id => { const s = submissions.find(x => x.id === id); if (s) openReplyModal(s); };
+    window._delSub = id => { if (confirm('Excluir esta inscrição?')) { submissions = submissions.filter(x => x.id !== id); saveSubs(); renderSubmissions(); } };
+    window._markSub = (id, status) => { const s = submissions.find(x => x.id === id); if (s) { s.status = status; saveSubs(); renderSubmissions(); } };
+
+    function renderSubmissions() {
+        const list = document.getElementById('subsList');
+        const badge = document.getElementById('navBadgeInscricoes');
+        const newCount = submissions.filter(s => s.status === 'novo').length;
+        if (badge) badge.textContent = newCount > 0 ? newCount : '';
+
+        if (submissions.length === 0) { list.innerHTML = '<p class="empty-state">Nenhuma inscrição recebida. Compartilhe a <a href="lp.html" target="_blank">landing page</a> para receber inscrições.</p>'; return; }
+
+        const statusLabels = { novo:'Novo', respondido:'Respondido', convertido:'Convertido', arquivado:'Arquivado' };
+        const statusClass = { novo:'stage-badge prospeccao', respondido:'stage-badge proposta', convertido:'stage-badge fechamento', arquivado:'stage-badge negociacao' };
+
+        list.innerHTML = submissions.map(s => {
+            const segLabel = SEGMENT_LABELS[s.segment] || s.segment;
+            return '<div class="sub-card">' +
+                '<div class="sub-card-top">' +
+                    '<div class="sub-card-info"><div class="td-avatar">' + s.name.charAt(0) + '</div><div><strong>' + esc(s.name) + '</strong><br><span class="sub-card-meta">' + esc(s.email) + ' · ' + segLabel + '</span></div></div>' +
+                    '<span class="' + (statusClass[s.status]||'stage-badge') + '">' + (statusLabels[s.status]||s.status) + '</span>' +
+                '</div>' +
+                (s.message ? '<p class="sub-card-msg">' + esc(s.message) + '</p>' : '') +
+                '<div class="sub-card-footer">' +
+                    '<span class="sub-card-date"><i class="fas fa-clock"></i> ' + new Date(s.createdAt).toLocaleDateString('pt-BR') + '</span>' +
+                    '<div class="sub-card-actions">' +
+                        '<button onclick="window._replySub(\'' + s.id + '\')" class="btn btn-primary btn-sm"><i class="fas fa-reply"></i> Responder</button>' +
+                        (s.status !== 'convertido' ? '<button onclick="window._markSub(\'' + s.id + '\',\'arquivado\')" class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i></button>' : '') +
+                        '<button onclick="window._delSub(\'' + s.id + '\')" class="btn btn-secondary btn-sm"><i class="fas fa-trash"></i></button>' +
+                    '</div>' +
+                '</div>' +
+                (s.replies && s.replies.length > 0 ? '<div class="sub-card-replies"><strong>Respostas enviadas:</strong>' + s.replies.map(r => '<div class="sub-reply"><span>' + r.subject + '</span><small>' + new Date(r.sentAt).toLocaleDateString('pt-BR') + '</small></div>').join('') + '</div>' : '') +
+                '</div>';
         }).join('');
     }
 
