@@ -53,7 +53,10 @@
     function showHub() { app.style.display = 'none'; hub.style.display = 'flex'; }
     function showApp(sec) { hub.style.display = 'none'; app.style.display = 'flex'; switchSection(sec || 'dashboard'); }
 
-    hubCards.forEach(c => c.addEventListener('click', function(e) { e.preventDefault(); showApp(this.dataset.section); }));
+    hubCards.forEach(c => c.addEventListener('click', function(e) {
+        if (!this.dataset.section) return; // let normal links (like aluno.html) navigate
+        e.preventDefault(); showApp(this.dataset.section);
+    }));
     sidebarBrand.addEventListener('click', showHub);
     backToHub.addEventListener('click', function(e) { e.preventDefault(); showHub(); });
 
