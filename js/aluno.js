@@ -15,6 +15,9 @@
 
     function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
     function save(k, d) { localStorage.setItem(k, JSON.stringify(d)); }
+    function savePlans() { save(PLANS_KEY, plans); if (typeof DB !== 'undefined') DB.saveAll('plans', plans); }
+    function saveChat() { save(CHAT_KEY, chatMessages); if (typeof DB !== 'undefined') DB.saveAll('chat', chatMessages); }
+    function saveNotifs() { save(NOTIF_KEY, notifications); if (typeof DB !== 'undefined') DB.saveAll('notifications', notifications); }
     function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
     function timeAgo(d) { const s = Math.floor((Date.now() - new Date(d)) / 1000); if (s < 60) return 'agora'; if (s < 3600) return Math.floor(s/60)+'min'; if (s < 86400) return Math.floor(s/3600)+'h'; return new Date(d).toLocaleDateString('pt-BR'); }
     const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -170,7 +173,7 @@
                 const idx = parseInt(this.closest('.aluno-step').dataset.idx);
                 plan.steps[idx].done = !plan.steps[idx].done;
                 plan.updatedAt = new Date().toISOString();
-                save(PLANS_KEY, plans);
+                savePlans();
                 renderPlan();
             });
         });
@@ -190,7 +193,7 @@
                 const idx = parseInt(this.dataset.step);
                 plan.steps[idx].notes = this.value;
                 plan.updatedAt = new Date().toISOString();
-                save(PLANS_KEY, plans);
+                savePlans();
             });
         });
     }
@@ -271,7 +274,7 @@
         const text = input.value.trim();
         if (!text) return;
         chatMessages.push({ id: Date.now().toString(), clientId: currentClientId, senderRole: 'aluno', text, time: new Date().toISOString() });
-        save(CHAT_KEY, chatMessages);
+        saveChat();
         input.value = '';
         renderChat();
     });
@@ -290,7 +293,7 @@
 
     document.getElementById('notifClearAll').addEventListener('click', function() {
         notifications = notifications.filter(n => n.clientId !== currentClientId);
-        save(NOTIF_KEY, notifications);
+        saveNotifs();
         renderNotifications();
     });
 
@@ -309,5 +312,35 @@
             return '<div class="notif-item"><div class="notif-item-icon '+(n.type?'notif-'+n.type:'')+'"><i class="'+cls.split(' ').slice(1).join(' ')+'"></i></div>' +
                 '<div><div class="notif-item-text">'+esc(n.message)+'</div><div class="notif-item-time">'+timeAgo(n.time)+'</div></div></div>';
         }).join('');
+    }
+
+    // ========== CLOUD SYNC ==========
+    async function loadFromCloud() {
+        if (typeof DB === 'undefined' || !DB.FIREBASE_ENABLED) return;
+        try {
+            const [cPlans, cMeetings, cChat, cNotifs] = await Promise.all([
+                DB.load('plans'), DB.load('meetings'), DB.load('chat'), DB.load('notifications')
+            ]);
+            if (cPlans.length > 0) plans = cPlans;
+            if (cMeetings.length > 0) meetings = cMeetings;
+            if (cChat.length > 0) chatMessages = cChat;
+            if (cNotifs.length > 0) notifications = cNotifs;
+            if (currentClientId) renderAll();
+        } catch (err) {
+            console.warn('[Aluno] Cloud load failed:', err.message);
+        }
+    }
+    loadFromCloud();
+
+    // Real-time: chat messages update instantly
+    if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
+        DB.onSnapshot('chat', data => {
+            chatMessages = data;
+            if (currentClientId) renderChat();
+        });
+        DB.onSnapshot('notifications', data => {
+            notifications = data;
+            if (currentClientId) renderNotifications();
+        });
     }
 })();
