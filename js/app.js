@@ -737,7 +737,7 @@
             message: 'Olá ' + sub.name.split(' ')[0] + '!\n\nSua inscrição na consultoria O Tom das Notas foi aceita!\n\nEm breve entraremos em contato para agendar seu diagnóstico gratuito.\n\nPrepare-se para transformar seu talento musical em um negócio de verdade.\n\nAbraços,\nEquipe O Tom das Notas'
         };
         try {
-            emailjs.send('default_service', 'template_accept', templateParams)
+            emailjs.send('service_fbj800w', 'template_gb30i8v', templateParams)
                 .then(function() { alert('Inscrição aceita e e-mail enviado para ' + sub.email + '!'); })
                 .catch(function(err) {
                     console.warn('[O Tom] EmailJS error:', err);
