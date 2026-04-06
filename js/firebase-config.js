@@ -11,12 +11,12 @@
 // ========================================
 
 const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_PROJETO.firebaseapp.com",
-    projectId: "SEU_PROJETO",
-    storageBucket: "SEU_PROJETO.appspot.com",
-    messagingSenderId: "SEU_SENDER_ID",
-    appId: "SEU_APP_ID"
+    apiKey: "AIzaSyBUT-Sp1yZG6b6LU6cn3GvJp4zMGizHID0",
+    authDomain: "otom-das-notas.firebaseapp.com",
+    projectId: "otom-das-notas",
+    storageBucket: "otom-das-notas.firebasestorage.app",
+    messagingSenderId: "458292321177",
+    appId: "1:458292321177:web:866250fab60d158e5a5108"
 };
 
 // Inicializa Firebase
