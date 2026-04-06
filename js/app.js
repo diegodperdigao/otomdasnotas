@@ -178,6 +178,18 @@
         if (nav) nav.classList.add('active');
         if (sec) sec.classList.add('active');
         if (!fromPopstate) pushState(name);
+        // Refresh data when entering specific sections
+        if (name === 'inscricoes') {
+            renderSubmissions();
+            // Also try fresh load from Firebase
+            try {
+                if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
+                    DB.load('submissions').then(function(data) {
+                        if (data && data.length > 0) { submissions = data; renderSubmissions(); }
+                    });
+                }
+            } catch(e) {}
+        }
     }
 
     const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -690,6 +702,10 @@
     window._markSub = (id, status) => { const s = submissions.find(x => x.id === id); if (s) { s.status = status; saveSubs(); renderSubmissions(); } };
 
     function renderSubmissions() {
+        // Always refresh from localStorage in case LP form submitted
+        var freshSubs = load(SUBS_KEY);
+        if (freshSubs && freshSubs.length > submissions.length) submissions = freshSubs;
+
         const list = document.getElementById('subsList');
         const badge = document.getElementById('navBadgeInscricoes');
         const newCount = submissions.filter(s => s.status === 'novo').length;

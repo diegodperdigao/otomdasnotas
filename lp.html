@@ -276,6 +276,13 @@
         </div>
     </footer>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/db.js"></script>
+
     <script>
     (function() {
         // Mobile menu
@@ -314,9 +321,16 @@
                 replies: []
             };
             var subs = [];
-            try { subs = JSON.parse(localStorage.getItem('otomdasnotas_submissions')) || []; } catch(e) {}
+            try { subs = JSON.parse(localStorage.getItem('otomdasnotas_submissions')) || []; } catch(ex) {}
             subs.push(sub);
             localStorage.setItem('otomdasnotas_submissions', JSON.stringify(subs));
+
+            // Sync to Firebase if available
+            try {
+                if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
+                    DB.saveAll('submissions', subs);
+                }
+            } catch(ex) {}
 
             document.querySelector('.lp-form-wrapper').style.display = 'none';
             document.getElementById('lpFormSuccess').style.display = 'block';
