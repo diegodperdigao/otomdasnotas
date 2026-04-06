@@ -314,33 +314,21 @@
         }).join('');
     }
 
-    // ========== CLOUD SYNC ==========
-    async function loadFromCloud() {
-        if (typeof DB === 'undefined' || !DB.FIREBASE_ENABLED) return;
-        try {
-            const [cPlans, cMeetings, cChat, cNotifs] = await Promise.all([
-                DB.load('plans'), DB.load('meetings'), DB.load('chat'), DB.load('notifications')
-            ]);
-            if (cPlans.length > 0) plans = cPlans;
-            if (cMeetings.length > 0) meetings = cMeetings;
-            if (cChat.length > 0) chatMessages = cChat;
-            if (cNotifs.length > 0) notifications = cNotifs;
-            if (currentClientId) renderAll();
-        } catch (err) {
-            console.warn('[Aluno] Cloud load failed:', err.message);
+    // ========== CLOUD SYNC (safe) ==========
+    try {
+        if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
+            (async function() {
+                try {
+                    var r = await Promise.all([DB.load('plans'), DB.load('meetings'), DB.load('chat'), DB.load('notifications')]);
+                    if (r[0].length > 0) plans = r[0];
+                    if (r[1].length > 0) meetings = r[1];
+                    if (r[2].length > 0) chatMessages = r[2];
+                    if (r[3].length > 0) notifications = r[3];
+                    if (currentClientId) renderAll();
+                } catch(e) { console.warn('[Aluno] Cloud load failed:', e.message); }
+            })();
+            DB.onSnapshot('chat', function(data) { chatMessages = data; if (currentClientId) renderChat(); });
+            DB.onSnapshot('notifications', function(data) { notifications = data; if (currentClientId) renderNotifications(); });
         }
-    }
-    loadFromCloud();
-
-    // Real-time: chat messages update instantly
-    if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
-        DB.onSnapshot('chat', data => {
-            chatMessages = data;
-            if (currentClientId) renderChat();
-        });
-        DB.onSnapshot('notifications', data => {
-            notifications = data;
-            if (currentClientId) renderNotifications();
-        });
-    }
+    } catch(e) { console.warn('[Aluno] Cloud init skipped:', e.message); }
 })();

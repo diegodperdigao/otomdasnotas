@@ -22,8 +22,9 @@
 
     function load(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
     function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
-    function saveLeads() { save(STORAGE_KEY, leads); DB.saveAll('leads', leads); }
-    function saveActivities() { save(ACTIVITY_KEY, activities); DB.saveAll('activities', activities); }
+    function cloud(col, data) { try { if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) DB.saveAll(col, data); } catch(e) {} }
+    function saveLeads() { save(STORAGE_KEY, leads); cloud('leads', leads); }
+    function saveActivities() { save(ACTIVITY_KEY, activities); cloud('activities', activities); }
     function genId() { return 'l_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7); }
     function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
     function fmt(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -328,7 +329,7 @@
     // ========== PLANS (Action Plans for clients) ==========
     const PLANS_KEY = 'otomdasnotas_plans';
     let plans = load(PLANS_KEY) || [];
-    function savePlans() { save(PLANS_KEY, plans); DB.saveAll('plans', plans); }
+    function savePlans() { save(PLANS_KEY, plans); cloud('plans', plans); }
     let editingPlanId = null;
 
     const planOverlay = document.getElementById('modalPlanOverlay');
@@ -590,7 +591,7 @@
     // ========== INSCRIPTIONS (from LP) ==========
     const SUBS_KEY = 'otomdasnotas_submissions';
     let submissions = load(SUBS_KEY) || [];
-    function saveSubs() { save(SUBS_KEY, submissions); DB.saveAll('submissions', submissions); }
+    function saveSubs() { save(SUBS_KEY, submissions); cloud('submissions', submissions); }
     let replyingSubId = null;
 
     const TEMPLATES = {
@@ -723,7 +724,7 @@
     // ========== USERS MANAGEMENT ==========
     const USERS_KEY = 'otomdasnotas_users';
     let users = load(USERS_KEY) || [];
-    function saveUsers() { save(USERS_KEY, users); DB.saveAll('users', users); }
+    function saveUsers() { save(USERS_KEY, users); cloud('users', users); }
     let editingUserId = null;
 
     const userOverlay = document.getElementById('modalUserOverlay');
@@ -790,7 +791,7 @@
     // ========== MEETINGS ==========
     const MEETINGS_KEY = 'otomdasnotas_meetings';
     let meetings = load(MEETINGS_KEY) || [];
-    function saveMeetings() { save(MEETINGS_KEY, meetings); DB.saveAll('meetings', meetings); }
+    function saveMeetings() { save(MEETINGS_KEY, meetings); cloud('meetings', meetings); }
     let editingMeetingId = null;
 
     const meetingOverlay = document.getElementById('modalMeetingOverlay');
@@ -865,7 +866,7 @@
     // ========== NOTIFICATIONS ==========
     const NOTIF_KEY = 'otomdasnotas_notifications';
     let notifications = load(NOTIF_KEY) || [];
-    function saveNotifications() { save(NOTIF_KEY, notifications); DB.saveAll('notifications', notifications); }
+    function saveNotifications() { save(NOTIF_KEY, notifications); cloud('notifications', notifications); }
     function addNotification(clientId, type, message) {
         notifications.push({ id: genId(), clientId, type, message, read: false, time: new Date().toISOString() });
         saveNotifications();
@@ -874,7 +875,7 @@
     // ========== CHAT (Admin side) ==========
     const CHAT_KEY = 'otomdasnotas_chat';
     let chatMessages = load(CHAT_KEY) || [];
-    function saveChat() { save(CHAT_KEY, chatMessages); DB.saveAll('chat', chatMessages); }
+    function saveChat() { save(CHAT_KEY, chatMessages); cloud('chat', chatMessages); }
     let activeChatClient = null;
 
     function renderChatContacts() {
@@ -1007,48 +1008,38 @@
     seedMeetings();
     renderAll();
 
-    // Load from Firestore (async, updates UI when ready)
-    async function loadFromCloud() {
-        if (!DB.FIREBASE_ENABLED) return;
-        try {
-            const [cloudLeads, cloudPlans, cloudUsers, cloudMeetings, cloudSubs, cloudChat, cloudNotifs] = await Promise.all([
-                DB.load('leads'), DB.load('plans'), DB.load('users'),
-                DB.load('meetings'), DB.load('submissions'), DB.load('chat'), DB.load('notifications')
-            ]);
-            if (cloudLeads.length > 0) leads = cloudLeads;
-            if (cloudPlans.length > 0) plans = cloudPlans;
-            if (cloudUsers.length > 0) users = cloudUsers;
-            if (cloudMeetings.length > 0) meetings = cloudMeetings;
-            if (cloudSubs.length > 0) submissions = cloudSubs;
-            if (cloudChat.length > 0) chatMessages = cloudChat;
-            if (cloudNotifs.length > 0) notifications = cloudNotifs;
-            renderAll();
-            console.log('[O Tom] Dados carregados do Firestore');
-        } catch (err) {
-            console.warn('[O Tom] Falha ao carregar do Firestore:', err.message);
-        }
-    }
-    loadFromCloud();
+    // Cloud sync (safe - only runs if DB is available)
+    try {
+        if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
+            // Load from Firestore
+            (async function() {
+                try {
+                    var results = await Promise.all([
+                        DB.load('leads'), DB.load('plans'), DB.load('users'),
+                        DB.load('meetings'), DB.load('submissions'), DB.load('chat'), DB.load('notifications')
+                    ]);
+                    if (results[0].length > 0) leads = results[0];
+                    if (results[1].length > 0) plans = results[1];
+                    if (results[2].length > 0) users = results[2];
+                    if (results[3].length > 0) meetings = results[3];
+                    if (results[4].length > 0) submissions = results[4];
+                    if (results[5].length > 0) chatMessages = results[5];
+                    if (results[6].length > 0) notifications = results[6];
+                    renderAll();
+                } catch(err) { console.warn('[O Tom] Cloud load failed:', err.message); }
+            })();
 
-    // Real-time listeners for chat (so admin sees new messages instantly)
-    if (DB.FIREBASE_ENABLED) {
-        DB.onSnapshot('chat', data => {
-            chatMessages = data;
-            if (activeChatClient) { renderChatContacts(); renderChatWindow(); }
-        });
-        DB.onSnapshot('submissions', data => {
-            submissions = data;
-            renderSubmissions();
-        });
-    }
+            // Real-time listeners
+            DB.onSnapshot('chat', function(data) { chatMessages = data; if (activeChatClient) { renderChatContacts(); renderChatWindow(); } });
+            DB.onSnapshot('submissions', function(data) { submissions = data; renderSubmissions(); });
 
-    // Sync local seed data to cloud on first run
-    if (DB.FIREBASE_ENABLED) {
-        const syncKey = 'otomdasnotas_cloud_synced';
-        if (!localStorage.getItem(syncKey)) {
-            DB.syncToCloud().then(() => localStorage.setItem(syncKey, '1'));
+            // Sync seed data to cloud on first run
+            var syncKey = 'otomdasnotas_cloud_synced';
+            if (!localStorage.getItem(syncKey)) {
+                DB.syncToCloud().then(function() { localStorage.setItem(syncKey, '1'); });
+            }
         }
-    }
+    } catch(e) { console.warn('[O Tom] Cloud init skipped:', e.message); }
 
     // LP form handling
     var lpFormEl = document.getElementById('lpForm');
