@@ -159,14 +159,40 @@
 
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        const email = document.getElementById('loginEmail').value.trim();
-        const pass = document.getElementById('loginPassword').value;
+        var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        var pass = document.getElementById('loginPassword').value;
         if (!email || !pass) { loginError.textContent = 'Preencha todos os campos.'; return; }
+
+        // Check if this email belongs to an aluno user
+        var allUsers = load('otomdasnotas_users') || [];
+        var user = allUsers.find(function(u) { return u.email.toLowerCase() === email; });
+
+        if (user && user.role === 'aluno') {
+            loginError.innerHTML = 'Este e-mail é de um aluno. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Aluno</a>';
+            return;
+        }
+
+        // Also check if email belongs to a lead (not an admin user)
+        var allLeads = load('otomdasnotas_leads') || [];
+        var isLead = allLeads.find(function(l) { return (l.email || '').toLowerCase() === email; });
+        var isAdmin = user && user.role === 'admin';
+
+        if (isLead && !isAdmin) {
+            loginError.innerHTML = 'Este e-mail é de um cliente. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Aluno</a>';
+            return;
+        }
+
+        // Valid admin login
+        if (user && user.password !== pass) {
+            loginError.textContent = 'Senha incorreta.';
+            return;
+        }
+
         loginAs('admin', email);
     });
 
-    document.getElementById('loginAsAdmin').addEventListener('click', () => loginAs('admin', 'consultor@otom.com'));
-    document.getElementById('loginAsAluno').addEventListener('click', () => loginAs('aluno', 'aluno@otom.com'));
+    document.getElementById('loginAsAdmin').addEventListener('click', function() { loginAs('admin', 'admin@otom.com'); });
+    document.getElementById('loginAsAluno').addEventListener('click', function() { window.location.href = 'aluno.html'; });
     document.getElementById('btnLogout').addEventListener('click', logout);
     document.getElementById('sidebarLogout').addEventListener('click', function(e) { e.preventDefault(); logout(); });
 
