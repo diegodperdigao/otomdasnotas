@@ -168,7 +168,7 @@
         var user = allUsers.find(function(u) { return u.email.toLowerCase() === email; });
 
         if (user && user.role === 'aluno') {
-            loginError.innerHTML = 'Este e-mail é de um aluno. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Aluno</a>';
+            loginError.innerHTML = 'Este e-mail é de um mentorado. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Mentorado</a>';
             return;
         }
 
@@ -178,7 +178,7 @@
         var isAdmin = user && user.role === 'admin';
 
         if (isLead && !isAdmin) {
-            loginError.innerHTML = 'Este e-mail é de um cliente. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Aluno</a>';
+            loginError.innerHTML = 'Este e-mail é de um cliente. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Mentorado</a>';
             return;
         }
 
@@ -661,7 +661,7 @@
         },
         info: {
             subject: 'Mais informações sobre a consultoria',
-            message: 'Olá {nome}!\n\nObrigado pela inscrição. Seguem mais detalhes sobre nossa consultoria:\n\nO que oferecemos:\n- Diagnóstico inicial gratuito da sua carreira\n- Plano de ação personalizado\n- Acompanhamento semanal com reuniões\n- Acesso à plataforma do aluno com conteúdos exclusivos\n- Chat direto com seu consultor\n\nInvestimento:\n- Consulte valores e condições na nossa conversa inicial.\n\nTem alguma dúvida? Responda este e-mail!\n\nAbraços,\nEquipe O Tom das Notas'
+            message: 'Olá {nome}!\n\nObrigado pela inscrição. Seguem mais detalhes sobre nossa consultoria:\n\nO que oferecemos:\n- Diagnóstico inicial gratuito da sua carreira\n- Plano de ação personalizado\n- Acompanhamento semanal com reuniões\n- Acesso à plataforma do mentorado com conteúdos exclusivos\n- Chat direto com seu consultor\n\nInvestimento:\n- Consulte valores e condições na nossa conversa inicial.\n\nTem alguma dúvida? Responda este e-mail!\n\nAbraços,\nEquipe O Tom das Notas'
         },
         waitlist: {
             subject: 'Você está na nossa lista de espera',
@@ -930,7 +930,7 @@
         tbody.innerHTML = users.map(u => {
             const lead = u.leadId ? leads.find(l => l.id === u.leadId) : null;
             return '<tr><td><strong>'+esc(u.name)+'</strong></td><td>'+esc(u.email)+'</td>' +
-                '<td><span class="role-badge '+u.role+'">'+(u.role==='admin'?'Administrador':'Aluno')+'</span></td>' +
+                '<td><span class="role-badge '+u.role+'">'+(u.role==='admin'?'Administrador':'Mentorado')+'</span></td>' +
                 '<td>'+(lead?esc(lead.name):'—')+'</td>' +
                 '<td>'+new Date(u.createdAt).toLocaleDateString('pt-BR')+'</td>' +
                 '<td><div class="table-actions"><button onclick="window._editUser(\''+u.id+'\')" title="Editar"><i class="fas fa-edit"></i></button>' +

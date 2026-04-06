@@ -1,5 +1,5 @@
 // ========================================
-// Área do Aluno — O Tom das Notas
+// Área do Mentorado — O Tom das Notas
 // Tabs: Plano (resources, notes, certificate), Agenda, Chat, Notifications
 // ========================================
 (function () {
