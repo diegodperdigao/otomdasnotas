@@ -134,7 +134,7 @@ a{text-decoration:none;color:inherit}
 .header-actions{display:flex;gap:10px}
 
 /* ========== KPI ========== */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:28px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
 .kpi-card{background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius-lg);padding:22px;display:flex;align-items:flex-start;gap:14px;transition:all .2s;position:relative;overflow:hidden}
 .kpi-card:hover{box-shadow:var(--shadow-md);border-color:var(--zinc-300);transform:translateY(-1px)}
 .kpi-icon{width:44px;height:44px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
@@ -286,7 +286,7 @@ a{text-decoration:none;color:inherit}
 .form-group{display:flex;flex-direction:column;gap:5px}
 .form-group.full{margin-bottom:0}
 .form-group label{font-size:.65rem;font-weight:800;color:var(--zinc-500);text-transform:uppercase;letter-spacing:.08em}
-.form-group input,.form-group select,.form-group textarea{padding:10px 14px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:.85rem;color:var(--zinc-900);outline:none;transition:border-color .15s}
+.form-group input,.form-group select,.form-group textarea{padding:10px 14px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:16px;color:var(--zinc-900);outline:none;transition:border-color .15s;width:100%;max-width:100%;box-sizing:border-box}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--zinc-900);box-shadow:0 0 0 3px rgba(0,0,0,.04)}
 .form-group input::placeholder,.form-group textarea::placeholder{color:var(--zinc-400)}
 .form-group textarea{resize:vertical}
@@ -314,16 +314,30 @@ a{text-decoration:none;color:inherit}
     .pipeline-column{min-width:100%}
     .leads-filters{flex-direction:column}
     .header-actions .btn span,.topbar-actions .btn span{display:none}
-    .section{padding:20px 16px}
-    .section-title{font-size:1.2rem}
+    .section{padding:16px 12px}
+    .section-title{font-size:1.1rem}
     .topbar-search{display:none}
     .section-header{flex-direction:column;align-items:flex-start;gap:12px}
     .table-actions button{padding:10px 12px;font-size:.85rem}
     .lead-card-btn{padding:8px 12px;font-size:.82rem}
     .hub-header{position:relative;justify-content:flex-end;padding:12px 16px;width:100%}
     .hub{padding-top:0}
+    .funnel-chart{gap:8px;height:160px;padding:0}
+    .funnel-bar-label{font-size:.6rem}
+    .segment-bar-wrap{width:50px}
+    .activity-value{font-size:.72rem}
+    .activity-badge{font-size:.55rem;padding:2px 6px}
+    .modal{max-width:calc(100vw - 24px);margin:12px}
+    .modal form{padding:16px}
+    .modal-header{padding:16px}
+    .detail-actions{flex-wrap:wrap}
 }
 @media(max-width:480px){
     .kpi-grid{grid-template-columns:1fr}
+    .kpi-card{padding:16px}
+    .kpi-icon{width:40px;height:40px;font-size:.9rem}
+    .kpi-value{font-size:1.3rem}
     .topbar{padding:0 12px}
+    .funnel-chart{gap:4px;height:130px}
+    .funnel-bar-value{font-size:.7rem;top:-20px}
 }

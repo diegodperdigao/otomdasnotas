@@ -279,6 +279,21 @@
 .sub-reply{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:.78rem;color:var(--zinc-700)}
 .sub-reply small{color:var(--zinc-400);font-size:.68rem}
 
+/* Submission status badges */
+.sub-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.badge-new{background:var(--blue-50);color:var(--blue-700);border:1px solid var(--blue-200)}
+.badge-replied{background:var(--amber-50);color:var(--amber-700);border:1px solid var(--amber-200)}
+.badge-accepted{background:var(--emerald-50);color:var(--emerald-700);border:1px solid var(--emerald-200)}
+.badge-converted{background:var(--zinc-900);color:var(--white)}
+.badge-archived{background:var(--zinc-100);color:var(--zinc-500);border:1px solid var(--zinc-200)}
+.sub-card-contact{font-size:.78rem;color:var(--zinc-500);display:flex;align-items:center;gap:6px;margin-top:6px}
+.sub-card-contact i{font-size:.68rem}
+.sub-archived{opacity:.6}
+.sub-archive-section{margin-top:20px;padding-top:16px;border-top:1px solid var(--zinc-200)}
+.sub-archive-toggle{color:var(--zinc-500)}
+.btn-accept{background:var(--emerald-700)!important;color:var(--white)!important}
+.btn-accept:hover{opacity:.9}
+
 /* Reply modal extras */
 .reply-info{padding:16px 24px;background:var(--zinc-50);border-bottom:1px solid var(--zinc-100)}
 .reply-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.82rem;color:var(--zinc-700)}

@@ -701,6 +701,53 @@
     window._delSub = id => { if (confirm('Excluir esta inscrição?')) { submissions = submissions.filter(x => x.id !== id); saveSubs(); renderSubmissions(); } };
     window._markSub = (id, status) => { const s = submissions.find(x => x.id === id); if (s) { s.status = status; saveSubs(); renderSubmissions(); } };
 
+    // Accept: convert to lead + send welcome email
+    window._acceptSub = function(id) {
+        const s = submissions.find(x => x.id === id);
+        if (!s) return;
+        // Convert to lead if not exists
+        if (!leads.find(l => l.email === s.email)) {
+            leads.push({
+                id: genId(), name: s.name, email: s.email, phone: s.phone,
+                segment: s.segment, stage: 'prospeccao', value: 0, source: 'site',
+                instrument: s.instrument || '', notes: s.message || '',
+                createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+            });
+            saveLeads();
+        }
+        s.status = 'aceito';
+        saveSubs();
+        renderSubmissions();
+        renderAll();
+        // Send email via EmailJS
+        sendAcceptEmail(s);
+    };
+
+    function sendAcceptEmail(sub) {
+        if (typeof emailjs === 'undefined') {
+            console.warn('[O Tom] EmailJS não carregou. E-mail não enviado.');
+            alert('Inscrição aceita! (E-mail não enviado — configure o EmailJS)');
+            return;
+        }
+        var templateParams = {
+            to_name: sub.name.split(' ')[0],
+            to_email: sub.email,
+            from_name: 'O Tom das Notas',
+            subject: 'Sua inscrição foi aceita! — O Tom das Notas',
+            message: 'Olá ' + sub.name.split(' ')[0] + '!\n\nSua inscrição na consultoria O Tom das Notas foi aceita!\n\nEm breve entraremos em contato para agendar seu diagnóstico gratuito.\n\nPrepare-se para transformar seu talento musical em um negócio de verdade.\n\nAbraços,\nEquipe O Tom das Notas'
+        };
+        try {
+            emailjs.send('default_service', 'template_accept', templateParams)
+                .then(function() { alert('Inscrição aceita e e-mail enviado para ' + sub.email + '!'); })
+                .catch(function(err) {
+                    console.warn('[O Tom] EmailJS error:', err);
+                    alert('Inscrição aceita! (Falha ao enviar e-mail: ' + (err.text || err) + ')');
+                });
+        } catch(e) {
+            alert('Inscrição aceita! (E-mail não enviado)');
+        }
+    }
+
     function renderSubmissions() {
         // Always refresh from localStorage in case LP form submitted
         var freshSubs = load(SUBS_KEY);
@@ -711,30 +758,56 @@
         const newCount = submissions.filter(s => s.status === 'novo').length;
         if (badge) badge.textContent = newCount > 0 ? newCount : '';
 
-        if (submissions.length === 0) { list.innerHTML = '<p class="empty-state">Nenhuma inscrição recebida. Compartilhe a <a href="lp.html" target="_blank">landing page</a> para receber inscrições.</p>'; return; }
+        if (submissions.length === 0) { list.innerHTML = '<p class="empty-state">Nenhuma inscrição recebida.</p>'; return; }
 
-        const statusLabels = { novo:'Novo', respondido:'Respondido', convertido:'Convertido', arquivado:'Arquivado' };
-        const statusClass = { novo:'stage-badge prospeccao', respondido:'stage-badge proposta', convertido:'stage-badge fechamento', arquivado:'stage-badge negociacao' };
+        const statusLabels = { novo:'Novo', respondido:'Respondido', aceito:'Aceito', convertido:'Convertido', arquivado:'Arquivado' };
+        const statusClass = { novo:'badge-new', respondido:'badge-replied', aceito:'badge-accepted', convertido:'badge-converted', arquivado:'badge-archived' };
 
-        list.innerHTML = submissions.map(s => {
-            const segLabel = SEGMENT_LABELS[s.segment] || s.segment;
-            return '<div class="sub-card">' +
-                '<div class="sub-card-top">' +
-                    '<div class="sub-card-info"><div class="td-avatar">' + s.name.charAt(0) + '</div><div><strong>' + esc(s.name) + '</strong><br><span class="sub-card-meta">' + esc(s.email) + ' · ' + segLabel + '</span></div></div>' +
-                    '<span class="' + (statusClass[s.status]||'stage-badge') + '">' + (statusLabels[s.status]||s.status) + '</span>' +
+        // Separate active and archived
+        var active = submissions.filter(s => s.status !== 'arquivado');
+        var archived = submissions.filter(s => s.status === 'arquivado');
+
+        var html = '';
+
+        if (active.length > 0) {
+            html += active.map(renderSubCard).join('');
+        } else {
+            html += '<p class="empty-state">Nenhuma inscrição ativa.</p>';
+        }
+
+        if (archived.length > 0) {
+            html += '<div class="sub-archive-section"><button class="btn btn-secondary btn-sm sub-archive-toggle" onclick="document.getElementById(\'archivedSubs\').style.display=document.getElementById(\'archivedSubs\').style.display===\'none\'?\'block\':\'none\'"><i class="fas fa-archive"></i> Arquivadas (' + archived.length + ')</button>' +
+                '<div id="archivedSubs" style="display:none;margin-top:12px">' + archived.map(renderSubCard).join('') + '</div></div>';
+        }
+
+        list.innerHTML = html;
+    }
+
+    function renderSubCard(s) {
+        var segLabel = SEGMENT_LABELS[s.segment] || s.segment;
+        var statusLabels = { novo:'Novo', respondido:'Respondido', aceito:'Aceito', convertido:'Convertido', arquivado:'Arquivado' };
+        var statusClass = { novo:'badge-new', respondido:'badge-replied', aceito:'badge-accepted', convertido:'badge-converted', arquivado:'badge-archived' };
+        var isNew = s.status === 'novo';
+        var isArchived = s.status === 'arquivado';
+
+        return '<div class="sub-card' + (isArchived ? ' sub-archived' : '') + '">' +
+            '<div class="sub-card-top">' +
+                '<div class="sub-card-info"><div class="td-avatar">' + s.name.charAt(0) + '</div><div><strong>' + esc(s.name) + '</strong><br><span class="sub-card-meta">' + esc(s.email) + ' · ' + segLabel + '</span></div></div>' +
+                '<span class="sub-status ' + (statusClass[s.status]||'') + '">' + (statusLabels[s.status]||s.status) + '</span>' +
+            '</div>' +
+            (s.phone ? '<div class="sub-card-contact"><i class="fas fa-phone"></i> ' + esc(s.phone) + '</div>' : '') +
+            (s.message ? '<p class="sub-card-msg">' + esc(s.message) + '</p>' : '') +
+            '<div class="sub-card-footer">' +
+                '<span class="sub-card-date"><i class="fas fa-clock"></i> ' + new Date(s.createdAt).toLocaleDateString('pt-BR') + '</span>' +
+                '<div class="sub-card-actions">' +
+                    (isNew ? '<button onclick="window._acceptSub(\'' + s.id + '\')" class="btn btn-accept btn-sm"><i class="fas fa-check"></i> Aceitar</button>' : '') +
+                    '<button onclick="window._replySub(\'' + s.id + '\')" class="btn btn-secondary btn-sm"><i class="fas fa-reply"></i></button>' +
+                    (!isArchived ? '<button onclick="window._markSub(\'' + s.id + '\',\'arquivado\')" class="btn btn-secondary btn-sm" title="Arquivar"><i class="fas fa-archive"></i></button>' : '<button onclick="window._markSub(\'' + s.id + '\',\'novo\')" class="btn btn-secondary btn-sm" title="Desarquivar"><i class="fas fa-undo"></i></button>') +
+                    '<button onclick="window._delSub(\'' + s.id + '\')" class="btn btn-secondary btn-sm" title="Excluir"><i class="fas fa-trash"></i></button>' +
                 '</div>' +
-                (s.message ? '<p class="sub-card-msg">' + esc(s.message) + '</p>' : '') +
-                '<div class="sub-card-footer">' +
-                    '<span class="sub-card-date"><i class="fas fa-clock"></i> ' + new Date(s.createdAt).toLocaleDateString('pt-BR') + '</span>' +
-                    '<div class="sub-card-actions">' +
-                        '<button onclick="window._replySub(\'' + s.id + '\')" class="btn btn-primary btn-sm"><i class="fas fa-reply"></i> Responder</button>' +
-                        (s.status !== 'convertido' ? '<button onclick="window._markSub(\'' + s.id + '\',\'arquivado\')" class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i></button>' : '') +
-                        '<button onclick="window._delSub(\'' + s.id + '\')" class="btn btn-secondary btn-sm"><i class="fas fa-trash"></i></button>' +
-                    '</div>' +
-                '</div>' +
-                (s.replies && s.replies.length > 0 ? '<div class="sub-card-replies"><strong>Respostas enviadas:</strong>' + s.replies.map(r => '<div class="sub-reply"><span>' + r.subject + '</span><small>' + new Date(r.sentAt).toLocaleDateString('pt-BR') + '</small></div>').join('') + '</div>' : '') +
-                '</div>';
-        }).join('');
+            '</div>' +
+            (s.replies && s.replies.length > 0 ? '<div class="sub-card-replies"><strong>Respostas:</strong>' + s.replies.map(r => '<div class="sub-reply"><span>' + esc(r.subject) + '</span><small>' + new Date(r.sentAt).toLocaleDateString('pt-BR') + '</small></div>').join('') + '</div>' : '') +
+            '</div>';
     }
 
     // ========== USERS MANAGEMENT ==========
