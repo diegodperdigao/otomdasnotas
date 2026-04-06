@@ -61,19 +61,19 @@
         const pass = document.getElementById('alunoPassword').value;
         if (!email || !pass) { loginError.textContent = 'Preencha todos os campos.'; return; }
 
-        // Check in users table first
+        // Find user account
         const user = users.find(u => u.email.toLowerCase() === email && u.role === 'aluno');
-        if (user) {
-            if (user.password !== pass) { loginError.textContent = 'Senha incorreta.'; return; }
-            const lead = user.leadId ? leads.find(l => l.id === user.leadId) : leads.find(l => (l.email||'').toLowerCase() === email);
-            if (!lead) { loginError.textContent = 'Nenhum perfil de cliente vinculado.'; return; }
-            currentClientId = lead.id;
-        } else {
-            // Fallback: match by lead email (demo mode)
-            const lead = leads.find(l => (l.email || '').toLowerCase() === email);
-            if (!lead) { loginError.textContent = 'E-mail não encontrado.'; return; }
-            currentClientId = lead.id;
+        if (!user) {
+            loginError.textContent = 'E-mail não encontrado. Verifique com seu consultor.';
+            return;
         }
+        if (user.password !== pass) {
+            loginError.textContent = 'Senha incorreta.';
+            return;
+        }
+        const lead = user.leadId ? leads.find(l => l.id === user.leadId) : leads.find(l => (l.email||'').toLowerCase() === email);
+        if (!lead) { loginError.textContent = 'Nenhum perfil vinculado. Contate seu consultor.'; return; }
+        currentClientId = lead.id;
 
         save(SESSION_KEY, { role: 'aluno', email, clientId: currentClientId, time: Date.now() });
         loginError.textContent = '';

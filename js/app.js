@@ -177,17 +177,23 @@
             return;
         }
 
-        // Validate password if user exists
-        if (user && user.password !== pass) {
+        // Must have a user account to login
+        if (!user) {
+            loginError.textContent = 'E-mail não encontrado. Verifique com seu consultor.';
+            return;
+        }
+
+        // Validate password
+        if (user.password !== pass) {
             loginError.textContent = 'Senha incorreta.';
             return;
         }
 
-        // Find the lead and save session
+        // Find linked lead
         var allLeads = load('otomdasnotas_leads') || [];
-        var lead = allLeads.find(function(l) { return (l.email || '').toLowerCase() === email; });
+        var lead = user.leadId ? allLeads.find(function(l) { return l.id === user.leadId; }) : allLeads.find(function(l) { return (l.email || '').toLowerCase() === email; });
         if (!lead) {
-            loginError.textContent = 'E-mail não encontrado. Verifique com seu consultor.';
+            loginError.textContent = 'Nenhum perfil vinculado. Contate seu consultor.';
             return;
         }
         save(SESSION_KEY, { role: 'aluno', email: email, clientId: lead.id, time: Date.now() });
@@ -232,6 +238,9 @@
                 adminLoginError.innerHTML = 'Este e-mail é de um cliente. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Mentorado</a>';
                 return;
             }
+            // Unknown email — block access
+            adminLoginError.textContent = 'E-mail não encontrado. Apenas administradores cadastrados podem acessar.';
+            return;
         }
 
         loginAs('admin', email);
@@ -240,7 +249,7 @@
     document.getElementById('sidebarLogout').addEventListener('click', function(e) { e.preventDefault(); logout(); });
 
     // ========== HUB / APP NAVIGATION ==========
-    function showHub() { app.style.display = 'none'; hub.style.display = 'flex'; }
+    function showHub() { hideAll(); hub.style.display = 'flex'; pushState('hub'); }
     function showApp(sec) { hideAll(); app.style.display = 'flex'; switchSection(sec || 'dashboard'); }
 
     hubCards.forEach(c => c.addEventListener('click', function(e) {
@@ -1136,8 +1145,9 @@
 
 
     // ========== SEED DATA ==========
+    var SEEDED = localStorage.getItem('otomdasnotas_seeded_v2');
     function seed() {
-        if (leads.length > 0) return;
+        if (SEEDED || leads.length > 0) return;
         const data = [
             { name:'Lucas Mendes', email:'lucas.mendes@email.com', phone:'(11) 98765-4321', segment:'instrumentista', stage:'prospeccao', value:1500, source:'instagram', instrument:'Guitarra', notes:'Guitarrista profissional com 12k seguidores.' },
             { name:'Juliana Ferreira', email:'ju.ferreira@email.com', phone:'(85) 99567-8901', segment:'cantor', stage:'prospeccao', value:3000, source:'instagram', instrument:'Vocal / Sertanejo', notes:'Cantora regional, quer expandir para streaming.' },
@@ -1154,7 +1164,7 @@
 
     // Seed plans
     function seedPlans() {
-        if (plans.length > 0) return;
+        if (SEEDED || plans.length > 0) return;
         // Find Maria Eduarda (fechamento) to give her a plan
         const maria = leads.find(l => l.name.includes('Maria Eduarda'));
         if (!maria) return;
@@ -1179,19 +1189,16 @@
 
     // Seed users
     function seedUsers() {
-        if (users.length > 0) return;
-        // Check if already seeded (prevent duplicates on localStorage clear)
-        if (localStorage.getItem('otomdasnotas_users_seeded')) return;
+        if (SEEDED || users.length > 0) return;
         const maria = leads.find(l => l.name.includes('Maria Eduarda'));
         users.push({ id: genId(), name: 'Admin', email: 'admin@otom.com', password: '1234', role: 'admin', leadId: '', createdAt: new Date().toISOString() });
         if (maria) users.push({ id: genId(), name: maria.name, email: maria.email, password: '1234', role: 'aluno', leadId: maria.id, createdAt: new Date().toISOString() });
         saveUsers();
-        localStorage.setItem('otomdasnotas_users_seeded', '1');
     }
 
     // Seed meetings
     function seedMeetings() {
-        if (meetings.length > 0) return;
+        if (SEEDED || meetings.length > 0) return;
         const maria = leads.find(l => l.name.includes('Maria Eduarda'));
         if (!maria) return;
         const today = new Date();
@@ -1209,6 +1216,7 @@
     seedPlans();
     seedUsers();
     seedMeetings();
+    if (!SEEDED) localStorage.setItem('otomdasnotas_seeded_v2', '1');
     renderAll();
 
     // Cloud sync (safe - only runs if DB is available)
