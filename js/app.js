@@ -26,6 +26,28 @@
     function saveLeads() { save(STORAGE_KEY, leads); cloud('leads', leads); }
     function saveActivities() { save(ACTIVITY_KEY, activities); cloud('activities', activities); }
     function genId() { return 'l_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7); }
+
+    // ========== TOAST NOTIFICATIONS ==========
+    function showToast(message, type) {
+        type = type || 'info';
+        var container = document.getElementById('toastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+        var icons = { success:'fa-check-circle', error:'fa-exclamation-circle', warn:'fa-exclamation-triangle', info:'fa-info-circle' };
+        var toast = document.createElement('div');
+        toast.className = 'toast toast-' + type;
+        toast.innerHTML = '<i class="fas ' + (icons[type]||icons.info) + '"></i><span>' + message + '</span><button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>';
+        container.appendChild(toast);
+        setTimeout(function() { toast.classList.add('toast-show'); }, 10);
+        setTimeout(function() {
+            toast.classList.remove('toast-show');
+            setTimeout(function() { if (toast.parentElement) toast.remove(); }, 300);
+        }, 4000);
+    }
     function esc(t) { if (!t) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
     function fmt(v) { return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
     function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -672,6 +694,7 @@
         sub.replies = sub.replies || [];
         sub.replies.push({ subject, message, sentAt: new Date().toISOString() });
         saveSubs(); closeReplyModal(); renderSubmissions();
+        showToast('Resposta registrada para ' + sub.name, 'success');
     });
 
     // Convert to Lead
@@ -680,7 +703,7 @@
         if (!sub) return;
         // Check if lead already exists
         if (leads.find(l => l.email === sub.email)) {
-            alert('Um lead com este e-mail já existe.');
+            showToast('Um lead com este e-mail já existe.', 'warn');
             return;
         }
         leads.push({
@@ -694,12 +717,19 @@
         saveSubs();
         closeReplyModal();
         renderAll();
-        alert('Lead "' + sub.name + '" criado com sucesso na etapa Prospecção!');
+        showToast('Lead "' + sub.name + '" criado na etapa Prospecção!', 'success');
     });
 
     window._replySub = id => { const s = submissions.find(x => x.id === id); if (s) openReplyModal(s); };
-    window._delSub = id => { if (confirm('Excluir esta inscrição?')) { submissions = submissions.filter(x => x.id !== id); saveSubs(); renderSubmissions(); } };
-    window._markSub = (id, status) => { const s = submissions.find(x => x.id === id); if (s) { s.status = status; saveSubs(); renderSubmissions(); } };
+    window._delSub = id => { if (confirm('Excluir esta inscrição?')) { submissions = submissions.filter(x => x.id !== id); saveSubs(); renderSubmissions(); showToast('Inscrição excluída', 'info'); } };
+    window._markSub = function(id, status) {
+        const s = submissions.find(x => x.id === id);
+        if (s) {
+            s.status = status; saveSubs(); renderSubmissions();
+            var labels = { arquivado:'Inscrição arquivada', novo:'Inscrição restaurada', respondido:'Marcada como respondida' };
+            showToast(labels[status] || 'Status atualizado', 'info');
+        }
+    };
 
     // Accept: convert to lead + send welcome email
     window._acceptSub = function(id) {
@@ -719,32 +749,37 @@
         saveSubs();
         renderSubmissions();
         renderAll();
-        // Send email via EmailJS
+        showToast('Inscrição de ' + s.name + ' aceita!', 'success');
         sendAcceptEmail(s);
     };
 
     function sendAcceptEmail(sub) {
         if (typeof emailjs === 'undefined') {
-            console.warn('[O Tom] EmailJS não carregou. E-mail não enviado.');
-            alert('Inscrição aceita! (E-mail não enviado — configure o EmailJS)');
+            console.warn('[O Tom] EmailJS não carregou.');
+            showToast('Inscrição aceita! E-mail não enviado — configure o EmailJS.', 'warn');
             return;
         }
         var templateParams = {
             to_name: sub.name.split(' ')[0],
             to_email: sub.email,
             from_name: 'O Tom das Notas',
+            reply_to: sub.email,
             subject: 'Sua inscrição foi aceita! — O Tom das Notas',
-            message: 'Olá ' + sub.name.split(' ')[0] + '!\n\nSua inscrição na consultoria O Tom das Notas foi aceita!\n\nEm breve entraremos em contato para agendar seu diagnóstico gratuito.\n\nPrepare-se para transformar seu talento musical em um negócio de verdade.\n\nAbraços,\nEquipe O Tom das Notas'
+            message: 'Olá ' + sub.name.split(' ')[0] + '! Sua inscrição na consultoria O Tom das Notas foi aceita! Em breve entraremos em contato para agendar seu diagnóstico gratuito.'
         };
         try {
             emailjs.send('service_fbj800w', 'template_gb30i8v', templateParams)
-                .then(function() { alert('Inscrição aceita e e-mail enviado para ' + sub.email + '!'); })
+                .then(function(response) {
+                    console.log('[O Tom] Email sent:', response.status);
+                    showToast('E-mail de aceite enviado para ' + sub.email, 'success');
+                })
                 .catch(function(err) {
-                    console.warn('[O Tom] EmailJS error:', err);
-                    alert('Inscrição aceita! (Falha ao enviar e-mail: ' + (err.text || err) + ')');
+                    console.error('[O Tom] EmailJS error:', JSON.stringify(err));
+                    showToast('Inscrição aceita! Falha no e-mail: ' + (err.text || err.message || 'erro desconhecido'), 'error');
                 });
         } catch(e) {
-            alert('Inscrição aceita! (E-mail não enviado)');
+            console.error('[O Tom] EmailJS exception:', e);
+            showToast('Inscrição aceita! E-mail não enviado.', 'warn');
         }
     }
 
@@ -801,8 +836,8 @@
                 '<span class="sub-card-date"><i class="fas fa-clock"></i> ' + new Date(s.createdAt).toLocaleDateString('pt-BR') + '</span>' +
                 '<div class="sub-card-actions">' +
                     (isNew ? '<button onclick="window._acceptSub(\'' + s.id + '\')" class="btn btn-accept btn-sm"><i class="fas fa-check"></i> Aceitar</button>' : '') +
-                    '<button onclick="window._replySub(\'' + s.id + '\')" class="btn btn-secondary btn-sm"><i class="fas fa-reply"></i></button>' +
-                    (!isArchived ? '<button onclick="window._markSub(\'' + s.id + '\',\'arquivado\')" class="btn btn-secondary btn-sm" title="Arquivar"><i class="fas fa-archive"></i></button>' : '<button onclick="window._markSub(\'' + s.id + '\',\'novo\')" class="btn btn-secondary btn-sm" title="Desarquivar"><i class="fas fa-undo"></i></button>') +
+                    '<button onclick="window._replySub(\'' + s.id + '\')" class="btn btn-secondary btn-sm"><i class="fas fa-reply"></i> Responder</button>' +
+                    (!isArchived ? '<button onclick="window._markSub(\'' + s.id + '\',\'arquivado\')" class="btn btn-secondary btn-sm"><i class="fas fa-archive"></i> Arquivar</button>' : '<button onclick="window._markSub(\'' + s.id + '\',\'novo\')" class="btn btn-secondary btn-sm"><i class="fas fa-undo"></i> Restaurar</button>') +
                     '<button onclick="window._delSub(\'' + s.id + '\')" class="btn btn-secondary btn-sm" title="Excluir"><i class="fas fa-trash"></i></button>' +
                 '</div>' +
             '</div>' +
