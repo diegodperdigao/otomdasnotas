@@ -417,6 +417,7 @@
                 l.stage = STAGES[i + 1]; l.updatedAt = new Date().toISOString();
                 saveLeads(); addActivity(esc(l.name) + ' avançou de ' + old + ' para ' + STAGE_LABELS[l.stage], 'advance');
                 closeDetailModal(); renderAll();
+                showToast(l.name + ' avançou para ' + STAGE_LABELS[l.stage], 'success');
             }
         }
     });
