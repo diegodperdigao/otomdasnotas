@@ -38,9 +38,20 @@
 
     // Check existing session
     const session = load(SESSION_KEY);
-    if (session && session.role === 'aluno' && session.clientId) {
-        currentClientId = session.clientId;
-        enterPortal();
+    if (session && session.role === 'aluno') {
+        if (session.clientId) {
+            currentClientId = session.clientId;
+            enterPortal();
+        } else if (session.email) {
+            // Try to find lead by email
+            const lead = leads.find(l => (l.email || '').toLowerCase() === session.email.toLowerCase());
+            if (lead) {
+                currentClientId = lead.id;
+                save(SESSION_KEY, { role: 'aluno', email: session.email, clientId: lead.id, time: Date.now() });
+                enterPortal();
+            }
+            // If no lead found, show login screen (will pre-fill email)
+        }
     }
 
     // Login

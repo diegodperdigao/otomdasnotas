@@ -183,14 +183,14 @@
             return;
         }
 
-        // Save session and redirect
+        // Find the lead and save session
         var allLeads = load('otomdasnotas_leads') || [];
         var lead = allLeads.find(function(l) { return (l.email || '').toLowerCase() === email; });
-        if (lead) {
-            save(SESSION_KEY, { role: 'aluno', email: email, clientId: lead.id, time: Date.now() });
-        } else {
-            save(SESSION_KEY, { role: 'aluno', email: email, time: Date.now() });
+        if (!lead) {
+            loginError.textContent = 'E-mail não encontrado. Verifique com seu consultor.';
+            return;
         }
+        save(SESSION_KEY, { role: 'aluno', email: email, clientId: lead.id, time: Date.now() });
         window.location.href = 'aluno.html';
     });
 
