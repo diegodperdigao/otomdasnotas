@@ -1276,11 +1276,25 @@
         if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
     });
 
-    // Check session on load
+    // Restore state on load (F5 / refresh)
     const session = getSession();
+    const hash = window.location.hash.replace('#', '');
+
     if (session && session.role === 'admin') {
-        showHubAdmin(session.email);
+        // Admin is logged in — restore the view they were on
+        if (hash && titles[hash]) {
+            showApp(hash);
+        } else if (hash === 'hub') {
+            showHubAdmin(session.email);
+        } else {
+            showHubAdmin(session.email);
+        }
+    } else if (hash === 'login') {
+        window.showLoginScreen(true);
+    } else if (hash === 'admin-login') {
+        hideAll();
+        adminLoginScreen.style.display = 'flex';
     } else {
-        window.showLp();
+        window.showLp(true);
     }
 })();

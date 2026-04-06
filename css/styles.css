@@ -299,7 +299,8 @@ a{text-decoration:none;color:inherit}
 .detail-actions{display:flex;gap:8px;padding:16px 24px;border-top:1px solid var(--zinc-100);justify-content:flex-end}
 
 /* Admin button in login */
-.login-admin-link{margin-top:24px;padding-top:16px;border-top:1px solid var(--zinc-100)}
+.login-admin-link{margin-top:24px;padding-top:16px;border-top:1px solid var(--zinc-100);display:flex;justify-content:center}
+.login-admin-link .login-role-btn{width:100%}
 
 /* ========== TOAST NOTIFICATIONS ========== */
 .toast-container{position:fixed;top:80px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:380px;width:calc(100% - 40px)}
