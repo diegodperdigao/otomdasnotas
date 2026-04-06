@@ -376,11 +376,14 @@
         if (editingLeadId) {
             const i = leads.findIndex(l => l.id === editingLeadId);
             if (i !== -1) { leads[i] = { ...leads[i], ...data, updatedAt: new Date().toISOString() }; addActivity(esc(data.name) + ' foi atualizado', 'edit'); }
+            saveLeads(); closeLeadModal(); renderAll();
+            showToast('Lead "' + data.name + '" atualizado', 'success');
         } else {
             leads.push({ id: genId(), ...data, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
             addActivity(esc(data.name) + ' adicionado em ' + STAGE_LABELS[data.stage], 'new');
+            saveLeads(); closeLeadModal(); renderAll();
+            showToast('Lead "' + data.name + '" criado!', 'success');
         }
-        saveLeads(); closeLeadModal(); renderAll();
     });
 
     // Detail actions
@@ -393,6 +396,7 @@
         if (l && confirm('Excluir "' + l.name + '"?')) {
             leads = leads.filter(x => x.id !== viewingLeadId);
             saveLeads(); addActivity(esc(l.name) + ' removido', 'delete'); closeDetailModal(); renderAll();
+            showToast('Lead "' + l.name + '" excluído', 'info');
         }
     });
     document.getElementById('btnAdvanceLead').addEventListener('click', () => {
@@ -411,8 +415,8 @@
     // Global handlers
     window._view = id => { const l = leads.find(x => x.id === id); if (l) openDetailModal(l); };
     window._edit = id => { const l = leads.find(x => x.id === id); if (l) openLeadModal(l); };
-    window._del = id => { const l = leads.find(x => x.id === id); if (l && confirm('Excluir "' + l.name + '"?')) { leads = leads.filter(x => x.id !== id); saveLeads(); addActivity(esc(l.name) + ' removido', 'delete'); renderAll(); } };
-    window._advance = id => { const l = leads.find(x => x.id === id); if (l) { const i = STAGES.indexOf(l.stage); if (i < STAGES.length - 1) { const old = STAGE_LABELS[l.stage]; l.stage = STAGES[i+1]; l.updatedAt = new Date().toISOString(); saveLeads(); addActivity(esc(l.name) + ' avançou de ' + old + ' para ' + STAGE_LABELS[l.stage], 'advance'); renderAll(); } } };
+    window._del = id => { const l = leads.find(x => x.id === id); if (l && confirm('Excluir "' + l.name + '"?')) { leads = leads.filter(x => x.id !== id); saveLeads(); addActivity(esc(l.name) + ' removido', 'delete'); renderAll(); showToast('Lead excluído', 'info'); } };
+    window._advance = id => { const l = leads.find(x => x.id === id); if (l) { const i = STAGES.indexOf(l.stage); if (i < STAGES.length - 1) { const old = STAGE_LABELS[l.stage]; l.stage = STAGES[i+1]; l.updatedAt = new Date().toISOString(); saveLeads(); addActivity(esc(l.name) + ' avançou de ' + old + ' para ' + STAGE_LABELS[l.stage], 'advance'); renderAll(); showToast(l.name + ' avançou para ' + STAGE_LABELS[l.stage], 'success'); } } };
 
     // Filters
     document.getElementById('searchLeads').addEventListener('input', renderLeadsTable);
@@ -528,10 +532,11 @@
             addNotification(clientId, 'content', 'Novo plano de ação criado: ' + title);
         }
         savePlans(); closePlanModal(); renderPlans();
+        showToast(editingPlanId ? 'Plano atualizado!' : 'Plano de ação criado!', 'success');
     });
 
     window._editPlan = id => { const p = plans.find(x => x.id === id); if (p) openPlanModal(p); };
-    window._delPlan = id => { const p = plans.find(x => x.id === id); if (p && confirm('Excluir este plano?')) { plans = plans.filter(x => x.id !== id); savePlans(); renderPlans(); } };
+    window._delPlan = id => { const p = plans.find(x => x.id === id); if (p && confirm('Excluir este plano?')) { plans = plans.filter(x => x.id !== id); savePlans(); renderPlans(); showToast('Plano excluído', 'info'); } };
 
     function renderPlans() {
         const grid = document.getElementById('plansGrid');
@@ -962,10 +967,11 @@
             users.push({ id: genId(), ...data, createdAt: new Date().toISOString() });
         }
         saveUsers(); closeUserModal(); renderUsers();
+        showToast('Usuário ' + (editingUserId ? 'atualizado' : 'criado') + '!', 'success');
     });
 
     window._editUser = id => { const u = users.find(x => x.id === id); if (u) openUserModal(u); };
-    window._delUser = id => { if (confirm('Excluir este usuário?')) { users = users.filter(x => x.id !== id); saveUsers(); renderUsers(); } };
+    window._delUser = id => { if (confirm('Excluir este usuário?')) { users = users.filter(x => x.id !== id); saveUsers(); renderUsers(); showToast('Usuário excluído', 'info'); } };
 
     function renderUsers() {
         const tbody = document.getElementById('usersTableBody');
@@ -1030,10 +1036,11 @@
             addNotification(data.clientId, 'meeting', 'Novo encontro agendado: ' + data.title + ' em ' + formatDateBR(data.date));
         }
         saveMeetings(); closeMeetingModal(); renderMeetings();
+        showToast('Encontro ' + (editingMeetingId ? 'atualizado' : 'agendado') + '!', 'success');
     });
 
     window._editMeeting = id => { const m = meetings.find(x => x.id === id); if (m) openMeetingModal(m); };
-    window._delMeeting = id => { if (confirm('Excluir este encontro?')) { meetings = meetings.filter(x => x.id !== id); saveMeetings(); renderMeetings(); } };
+    window._delMeeting = id => { if (confirm('Excluir este encontro?')) { meetings = meetings.filter(x => x.id !== id); saveMeetings(); renderMeetings(); showToast('Encontro excluído', 'info'); } };
 
     function formatDateBR(d) { if (!d) return ''; const [y,m,dd] = d.split('-'); return dd+'/'+m+'/'+y; }
     const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
