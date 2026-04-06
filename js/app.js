@@ -1173,10 +1173,13 @@
     // Seed users
     function seedUsers() {
         if (users.length > 0) return;
+        // Check if already seeded (prevent duplicates on localStorage clear)
+        if (localStorage.getItem('otomdasnotas_users_seeded')) return;
         const maria = leads.find(l => l.name.includes('Maria Eduarda'));
         users.push({ id: genId(), name: 'Admin', email: 'admin@otom.com', password: '1234', role: 'admin', leadId: '', createdAt: new Date().toISOString() });
         if (maria) users.push({ id: genId(), name: maria.name, email: maria.email, password: '1234', role: 'aluno', leadId: maria.id, createdAt: new Date().toISOString() });
         saveUsers();
+        localStorage.setItem('otomdasnotas_users_seeded', '1');
     }
 
     // Seed meetings
