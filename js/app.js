@@ -68,17 +68,50 @@
         app.style.display = 'none';
     }
 
+    // ========== HISTORY API ==========
+    function pushState(view) {
+        const state = { view };
+        if (history.state && history.state.view === view) return;
+        history.pushState(state, '', '#' + view);
+    }
+
+    window.addEventListener('popstate', function(e) {
+        const state = e.state;
+        if (!state || !state.view) { window.showLp(true); return; }
+        switch (state.view) {
+            case 'lp': window.showLp(true); break;
+            case 'login': window.showLoginScreen(true); break;
+            case 'hub': showHubFromHistory(); break;
+            default:
+                if (titles[state.view]) { showAppFromHistory(state.view); }
+                else { window.showLp(true); }
+        }
+    });
+
+    function showHubFromHistory() {
+        const s = getSession();
+        if (s && s.role === 'admin') { hideAll(); hub.style.display = 'flex'; renderAll(); }
+        else { window.showLp(true); }
+    }
+    function showAppFromHistory(sec) {
+        const s = getSession();
+        if (s && s.role === 'admin') { hideAll(); app.style.display = 'flex'; switchSection(sec, true); }
+        else { window.showLp(true); }
+    }
+
     // Global functions (called from inline onclick in LP HTML)
-    window.showLp = function() {
+    window.showLp = function(fromPopstate) {
         hideAll();
         lpView.style.display = 'block';
         window.scrollTo(0, 0);
+        if (!fromPopstate) pushState('lp');
     };
 
-    window.showLoginScreen = function() {
+    window.showLoginScreen = function(fromPopstate) {
         hideAll();
         loginScreen.style.display = 'flex';
         loginError.textContent = '';
+        if (!fromPopstate) pushState('login');
     };
 
     function showHubAdmin(email) {
@@ -86,6 +119,8 @@
         hub.style.display = 'flex';
         const label = document.getElementById('hubUserLabel');
         if (label) label.textContent = email || '';
+        renderAll();
+        pushState('hub');
     }
 
     function loginAs(role, email) {
@@ -97,7 +132,7 @@
         }
     }
 
-    function logout() { clearSession(); window.showLp(); }
+    function logout() { clearSession(); window.showLp(false); }
 
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -114,7 +149,7 @@
 
     // ========== HUB / APP NAVIGATION ==========
     function showHub() { app.style.display = 'none'; hub.style.display = 'flex'; }
-    function showApp(sec) { hub.style.display = 'none'; app.style.display = 'flex'; switchSection(sec || 'dashboard'); }
+    function showApp(sec) { hideAll(); app.style.display = 'flex'; switchSection(sec || 'dashboard'); }
 
     hubCards.forEach(c => c.addEventListener('click', function(e) {
         if (!this.dataset.section) return;
@@ -134,13 +169,14 @@
         link.addEventListener('click', function(e) { e.preventDefault(); switchSection(this.dataset.section); });
     });
 
-    function switchSection(name) {
+    function switchSection(name, fromPopstate) {
         navItems.forEach(n => n.classList.remove('active'));
         sections.forEach(s => s.classList.remove('active'));
         const nav = document.querySelector(`.sidebar-nav [data-section="${name}"]`);
         const sec = document.getElementById(`section-${name}`);
         if (nav) nav.classList.add('active');
         if (sec) sec.classList.add('active');
+        if (!fromPopstate) pushState(name);
     }
 
     const sidebarOverlay = document.getElementById('sidebarOverlay');

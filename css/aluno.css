@@ -14,7 +14,7 @@
 .aluno-back:hover{color:var(--zinc-900)}
 
 /* Portal */
-.aluno-portal{min-height:100vh;background:var(--bg);display:flex;flex-direction:column}
+.aluno-portal{min-height:100vh;background:var(--bg);display:flex;flex-direction:column;overflow-x:hidden}
 
 /* Topbar */
 .aluno-topbar{height:64px;background:var(--white);border-bottom:1px solid var(--zinc-200);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:50}
@@ -104,7 +104,7 @@
 .step-number{font-size:.6rem;font-weight:800;color:var(--zinc-400);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
 
 /* Step Resources (aluno side) */
-.step-resources{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.step-resources{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;max-width:100%}
 .step-resource-link{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--zinc-50);border:1px solid var(--zinc-200);border-radius:var(--radius-sm);font-size:.7rem;font-weight:600;color:var(--zinc-700);cursor:pointer;transition:all .15s}
 .step-resource-link:hover{background:var(--zinc-900);color:var(--white);border-color:var(--zinc-900)}
 .step-resource-link i{font-size:.65rem}
@@ -265,10 +265,10 @@
 .subs-list{display:flex;flex-direction:column;gap:14px}
 .sub-card{background:var(--white);border:1px solid var(--zinc-200);border-radius:var(--radius);padding:20px;transition:all .15s}
 .sub-card:hover{border-color:var(--zinc-400)}
-.sub-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:12px}
+.sub-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:12px;flex-wrap:wrap}
 .sub-card-info{display:flex;align-items:center;gap:10px}
 .sub-card-info strong{font-size:.9rem;color:var(--zinc-900)}
-.sub-card-meta{font-size:.72rem;color:var(--zinc-500)}
+.sub-card-meta{font-size:.72rem;color:var(--zinc-500);word-break:break-all}
 .sub-card-msg{font-size:.82rem;color:var(--zinc-600);line-height:1.6;padding:10px 0;border-top:1px solid var(--zinc-100);margin-top:4px}
 .sub-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--zinc-100)}
 .sub-card-date{font-size:.7rem;color:var(--zinc-500);display:flex;align-items:center;gap:4px}
