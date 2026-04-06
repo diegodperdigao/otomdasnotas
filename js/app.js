@@ -77,8 +77,11 @@
     const SESSION_KEY = 'otomdasnotas_session';
     const lpView = document.getElementById('lpView');
     const loginScreen = document.getElementById('loginScreen');
+    const adminLoginScreen = document.getElementById('adminLoginScreen');
     const loginForm = document.getElementById('loginForm');
     const loginError = document.getElementById('loginError');
+    const adminLoginForm = document.getElementById('adminLoginForm');
+    const adminLoginError = document.getElementById('adminLoginError');
 
     function getSession() { return load(SESSION_KEY); }
     function setSession(role, email) { save(SESSION_KEY, { role, email, time: Date.now() }); }
@@ -87,6 +90,7 @@
     function hideAll() {
         lpView.style.display = 'none';
         loginScreen.style.display = 'none';
+        adminLoginScreen.style.display = 'none';
         hub.style.display = 'none';
         app.style.display = 'none';
     }
@@ -104,6 +108,7 @@
         switch (state.view) {
             case 'lp': window.showLp(true); break;
             case 'login': window.showLoginScreen(true); break;
+            case 'admin-login': hideAll(); adminLoginScreen.style.display = 'flex'; break;
             case 'hub': showHubFromHistory(); break;
             default:
                 if (titles[state.view]) { showAppFromHistory(state.view); }
@@ -157,42 +162,80 @@
 
     function logout() { clearSession(); window.showLp(false); }
 
+    // Mentorado login — redirects to aluno.html
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         var email = document.getElementById('loginEmail').value.trim().toLowerCase();
         var pass = document.getElementById('loginPassword').value;
         if (!email || !pass) { loginError.textContent = 'Preencha todos os campos.'; return; }
 
-        // Check if this email belongs to an aluno user
+        // Block admins from mentorado login
         var allUsers = load('otomdasnotas_users') || [];
         var user = allUsers.find(function(u) { return u.email.toLowerCase() === email; });
-
-        if (user && user.role === 'aluno') {
-            loginError.innerHTML = 'Este e-mail é de um mentorado. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Mentorado</a>';
+        if (user && user.role === 'admin') {
+            loginError.innerHTML = 'Este é um acesso de administrador. <a href="#" onclick="document.getElementById(\'loginAsAdmin\').click();return false;" style="color:var(--zinc-900);font-weight:700;text-decoration:underline">Ir para login administrativo</a>';
             return;
         }
 
-        // Also check if email belongs to a lead (not an admin user)
-        var allLeads = load('otomdasnotas_leads') || [];
-        var isLead = allLeads.find(function(l) { return (l.email || '').toLowerCase() === email; });
-        var isAdmin = user && user.role === 'admin';
-
-        if (isLead && !isAdmin) {
-            loginError.innerHTML = 'Este e-mail é de um cliente. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Mentorado</a>';
-            return;
-        }
-
-        // Valid admin login
+        // Validate password if user exists
         if (user && user.password !== pass) {
             loginError.textContent = 'Senha incorreta.';
             return;
         }
 
-        loginAs('admin', email);
+        // Save session and redirect
+        var allLeads = load('otomdasnotas_leads') || [];
+        var lead = allLeads.find(function(l) { return (l.email || '').toLowerCase() === email; });
+        if (lead) {
+            save(SESSION_KEY, { role: 'aluno', email: email, clientId: lead.id, time: Date.now() });
+        } else {
+            save(SESSION_KEY, { role: 'aluno', email: email, time: Date.now() });
+        }
+        window.location.href = 'aluno.html';
     });
 
-    document.getElementById('loginAsAdmin').addEventListener('click', function() { loginAs('admin', 'admin@otom.com'); });
-    document.getElementById('loginAsAluno').addEventListener('click', function() { window.location.href = 'aluno.html'; });
+    // "Acesso administrativo" — shows admin login
+    document.getElementById('loginAsAdmin').addEventListener('click', function(e) {
+        e.preventDefault();
+        hideAll();
+        adminLoginScreen.style.display = 'flex';
+        pushState('admin-login');
+    });
+
+    // Admin login form
+    adminLoginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = document.getElementById('adminEmail').value.trim().toLowerCase();
+        var pass = document.getElementById('adminPassword').value;
+        if (!email || !pass) { adminLoginError.textContent = 'Preencha todos os campos.'; return; }
+
+        var allUsers = load('otomdasnotas_users') || [];
+        var user = allUsers.find(function(u) { return u.email.toLowerCase() === email; });
+
+        // Block mentorados
+        if (user && user.role === 'aluno') {
+            adminLoginError.innerHTML = 'Este e-mail é de um mentorado. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Mentorado</a>';
+            return;
+        }
+
+        // Validate password
+        if (user && user.password !== pass) {
+            adminLoginError.textContent = 'Senha incorreta.';
+            return;
+        }
+
+        // Block leads that aren't admins
+        if (!user) {
+            var allLeads = load('otomdasnotas_leads') || [];
+            var isLead = allLeads.find(function(l) { return (l.email || '').toLowerCase() === email; });
+            if (isLead) {
+                adminLoginError.innerHTML = 'Este e-mail é de um cliente. <a href="aluno.html" style="color:var(--emerald-700);font-weight:700;text-decoration:underline">Acessar Área do Mentorado</a>';
+                return;
+            }
+        }
+
+        loginAs('admin', email);
+    });
     document.getElementById('btnLogout').addEventListener('click', logout);
     document.getElementById('sidebarLogout').addEventListener('click', function(e) { e.preventDefault(); logout(); });
 
