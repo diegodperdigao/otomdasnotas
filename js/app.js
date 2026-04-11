@@ -54,11 +54,34 @@
     function fmtDate(d) { if (!d) return '—'; const x = new Date(d); return x.toLocaleDateString('pt-BR') + ' ' + x.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
     function timeAgo(d) { const s = Math.floor((Date.now() - new Date(d)) / 1000); if (s < 60) return 'agora'; if (s < 3600) return Math.floor(s/60)+'min'; if (s < 86400) return Math.floor(s/3600)+'h'; if (s < 604800) return Math.floor(s/86400)+'d'; return new Date(d).toLocaleDateString('pt-BR'); }
 
-    // Deduplicate users by email (keeps the latest one)
+    // Deduplicate arrays by a key (keeps the latest one)
     function deduplicateByEmail(arr) {
+        return deduplicateBy(arr, 'email');
+    }
+    function deduplicateBy(arr, key) {
         var seen = {};
         var result = [];
         for (var i = arr.length - 1; i >= 0; i--) {
+            var val = key === 'id' ? arr[i].id : (arr[i][key] || arr[i].id || '').toLowerCase();
+            if (!val || seen[val]) continue;
+            seen[val] = true;
+            result.unshift(arr[i]);
+        }
+        return result;
+    }
+    function deduplicateById(arr) {
+        return deduplicateBy(arr, 'id');
+    }
+    // Clean a collection: deduplicate and replace in Firebase if needed
+    function cleanCollection(name, arr, key) {
+        var clean = key === 'email' ? deduplicateByEmail(arr) : deduplicateById(arr);
+        if (clean.length < arr.length) {
+            save('otomdasnotas_' + name, clean);
+            try { if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) DB.replaceAll(name, clean); } catch(e) {}
+            console.log('[O Tom] Cleaned ' + name + ': removed', arr.length - clean.length, 'duplicates');
+        }
+        return clean;
+    }
             var email = (arr[i].email || '').toLowerCase();
             if (!email || seen[email]) continue;
             seen[email] = true;
@@ -1362,15 +1385,13 @@
     seedUsers();
     seedMeetings();
     if (!SEEDED) localStorage.setItem('otomdasnotas_seeded_v3', '1');
-    // Deduplicate users on startup
-    var beforeCount = users.length;
-    users = deduplicateByEmail(users);
-    if (users.length !== beforeCount) {
-        save('otomdasnotas_users', users);
-        // Replace in Firebase (delete duplicates from cloud too)
-        try { if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) DB.replaceAll('users', users); } catch(e) {}
-        console.log('[O Tom] Removed', beforeCount - users.length, 'duplicate users');
-    }
+    // Deduplicate ALL collections on startup
+    leads = cleanCollection('leads', leads, 'email');
+    users = cleanCollection('users', users, 'email');
+    plans = cleanCollection('plans', plans, 'id');
+    meetings = cleanCollection('meetings', meetings, 'id');
+    submissions = cleanCollection('submissions', submissions, 'id');
+    feedPosts = cleanCollection('feed', feedPosts, 'id');
     renderAll();
 
     // Cloud sync (safe - only runs if DB is available)
@@ -1383,21 +1404,12 @@
                         DB.load('leads'), DB.load('plans'), DB.load('users'),
                         DB.load('meetings'), DB.load('submissions'), DB.load('chat'), DB.load('notifications')
                     ]);
-                    if (results[0].length > 0) leads = results[0];
-                    if (results[1].length > 0) plans = results[1];
-                    if (results[2].length > 0) {
-                        var dedupd = deduplicateByEmail(results[2]);
-                        if (dedupd.length < results[2].length) {
-                            users = dedupd;
-                            save('otomdasnotas_users', users);
-                            try { DB.replaceAll('users', users); } catch(e) {}
-                            console.log('[O Tom] Cloud dedup: removed', results[2].length - dedupd.length, 'duplicates');
-                        } else {
-                            users = results[2];
-                        }
-                    }
-                    if (results[3].length > 0) meetings = results[3];
-                    if (results[4].length > 0) submissions = results[4];
+                    // Load and deduplicate all collections from cloud
+                    if (results[0].length > 0) leads = cleanCollection('leads', results[0], 'email');
+                    if (results[1].length > 0) plans = cleanCollection('plans', results[1], 'id');
+                    if (results[2].length > 0) users = cleanCollection('users', results[2], 'email');
+                    if (results[3].length > 0) meetings = cleanCollection('meetings', results[3], 'id');
+                    if (results[4].length > 0) submissions = cleanCollection('submissions', results[4], 'id');
                     if (results[5].length > 0) chatMessages = results[5];
                     if (results[6].length > 0) notifications = results[6];
                     renderAll();
