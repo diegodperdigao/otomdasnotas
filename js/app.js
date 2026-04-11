@@ -469,6 +469,32 @@
     document.getElementById('filterSegment').addEventListener('change', renderLeadsTable);
     document.getElementById('filterStage').addEventListener('change', renderLeadsTable);
 
+    // Select search filter — filters options in a <select> as user types
+    document.querySelectorAll('.select-search').forEach(function(input) {
+        input.addEventListener('input', function() {
+            var target = document.getElementById(this.dataset.target);
+            if (!target) return;
+            var search = this.value.toLowerCase();
+            var options = target.querySelectorAll('option');
+            options.forEach(function(opt) {
+                if (!opt.value) { opt.style.display = ''; return; } // keep placeholder
+                opt.style.display = opt.textContent.toLowerCase().indexOf(search) !== -1 ? '' : 'none';
+            });
+            // If current selection is hidden, reset
+            var selected = target.options[target.selectedIndex];
+            if (selected && selected.style.display === 'none') target.selectedIndex = 0;
+        });
+        // Clear search when select changes
+        var target = document.getElementById(input.dataset.target);
+        if (target) {
+            target.addEventListener('change', function() {
+                input.value = '';
+                var options = this.querySelectorAll('option');
+                options.forEach(function(opt) { opt.style.display = ''; });
+            });
+        }
+    });
+
     // Phone mask
     document.getElementById('leadPhone').addEventListener('input', function(e) {
         let v = e.target.value.replace(/\D/g, '');
