@@ -61,6 +61,33 @@ var DB = (function() {
             }
         },
 
+        // Replace entire collection: delete all docs then write new ones
+        async replaceAll(collection, items) {
+            localSet(COLLECTIONS[collection], items);
+            var firedb = getDb();
+            if (!firedb) return;
+            try {
+                // Get all existing docs
+                var snap = await firedb.collection(collection).get();
+                // Delete all
+                var delBatch = firedb.batch();
+                snap.docs.forEach(function(doc) { delBatch.delete(doc.ref); });
+                await delBatch.commit();
+                // Write new ones
+                if (items.length > 0) {
+                    var addBatch = firedb.batch();
+                    items.forEach(function(item) {
+                        if (!item.id) return;
+                        addBatch.set(firedb.collection(collection).doc(item.id), JSON.parse(JSON.stringify(item)));
+                    });
+                    await addBatch.commit();
+                }
+                console.log('[DB] Replaced', collection, ':', items.length, 'items');
+            } catch(err) {
+                console.warn('[DB] Replace failed:', err.message);
+            }
+        },
+
         async add(collection, item) {
             var items = localGet(COLLECTIONS[collection]);
             items.push(item);

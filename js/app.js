@@ -1365,7 +1365,12 @@
     // Deduplicate users on startup
     var beforeCount = users.length;
     users = deduplicateByEmail(users);
-    if (users.length !== beforeCount) { saveUsers(); console.log('[O Tom] Removed', beforeCount - users.length, 'duplicate users'); }
+    if (users.length !== beforeCount) {
+        save('otomdasnotas_users', users);
+        // Replace in Firebase (delete duplicates from cloud too)
+        try { if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) DB.replaceAll('users', users); } catch(e) {}
+        console.log('[O Tom] Removed', beforeCount - users.length, 'duplicate users');
+    }
     renderAll();
 
     // Cloud sync (safe - only runs if DB is available)
@@ -1380,7 +1385,17 @@
                     ]);
                     if (results[0].length > 0) leads = results[0];
                     if (results[1].length > 0) plans = results[1];
-                    if (results[2].length > 0) { users = deduplicateByEmail(results[2]); saveUsers(); }
+                    if (results[2].length > 0) {
+                        var dedupd = deduplicateByEmail(results[2]);
+                        if (dedupd.length < results[2].length) {
+                            users = dedupd;
+                            save('otomdasnotas_users', users);
+                            try { DB.replaceAll('users', users); } catch(e) {}
+                            console.log('[O Tom] Cloud dedup: removed', results[2].length - dedupd.length, 'duplicates');
+                        } else {
+                            users = results[2];
+                        }
+                    }
                     if (results[3].length > 0) meetings = results[3];
                     if (results[4].length > 0) submissions = results[4];
                     if (results[5].length > 0) chatMessages = results[5];
