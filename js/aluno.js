@@ -339,13 +339,16 @@
         return client ? client.name : 'Mentorado';
     }
 
-    window._alunoToggleUpvote = function(id) {
+    window._alunoVote = function(id, dir) {
         var p = feedPosts.find(x => x.id === id);
         if (!p) return;
-        if (!p.upvotes) p.upvotes = [];
         var voter = currentClientId || 'anon';
-        var idx = p.upvotes.indexOf(voter);
-        if (idx === -1) p.upvotes.push(voter); else p.upvotes.splice(idx, 1);
+        if (!p.upvotes) p.upvotes = [];
+        if (!p.downvotes) p.downvotes = [];
+        p.upvotes = p.upvotes.filter(v => v !== voter);
+        p.downvotes = p.downvotes.filter(v => v !== voter);
+        if (dir === 'up') p.upvotes.push(voter);
+        else p.downvotes.push(voter);
         saveFeed(); renderFeed();
     };
     window._alunoAddComment = function(id, text) {
@@ -393,8 +396,11 @@
             var catLabel = CAT_LABELS[p.category] || p.category;
             var catIcon = CAT_ICONS[p.category] || 'fa-tag';
             var upCount = (p.upvotes || []).length;
+            var downCount = (p.downvotes || []).length;
+            var score = upCount - downCount;
             var commentCount = (p.comments || []).length;
             var isUpvoted = (p.upvotes || []).indexOf(voter) !== -1;
+            var isDownvoted = (p.downvotes || []).indexOf(voter) !== -1;
 
             return '<div class="feed-post">' +
                 '<div class="feed-post-header">' +
@@ -406,8 +412,10 @@
                 '<div class="feed-post-body">' + esc(p.content) + '</div>' +
                 (p.link ? '<a href="' + esc(p.link) + '" target="_blank" class="feed-post-link"><i class="fas fa-external-link-alt"></i> Abrir link</a>' : '') +
                 '<div class="feed-reactions">' +
-                    '<button class="feed-react-btn ' + (isUpvoted ? 'active' : '') + '" onclick="window._alunoToggleUpvote(\'' + p.id + '\')"><i class="fas fa-arrow-up"></i> <span class="feed-react-count">' + upCount + '</span></button>' +
-                    '<button class="feed-comment-btn" onclick="window._alunoToggleComments(\'' + p.id + '\')"><i class="fas fa-comment"></i> ' + commentCount + '</button>' +
+                    '<button class="feed-react-btn ' + (isUpvoted ? 'active' : '') + '" onclick="window._alunoVote(\'' + p.id + '\',\'up\')"><i class="fas fa-arrow-up"></i></button>' +
+                    '<span class="feed-score">' + score + '</span>' +
+                    '<button class="feed-react-btn ' + (isDownvoted ? 'active down' : '') + '" onclick="window._alunoVote(\'' + p.id + '\',\'down\')"><i class="fas fa-arrow-down"></i></button>' +
+                    '<button class="feed-comment-btn" onclick="window._alunoToggleComments(\'' + p.id + '\')"><i class="fas fa-comment-dots"></i> ' + commentCount + ' comentário' + (commentCount !== 1 ? 's' : '') + '</button>' +
                 '</div>' +
                 '<div class="feed-comments" id="fc-' + p.id + '" style="display:none">' +
                     (commentCount > 0 ? '<div class="feed-comments-list">' + p.comments.map(function(c) {

@@ -54,6 +54,19 @@
     function fmtDate(d) { if (!d) return '—'; const x = new Date(d); return x.toLocaleDateString('pt-BR') + ' ' + x.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
     function timeAgo(d) { const s = Math.floor((Date.now() - new Date(d)) / 1000); if (s < 60) return 'agora'; if (s < 3600) return Math.floor(s/60)+'min'; if (s < 86400) return Math.floor(s/3600)+'h'; if (s < 604800) return Math.floor(s/86400)+'d'; return new Date(d).toLocaleDateString('pt-BR'); }
 
+    // Deduplicate users by email (keeps the latest one)
+    function deduplicateByEmail(arr) {
+        var seen = {};
+        var result = [];
+        for (var i = arr.length - 1; i >= 0; i--) {
+            var email = (arr[i].email || '').toLowerCase();
+            if (!email || seen[email]) continue;
+            seen[email] = true;
+            result.unshift(arr[i]);
+        }
+        return result;
+    }
+
     function addActivity(text, type) {
         activities.unshift({ id: Date.now(), text, type: type || 'system', time: new Date().toISOString() });
         if (activities.length > 50) activities = activities.slice(0, 50);
@@ -982,12 +995,17 @@
 
     window._editPost = function(id) { var p = feedPosts.find(function(x) { return x.id === id; }); if (p) openPostModal(p); };
     window._delPost = function(id) { if (confirm('Excluir esta publicação?')) { feedPosts = feedPosts.filter(function(x) { return x.id !== id; }); saveFeed(); renderFeed(); showToast('Publicação excluída', 'info'); } };
-    window._toggleUpvote = function(id, voter) {
+    window._vote = function(id, voter, dir) {
         var p = feedPosts.find(function(x) { return x.id === id; });
         if (!p) return;
         if (!p.upvotes) p.upvotes = [];
-        var idx = p.upvotes.indexOf(voter);
-        if (idx === -1) p.upvotes.push(voter); else p.upvotes.splice(idx, 1);
+        if (!p.downvotes) p.downvotes = [];
+        // Remove from both first
+        p.upvotes = p.upvotes.filter(function(v) { return v !== voter; });
+        p.downvotes = p.downvotes.filter(function(v) { return v !== voter; });
+        // Add to selected direction (toggle off if already there)
+        if (dir === 'up') { var wasUp = (p.upvotes || []).indexOf(voter) !== -1; if (!wasUp) p.upvotes.push(voter); }
+        else { p.downvotes.push(voter); }
         saveFeed(); renderFeed();
     };
     window._addComment = function(id, author, text) {
@@ -1013,8 +1031,11 @@
             var catLabel = CAT_LABELS[p.category] || p.category;
             var catIcon = CAT_ICONS[p.category] || 'fa-tag';
             var upCount = (p.upvotes || []).length;
+            var downCount = (p.downvotes || []).length;
+            var score = upCount - downCount;
             var commentCount = (p.comments || []).length;
             var isUpvoted = (p.upvotes || []).indexOf('admin') !== -1;
+            var isDownvoted = (p.downvotes || []).indexOf('admin') !== -1;
             var timeStr = timeAgo(p.createdAt);
 
             return '<div class="feed-post">' +
@@ -1031,8 +1052,10 @@
                 '<div class="feed-post-body">' + esc(p.content) + '</div>' +
                 (p.link ? '<a href="' + esc(p.link) + '" target="_blank" class="feed-post-link"><i class="fas fa-external-link-alt"></i> Abrir link</a>' : '') +
                 '<div class="feed-reactions">' +
-                    '<button class="feed-react-btn ' + (isUpvoted ? 'active' : '') + '" onclick="window._toggleUpvote(\'' + p.id + '\',\'admin\')"><i class="fas fa-arrow-up"></i> <span class="feed-react-count">' + upCount + '</span></button>' +
-                    '<button class="feed-comment-btn" onclick="window._toggleComments(\'' + p.id + '\')"><i class="fas fa-comment"></i> ' + commentCount + ' comentário' + (commentCount !== 1 ? 's' : '') + '</button>' +
+                    '<button class="feed-react-btn ' + (isUpvoted ? 'active' : '') + '" onclick="window._vote(\'' + p.id + '\',\'admin\',\'up\')"><i class="fas fa-arrow-up"></i></button>' +
+                    '<span class="feed-score">' + score + '</span>' +
+                    '<button class="feed-react-btn ' + (isDownvoted ? 'active down' : '') + '" onclick="window._vote(\'' + p.id + '\',\'admin\',\'down\')"><i class="fas fa-arrow-down"></i></button>' +
+                    '<button class="feed-comment-btn" onclick="window._toggleComments(\'' + p.id + '\')"><i class="fas fa-comment-dots"></i> ' + commentCount + ' comentário' + (commentCount !== 1 ? 's' : '') + '</button>' +
                 '</div>' +
                 '<div class="feed-comments" id="comments-' + p.id + '" style="display:none">' +
                     (commentCount > 0 ? '<div class="feed-comments-list">' + p.comments.map(function(c) {
@@ -1089,6 +1112,11 @@
             const i = users.findIndex(u => u.id === editingUserId);
             if (i !== -1) users[i] = { ...users[i], ...data };
         } else {
+            // Check for duplicate email
+            if (users.find(function(u) { return u.email.toLowerCase() === data.email.toLowerCase(); })) {
+                showToast('Já existe um usuário com este e-mail.', 'warn');
+                return;
+            }
             users.push({ id: genId(), ...data, createdAt: new Date().toISOString() });
         }
         saveUsers(); closeUserModal(); renderUsers();
@@ -1260,8 +1288,8 @@
     }
 
 
-    // ========== SEED DATA ==========
-    var SEEDED = localStorage.getItem('otomdasnotas_seeded_v2');
+    // ========== SEED DATA (only if completely fresh install) ==========
+    var SEEDED = localStorage.getItem('otomdasnotas_seeded_v3');
     function seed() {
         if (SEEDED || leads.length > 0) return;
         const data = [
@@ -1281,6 +1309,7 @@
     // Seed plans
     function seedPlans() {
         if (SEEDED || plans.length > 0) return;
+
         // Find Maria Eduarda (fechamento) to give her a plan
         const maria = leads.find(l => l.name.includes('Maria Eduarda'));
         if (!maria) return;
@@ -1332,7 +1361,11 @@
     seedPlans();
     seedUsers();
     seedMeetings();
-    if (!SEEDED) localStorage.setItem('otomdasnotas_seeded_v2', '1');
+    if (!SEEDED) localStorage.setItem('otomdasnotas_seeded_v3', '1');
+    // Deduplicate users on startup
+    var beforeCount = users.length;
+    users = deduplicateByEmail(users);
+    if (users.length !== beforeCount) { saveUsers(); console.log('[O Tom] Removed', beforeCount - users.length, 'duplicate users'); }
     renderAll();
 
     // Cloud sync (safe - only runs if DB is available)
@@ -1347,7 +1380,7 @@
                     ]);
                     if (results[0].length > 0) leads = results[0];
                     if (results[1].length > 0) plans = results[1];
-                    if (results[2].length > 0) users = results[2];
+                    if (results[2].length > 0) { users = deduplicateByEmail(results[2]); saveUsers(); }
                     if (results[3].length > 0) meetings = results[3];
                     if (results[4].length > 0) submissions = results[4];
                     if (results[5].length > 0) chatMessages = results[5];
