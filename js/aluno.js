@@ -107,6 +107,7 @@
         renderAgenda();
         renderChat();
         renderNotifications();
+        renderFeed();
     }
 
     // ========== PLAN ==========
@@ -325,14 +326,108 @@
         }).join('');
     }
 
+    // ========== COMMUNITY FEED ==========
+    const FEED_KEY = 'otomdasnotas_feed';
+    let feedPosts = load(FEED_KEY) || [];
+    function saveFeed() { save(FEED_KEY, feedPosts); try { if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) DB.saveAll('feed', feedPosts); } catch(e) {} }
+
+    const CAT_LABELS = { oportunidade:'Oportunidade', ideia:'Ideia', dica:'Dica', discussao:'Discussão', evento:'Evento' };
+    const CAT_ICONS = { oportunidade:'fa-briefcase', ideia:'fa-lightbulb', dica:'fa-star', discussao:'fa-comments', evento:'fa-calendar' };
+
+    function getClientName() {
+        var client = leads.find(l => l.id === currentClientId);
+        return client ? client.name : 'Mentorado';
+    }
+
+    window._alunoToggleUpvote = function(id) {
+        var p = feedPosts.find(x => x.id === id);
+        if (!p) return;
+        if (!p.upvotes) p.upvotes = [];
+        var voter = currentClientId || 'anon';
+        var idx = p.upvotes.indexOf(voter);
+        if (idx === -1) p.upvotes.push(voter); else p.upvotes.splice(idx, 1);
+        saveFeed(); renderFeed();
+    };
+    window._alunoAddComment = function(id, text) {
+        var p = feedPosts.find(x => x.id === id);
+        if (!p || !text) return;
+        if (!p.comments) p.comments = [];
+        p.comments.push({ id: Date.now().toString(), author: getClientName(), text: text, time: new Date().toISOString() });
+        saveFeed(); renderFeed();
+    };
+    window._alunoToggleComments = function(id) {
+        var el = document.getElementById('fc-' + id);
+        if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    };
+    window._alunoNewPost = function() {
+        var title = prompt('Título da publicação:');
+        if (!title) return;
+        var content = prompt('Conteúdo:');
+        if (!content) return;
+        var category = prompt('Categoria (oportunidade, ideia, dica, discussao, evento):', 'ideia') || 'ideia';
+        feedPosts.unshift({
+            id: Date.now().toString(), author: getClientName(), authorRole: 'aluno', authorId: currentClientId,
+            category: category, title: title, content: content, link: '',
+            upvotes: [], comments: [],
+            createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+        });
+        saveFeed(); renderFeed();
+    };
+
+    function renderFeed() {
+        var container = document.getElementById('alunoFeedContainer');
+        if (!container) return;
+        var voter = currentClientId || 'anon';
+        var clientName = getClientName();
+
+        var newPostBtn = '<button class="btn btn-primary" onclick="window._alunoNewPost()" style="margin-bottom:16px"><i class="fas fa-plus"></i> Nova Publicação</button>';
+
+        if (feedPosts.length === 0) {
+            container.innerHTML = newPostBtn + '<p class="empty-state">Nenhuma publicação ainda. Seja o primeiro a publicar!</p>';
+            return;
+        }
+
+        container.innerHTML = newPostBtn + feedPosts.map(function(p) {
+            var initial = (p.author || '?').charAt(0);
+            var catClass = 'cat-' + p.category;
+            var catLabel = CAT_LABELS[p.category] || p.category;
+            var catIcon = CAT_ICONS[p.category] || 'fa-tag';
+            var upCount = (p.upvotes || []).length;
+            var commentCount = (p.comments || []).length;
+            var isUpvoted = (p.upvotes || []).indexOf(voter) !== -1;
+
+            return '<div class="feed-post">' +
+                '<div class="feed-post-header">' +
+                    '<div class="feed-post-avatar">' + initial + '</div>' +
+                    '<div class="feed-post-meta"><span class="feed-post-author">' + esc(p.author) + '</span><span class="feed-post-time"> · ' + timeAgo(p.createdAt) + '</span></div>' +
+                    '<span class="feed-post-category ' + catClass + '"><i class="fas ' + catIcon + '"></i> ' + catLabel + '</span>' +
+                '</div>' +
+                '<div class="feed-post-title">' + esc(p.title) + '</div>' +
+                '<div class="feed-post-body">' + esc(p.content) + '</div>' +
+                (p.link ? '<a href="' + esc(p.link) + '" target="_blank" class="feed-post-link"><i class="fas fa-external-link-alt"></i> Abrir link</a>' : '') +
+                '<div class="feed-reactions">' +
+                    '<button class="feed-react-btn ' + (isUpvoted ? 'active' : '') + '" onclick="window._alunoToggleUpvote(\'' + p.id + '\')"><i class="fas fa-arrow-up"></i> <span class="feed-react-count">' + upCount + '</span></button>' +
+                    '<button class="feed-comment-btn" onclick="window._alunoToggleComments(\'' + p.id + '\')"><i class="fas fa-comment"></i> ' + commentCount + '</button>' +
+                '</div>' +
+                '<div class="feed-comments" id="fc-' + p.id + '" style="display:none">' +
+                    (commentCount > 0 ? '<div class="feed-comments-list">' + p.comments.map(function(c) {
+                        return '<div class="feed-comment"><div class="feed-comment-avatar">' + (c.author || '?').charAt(0) + '</div><div class="feed-comment-body"><span class="feed-comment-author">' + esc(c.author) + '</span><div class="feed-comment-text">' + esc(c.text) + '</div><span class="feed-comment-time">' + timeAgo(c.time) + '</span></div></div>';
+                    }).join('') + '</div>' : '') +
+                    '<form class="feed-comment-form" onsubmit="event.preventDefault();var inp=this.querySelector(\'input\');window._alunoAddComment(\'' + p.id + '\',inp.value);inp.value=\'\';"><input type="text" placeholder="Escreva um comentário..." required><button type="submit"><i class="fas fa-paper-plane"></i></button></form>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+    }
+
     // ========== CLOUD SYNC (safe) ==========
     try {
         if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
             (async function() {
                 try {
-                    var r = await Promise.all([DB.load('plans'), DB.load('meetings'), DB.load('chat'), DB.load('notifications')]);
+                    var r = await Promise.all([DB.load('plans'), DB.load('meetings'), DB.load('chat'), DB.load('notifications'), DB.load('feed')]);
                     if (r[0].length > 0) plans = r[0];
                     if (r[1].length > 0) meetings = r[1];
+                    if (r[4] && r[4].length > 0) feedPosts = r[4];
                     if (r[2].length > 0) chatMessages = r[2];
                     if (r[3].length > 0) notifications = r[3];
                     if (currentClientId) renderAll();

@@ -22,7 +22,8 @@ var DB = (function() {
         submissions: 'otomdasnotas_submissions',
         chat: 'otomdasnotas_chat',
         notifications: 'otomdasnotas_notifications',
-        activities: 'otomdasnotas_activities'
+        activities: 'otomdasnotas_activities',
+        feed: 'otomdasnotas_feed'
     };
 
     function getDb() {

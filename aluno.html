@@ -72,6 +72,7 @@
             <button class="aluno-tab active" data-tab="plano"><i class="fas fa-route"></i> Plano de Ação</button>
             <button class="aluno-tab" data-tab="agenda"><i class="fas fa-calendar-alt"></i> Agenda</button>
             <button class="aluno-tab" data-tab="chat"><i class="fas fa-comments"></i> Mensagens</button>
+            <button class="aluno-tab" data-tab="feed"><i class="fas fa-comments"></i> Comunidade</button>
         </nav>
 
         <main class="aluno-main">
@@ -152,6 +153,13 @@
                         <input type="text" id="alunoChatText" placeholder="Digite sua mensagem..." required autocomplete="off">
                         <button type="submit"><i class="fas fa-paper-plane"></i></button>
                     </form>
+                </div>
+            </div>
+            <!-- TAB: Comunidade -->
+            <div class="aluno-tab-content" id="tab-feed">
+                <h2 class="tab-section-title"><i class="fas fa-comments"></i> Comunidade</h2>
+                <div class="feed-container" id="alunoFeedContainer">
+                    <p class="empty-state">Nenhuma publicação ainda.</p>
                 </div>
             </div>
         </main>

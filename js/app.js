@@ -71,7 +71,7 @@
     const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
     const sections = document.querySelectorAll('.section');
 
-    const titles = { dashboard:'Painel Geral', pipeline:'Pipeline de Vendas', leads:'Base de Contatos', planos:'Planos de Ação', inscricoes:'Inscrições', agenda:'Agenda', mensagens:'Mensagens', usuarios:'Gestão de Usuários', about:'Sobre' };
+    const titles = { dashboard:'Painel Geral', pipeline:'Pipeline de Vendas', leads:'Base de Contatos', planos:'Planos de Ação', inscricoes:'Inscrições', comunidade:'Comunidade', agenda:'Agenda', mensagens:'Mensagens', usuarios:'Gestão de Usuários', about:'Sobre' };
 
     // ========== LOGIN / SESSION ==========
     const SESSION_KEY = 'otomdasnotas_session';
@@ -570,7 +570,7 @@
     }
 
     // ========== RENDER ALL ==========
-    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); renderPlans(); renderSubmissions(); renderUsers(); renderMeetings(); renderChatContacts(); }
+    function renderAll() { renderKPIs(); renderFunnel(); renderActivities(); renderSegments(); renderGoals(); renderPipeline(); renderLeadsTable(); renderPlans(); renderSubmissions(); renderFeed(); renderUsers(); renderMeetings(); renderChatContacts(); }
 
     function renderKPIs() {
         const total = leads.length;
@@ -927,6 +927,121 @@
             '</div>' +
             (s.replies && s.replies.length > 0 ? '<div class="sub-card-replies"><strong>Respostas:</strong>' + s.replies.map(r => '<div class="sub-reply"><span>' + esc(r.subject) + '</span><small>' + new Date(r.sentAt).toLocaleDateString('pt-BR') + '</small></div>').join('') + '</div>' : '') +
             '</div>';
+    }
+
+    // ========== COMMUNITY FEED ==========
+    const FEED_KEY = 'otomdasnotas_feed';
+    let feedPosts = load(FEED_KEY) || [];
+    function saveFeed() { save(FEED_KEY, feedPosts); cloud('feed', feedPosts); }
+    let editingPostId = null;
+
+    const CAT_LABELS = { oportunidade:'Oportunidade', ideia:'Ideia', dica:'Dica', discussao:'Discussão', evento:'Evento' };
+    const CAT_ICONS = { oportunidade:'fa-briefcase', ideia:'fa-lightbulb', dica:'fa-star', discussao:'fa-comments', evento:'fa-calendar' };
+
+    const postOverlay = document.getElementById('modalPostOverlay');
+    const postForm = document.getElementById('postForm');
+
+    function openPostModal(post) {
+        editingPostId = post ? post.id : null;
+        document.getElementById('postModalTitle').innerHTML = post ? '<i class="fas fa-edit"></i> Editar Publicação' : '<i class="fas fa-edit"></i> Nova Publicação';
+        document.getElementById('postCategory').value = post ? post.category : 'oportunidade';
+        document.getElementById('postTitle').value = post ? post.title : '';
+        document.getElementById('postContent').value = post ? post.content : '';
+        document.getElementById('postLink').value = post ? (post.link || '') : '';
+        postOverlay.classList.add('active');
+    }
+    function closePostModal() { postOverlay.classList.remove('active'); editingPostId = null; postForm.reset(); }
+
+    document.getElementById('btnNewPost').addEventListener('click', function() { openPostModal(null); });
+    document.getElementById('postModalClose').addEventListener('click', closePostModal);
+    document.getElementById('btnCancelPost').addEventListener('click', closePostModal);
+    postOverlay.addEventListener('click', function(e) { if (e.target === postOverlay) closePostModal(); });
+
+    postForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var data = {
+            category: document.getElementById('postCategory').value,
+            title: document.getElementById('postTitle').value.trim(),
+            content: document.getElementById('postContent').value.trim(),
+            link: document.getElementById('postLink').value.trim()
+        };
+        if (editingPostId) {
+            var i = feedPosts.findIndex(function(p) { return p.id === editingPostId; });
+            if (i !== -1) feedPosts[i] = Object.assign({}, feedPosts[i], data, { updatedAt: new Date().toISOString() });
+        } else {
+            feedPosts.unshift({
+                id: genId(), author: 'Administrador', authorRole: 'admin',
+                upvotes: [], comments: [],
+                createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+                category: data.category, title: data.title, content: data.content, link: data.link
+            });
+        }
+        saveFeed(); closePostModal(); renderFeed();
+        showToast(editingPostId ? 'Publicação atualizada!' : 'Publicação criada!', 'success');
+    });
+
+    window._editPost = function(id) { var p = feedPosts.find(function(x) { return x.id === id; }); if (p) openPostModal(p); };
+    window._delPost = function(id) { if (confirm('Excluir esta publicação?')) { feedPosts = feedPosts.filter(function(x) { return x.id !== id; }); saveFeed(); renderFeed(); showToast('Publicação excluída', 'info'); } };
+    window._toggleUpvote = function(id, voter) {
+        var p = feedPosts.find(function(x) { return x.id === id; });
+        if (!p) return;
+        if (!p.upvotes) p.upvotes = [];
+        var idx = p.upvotes.indexOf(voter);
+        if (idx === -1) p.upvotes.push(voter); else p.upvotes.splice(idx, 1);
+        saveFeed(); renderFeed();
+    };
+    window._addComment = function(id, author, text) {
+        var p = feedPosts.find(function(x) { return x.id === id; });
+        if (!p || !text) return;
+        if (!p.comments) p.comments = [];
+        p.comments.push({ id: genId(), author: author, text: text, time: new Date().toISOString() });
+        saveFeed(); renderFeed();
+    };
+    window._toggleComments = function(id) {
+        var el = document.getElementById('comments-' + id);
+        if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    };
+
+    function renderFeed() {
+        var container = document.getElementById('feedContainer');
+        if (!container) return;
+        if (feedPosts.length === 0) { container.innerHTML = '<p class="empty-state">Nenhuma publicação ainda. Clique em "Nova Publicação" para começar.</p>'; return; }
+
+        container.innerHTML = feedPosts.map(function(p) {
+            var initial = (p.author || 'A').charAt(0);
+            var catClass = 'cat-' + p.category;
+            var catLabel = CAT_LABELS[p.category] || p.category;
+            var catIcon = CAT_ICONS[p.category] || 'fa-tag';
+            var upCount = (p.upvotes || []).length;
+            var commentCount = (p.comments || []).length;
+            var isUpvoted = (p.upvotes || []).indexOf('admin') !== -1;
+            var timeStr = timeAgo(p.createdAt);
+
+            return '<div class="feed-post">' +
+                '<div class="feed-post-header">' +
+                    '<div class="feed-post-avatar">' + initial + '</div>' +
+                    '<div class="feed-post-meta"><span class="feed-post-author">' + esc(p.author) + '</span><span class="feed-post-time"> · ' + timeStr + '</span></div>' +
+                    '<span class="feed-post-category ' + catClass + '"><i class="fas ' + catIcon + '"></i> ' + catLabel + '</span>' +
+                    '<div class="feed-post-actions">' +
+                        '<button onclick="window._editPost(\'' + p.id + '\')" title="Editar"><i class="fas fa-edit"></i></button>' +
+                        '<button onclick="window._delPost(\'' + p.id + '\')" title="Excluir"><i class="fas fa-trash"></i></button>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="feed-post-title">' + esc(p.title) + '</div>' +
+                '<div class="feed-post-body">' + esc(p.content) + '</div>' +
+                (p.link ? '<a href="' + esc(p.link) + '" target="_blank" class="feed-post-link"><i class="fas fa-external-link-alt"></i> Abrir link</a>' : '') +
+                '<div class="feed-reactions">' +
+                    '<button class="feed-react-btn ' + (isUpvoted ? 'active' : '') + '" onclick="window._toggleUpvote(\'' + p.id + '\',\'admin\')"><i class="fas fa-arrow-up"></i> <span class="feed-react-count">' + upCount + '</span></button>' +
+                    '<button class="feed-comment-btn" onclick="window._toggleComments(\'' + p.id + '\')"><i class="fas fa-comment"></i> ' + commentCount + ' comentário' + (commentCount !== 1 ? 's' : '') + '</button>' +
+                '</div>' +
+                '<div class="feed-comments" id="comments-' + p.id + '" style="display:none">' +
+                    (commentCount > 0 ? '<div class="feed-comments-list">' + p.comments.map(function(c) {
+                        return '<div class="feed-comment"><div class="feed-comment-avatar">' + (c.author || '?').charAt(0) + '</div><div class="feed-comment-body"><span class="feed-comment-author">' + esc(c.author) + '</span><div class="feed-comment-text">' + esc(c.text) + '</div><span class="feed-comment-time">' + timeAgo(c.time) + '</span></div></div>';
+                    }).join('') + '</div>' : '') +
+                    '<form class="feed-comment-form" onsubmit="event.preventDefault();var inp=this.querySelector(\'input\');window._addComment(\'' + p.id + '\',\'Administrador\',inp.value);inp.value=\'\';"><input type="text" placeholder="Escreva um comentário..." required><button type="submit"><i class="fas fa-paper-plane"></i></button></form>' +
+                '</div>' +
+            '</div>';
+        }).join('');
     }
 
     // ========== USERS MANAGEMENT ==========
