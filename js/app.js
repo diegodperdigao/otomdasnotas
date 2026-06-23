@@ -82,13 +82,6 @@
         }
         return clean;
     }
-            var email = (arr[i].email || '').toLowerCase();
-            if (!email || seen[email]) continue;
-            seen[email] = true;
-            result.unshift(arr[i]);
-        }
-        return result;
-    }
 
     function addActivity(text, type) {
         activities.unshift({ id: Date.now(), text, type: type || 'system', time: new Date().toISOString() });
