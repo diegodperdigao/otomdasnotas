@@ -20,7 +20,7 @@
     let editingLeadId = null;
     let viewingLeadId = null;
 
-    function load(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
+    function load(key) { try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; } }
     function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
     function cloud(col, data) { try { if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) DB.saveAll(col, data); } catch(e) {} }
     function saveLeads() { save(STORAGE_KEY, leads); cloud('leads', leads); }

@@ -13,7 +13,7 @@
     const NOTIF_KEY = 'otomdasnotas_notifications';
     const USERS_KEY = 'otomdasnotas_users';
 
-    function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }
+    function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } }
     function save(k, d) { localStorage.setItem(k, JSON.stringify(d)); }
     function savePlans() { save(PLANS_KEY, plans); if (typeof DB !== 'undefined') DB.saveAll('plans', plans); }
     function saveChat() { save(CHAT_KEY, chatMessages); if (typeof DB !== 'undefined') DB.saveAll('chat', chatMessages); }
@@ -65,22 +65,9 @@
         }
     }
 
-    // Login — loads cloud data first if needed
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const email = document.getElementById('alunoEmail').value.trim().toLowerCase();
-        const pass = document.getElementById('alunoPassword').value;
-        if (!email || !pass) { loginError.textContent = 'Preencha todos os campos.'; return; }
-
-        // Load from cloud if local data is empty
-        if (users.length === 0 || leads.length === 0) {
-            loginError.textContent = 'Carregando dados...';
-            await ensureCloudData();
-            loginError.textContent = '';
-        }
-
-        // Find user account
-        const user = users.find(u => u.email.toLowerCase() === email && u.role === 'aluno');
+    // Login
+    function doLogin(email, pass) {
+        var user = users.find(function(u) { return u.email.toLowerCase() === email && u.role === 'aluno'; });
         if (!user) {
             loginError.textContent = 'E-mail não encontrado. Verifique com seu consultor.';
             return;
@@ -89,13 +76,34 @@
             loginError.textContent = 'Senha incorreta.';
             return;
         }
-        const lead = user.leadId ? leads.find(l => l.id === user.leadId) : leads.find(l => (l.email||'').toLowerCase() === email);
+        var lead = user.leadId ? leads.find(function(l) { return l.id === user.leadId; }) : leads.find(function(l) { return (l.email||'').toLowerCase() === email; });
         if (!lead) { loginError.textContent = 'Nenhum perfil vinculado. Contate seu consultor.'; return; }
         currentClientId = lead.id;
-
-        save(SESSION_KEY, { role: 'aluno', email, clientId: currentClientId, time: Date.now() });
+        save(SESSION_KEY, { role: 'aluno', email: email, clientId: currentClientId, time: Date.now() });
         loginError.textContent = '';
         enterPortal();
+    }
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = document.getElementById('alunoEmail').value.trim().toLowerCase();
+        var pass = document.getElementById('alunoPassword').value;
+        if (!email || !pass) { loginError.textContent = 'Preencha todos os campos.'; return; }
+
+        // Try login with local data first
+        if (users.length > 0) {
+            doLogin(email, pass);
+            return;
+        }
+
+        // No local data — try loading from Firebase
+        loginError.textContent = 'Carregando...';
+        ensureCloudData().then(function() {
+            loginError.textContent = '';
+            doLogin(email, pass);
+        }).catch(function() {
+            loginError.textContent = 'Erro ao carregar dados. Tente novamente.';
+        });
     });
 
     document.getElementById('btnAlunoLogout').addEventListener('click', () => {
