@@ -22,12 +22,12 @@
     function timeAgo(d) { const s = Math.floor((Date.now() - new Date(d)) / 1000); if (s < 60) return 'agora'; if (s < 3600) return Math.floor(s/60)+'min'; if (s < 86400) return Math.floor(s/3600)+'h'; return new Date(d).toLocaleDateString('pt-BR'); }
     const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
-    const leads = load(LEADS_KEY) || [];
+    let leads = load(LEADS_KEY) || [];
     let plans = load(PLANS_KEY) || [];
     let meetings = load(MEETINGS_KEY) || [];
     let chatMessages = load(CHAT_KEY) || [];
     let notifications = load(NOTIF_KEY) || [];
-    const users = load(USERS_KEY) || [];
+    let users = load(USERS_KEY) || [];
 
     const loginScreen = document.getElementById('alunoLogin');
     const portal = document.getElementById('alunoPortal');
@@ -35,6 +35,19 @@
     const loginError = document.getElementById('alunoLoginError');
 
     let currentClientId = null;
+    let cloudLoaded = false;
+
+    // Try to load users and leads from Firebase before anything else
+    async function ensureCloudData() {
+        if (cloudLoaded) return;
+        if (typeof DB === 'undefined' || !DB.FIREBASE_ENABLED) return;
+        try {
+            var r = await Promise.all([DB.load('users'), DB.load('leads')]);
+            if (r[0] && r[0].length > 0) users = r[0];
+            if (r[1] && r[1].length > 0) leads = r[1];
+            cloudLoaded = true;
+        } catch(e) { console.warn('[Aluno] Cloud data load failed:', e.message); }
+    }
 
     // Check existing session
     const session = load(SESSION_KEY);
@@ -43,23 +56,28 @@
             currentClientId = session.clientId;
             enterPortal();
         } else if (session.email) {
-            // Try to find lead by email
-            const lead = leads.find(l => (l.email || '').toLowerCase() === session.email.toLowerCase());
+            var lead = leads.find(l => (l.email || '').toLowerCase() === session.email.toLowerCase());
             if (lead) {
                 currentClientId = lead.id;
                 save(SESSION_KEY, { role: 'aluno', email: session.email, clientId: lead.id, time: Date.now() });
                 enterPortal();
             }
-            // If no lead found, show login screen (will pre-fill email)
         }
     }
 
-    // Login
-    loginForm.addEventListener('submit', function(e) {
+    // Login — loads cloud data first if needed
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('alunoEmail').value.trim().toLowerCase();
         const pass = document.getElementById('alunoPassword').value;
         if (!email || !pass) { loginError.textContent = 'Preencha todos os campos.'; return; }
+
+        // Load from cloud if local data is empty
+        if (users.length === 0 || leads.length === 0) {
+            loginError.textContent = 'Carregando dados...';
+            await ensureCloudData();
+            loginError.textContent = '';
+        }
 
         // Find user account
         const user = users.find(u => u.email.toLowerCase() === email && u.role === 'aluno');
@@ -432,12 +450,15 @@
         if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
             (async function() {
                 try {
-                    var r = await Promise.all([DB.load('plans'), DB.load('meetings'), DB.load('chat'), DB.load('notifications'), DB.load('feed')]);
+                    var r = await Promise.all([DB.load('plans'), DB.load('meetings'), DB.load('chat'), DB.load('notifications'), DB.load('feed'), DB.load('users'), DB.load('leads')]);
                     if (r[0].length > 0) plans = r[0];
                     if (r[1].length > 0) meetings = r[1];
-                    if (r[4] && r[4].length > 0) feedPosts = r[4];
                     if (r[2].length > 0) chatMessages = r[2];
                     if (r[3].length > 0) notifications = r[3];
+                    if (r[4] && r[4].length > 0) feedPosts = r[4];
+                    if (r[5] && r[5].length > 0) users = r[5];
+                    if (r[6] && r[6].length > 0) leads = r[6];
+                    cloudLoaded = true;
                     if (currentClientId) renderAll();
                 } catch(e) { console.warn('[Aluno] Cloud load failed:', e.message); }
             })();
