@@ -1413,39 +1413,37 @@
     feedPosts = cleanCollection('feed', feedPosts, 'id');
     renderAll();
 
-    // Cloud sync (safe - only runs if DB is available)
-    try {
-        if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
-            // Load from Firestore
-            (async function() {
-                try {
-                    var results = await Promise.all([
-                        DB.load('leads'), DB.load('plans'), DB.load('users'),
-                        DB.load('meetings'), DB.load('submissions'), DB.load('chat'), DB.load('notifications')
-                    ]);
-                    // Load and deduplicate all collections from cloud
-                    if (results[0].length > 0) leads = cleanCollection('leads', results[0], 'email');
-                    if (results[1].length > 0) plans = cleanCollection('plans', results[1], 'id');
-                    if (results[2].length > 0) users = cleanCollection('users', results[2], 'email');
-                    if (results[3].length > 0) meetings = cleanCollection('meetings', results[3], 'id');
-                    if (results[4].length > 0) submissions = cleanCollection('submissions', results[4], 'id');
-                    if (results[5].length > 0) chatMessages = results[5];
-                    if (results[6].length > 0) notifications = results[6];
-                    renderAll();
-                } catch(err) { console.warn('[O Tom] Cloud load failed:', err.message); }
-            })();
+    // Cloud sync — runs when Firebase becomes available
+    function doCloudSync() {
+        try {
+            if (typeof DB === 'undefined' || !DB.FIREBASE_ENABLED) return;
+            Promise.all([
+                DB.load('leads'), DB.load('plans'), DB.load('users'),
+                DB.load('meetings'), DB.load('submissions'), DB.load('chat'), DB.load('notifications')
+            ]).then(function(results) {
+                if (results[0] && results[0].length > 0) leads = cleanCollection('leads', results[0], 'email');
+                if (results[1] && results[1].length > 0) plans = cleanCollection('plans', results[1], 'id');
+                if (results[2] && results[2].length > 0) users = cleanCollection('users', results[2], 'email');
+                if (results[3] && results[3].length > 0) meetings = cleanCollection('meetings', results[3], 'id');
+                if (results[4] && results[4].length > 0) submissions = cleanCollection('submissions', results[4], 'id');
+                if (results[5] && results[5].length > 0) chatMessages = results[5];
+                if (results[6] && results[6].length > 0) notifications = results[6];
+                renderAll();
+            }).catch(function(err) { console.warn('[O Tom] Cloud load failed:', err.message); });
 
-            // Real-time listeners
-            DB.onSnapshot('chat', function(data) { chatMessages = data; if (activeChatClient) { renderChatContacts(); renderChatWindow(); } });
-            DB.onSnapshot('submissions', function(data) { submissions = data; renderSubmissions(); });
+            try {
+                DB.onSnapshot('chat', function(data) { chatMessages = data; if (activeChatClient) { renderChatContacts(); renderChatWindow(); } });
+                DB.onSnapshot('submissions', function(data) { submissions = data; renderSubmissions(); });
+            } catch(e2) {}
 
-            // Sync seed data to cloud on first run
             var syncKey = 'otomdasnotas_cloud_synced';
             if (!localStorage.getItem(syncKey)) {
                 DB.syncToCloud().then(function() { localStorage.setItem(syncKey, '1'); });
             }
-        }
-    } catch(e) { console.warn('[O Tom] Cloud init skipped:', e.message); }
+        } catch(e) { console.warn('[O Tom] Cloud init skipped:', e.message); }
+    }
+    doCloudSync();
+    window._onFirebaseReady = function() { doCloudSync(); };
 
     // LP form handling
     var lpFormEl = document.getElementById('lpForm');

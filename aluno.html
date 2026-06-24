@@ -204,12 +204,33 @@
         </div>
     </div>
 
-    <!-- Firebase SDK (CDN) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="js/firebase-config.js"></script>
-    <script src="js/db.js"></script>
+    <!-- App (loads first, works without Firebase) -->
     <script src="js/aluno.js"></script>
+
+    <!-- Firebase SDK (async, optional - enhances with cloud sync) -->
+    <script>
+    (function(){
+        function loadScript(src, cb) {
+            var s = document.createElement('script');
+            s.src = src;
+            s.onload = cb;
+            s.onerror = function() { console.warn('[O Tom] Failed to load: ' + src); };
+            document.head.appendChild(s);
+        }
+        var base = 'https://www.gstatic.com/firebasejs/10.12.0/';
+        loadScript(base + 'firebase-app-compat.js', function() {
+            loadScript(base + 'firebase-firestore-compat.js', function() {
+                loadScript(base + 'firebase-auth-compat.js', function() {
+                    loadScript('js/firebase-config.js', function() {
+                        loadScript('js/db.js', function() {
+                            console.log('[O Tom] Firebase loaded');
+                            if (typeof window._onFirebaseReady === 'function') window._onFirebaseReady();
+                        });
+                    });
+                });
+            });
+        });
+    })();
+    </script>
 </body>
 </html>

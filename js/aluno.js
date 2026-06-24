@@ -453,25 +453,32 @@
         }).join('');
     }
 
-    // ========== CLOUD SYNC (safe) ==========
-    try {
-        if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) {
-            (async function() {
-                try {
-                    var r = await Promise.all([DB.load('plans'), DB.load('meetings'), DB.load('chat'), DB.load('notifications'), DB.load('feed'), DB.load('users'), DB.load('leads')]);
-                    if (r[0].length > 0) plans = r[0];
-                    if (r[1].length > 0) meetings = r[1];
-                    if (r[2].length > 0) chatMessages = r[2];
-                    if (r[3].length > 0) notifications = r[3];
+    // ========== CLOUD SYNC (loads when Firebase becomes available) ==========
+    function loadCloudData() {
+        try {
+            if (typeof DB === 'undefined' || !DB.FIREBASE_ENABLED) return;
+            (function() {
+                Promise.all([DB.load('plans'), DB.load('meetings'), DB.load('chat'), DB.load('notifications'), DB.load('feed'), DB.load('users'), DB.load('leads')])
+                .then(function(r) {
+                    if (r[0] && r[0].length > 0) plans = r[0];
+                    if (r[1] && r[1].length > 0) meetings = r[1];
+                    if (r[2] && r[2].length > 0) chatMessages = r[2];
+                    if (r[3] && r[3].length > 0) notifications = r[3];
                     if (r[4] && r[4].length > 0) feedPosts = r[4];
                     if (r[5] && r[5].length > 0) users = r[5];
                     if (r[6] && r[6].length > 0) leads = r[6];
                     cloudLoaded = true;
                     if (currentClientId) renderAll();
-                } catch(e) { console.warn('[Aluno] Cloud load failed:', e.message); }
+                }).catch(function(e) { console.warn('[Aluno] Cloud load failed:', e.message); });
             })();
-            DB.onSnapshot('chat', function(data) { chatMessages = data; if (currentClientId) renderChat(); });
-            DB.onSnapshot('notifications', function(data) { notifications = data; if (currentClientId) renderNotifications(); });
-        }
-    } catch(e) { console.warn('[Aluno] Cloud init skipped:', e.message); }
+            try {
+                DB.onSnapshot('chat', function(data) { chatMessages = data; if (currentClientId) renderChat(); });
+                DB.onSnapshot('notifications', function(data) { notifications = data; if (currentClientId) renderNotifications(); });
+            } catch(e2) {}
+        } catch(e) { console.warn('[Aluno] Cloud init skipped:', e.message); }
+    }
+
+    // Try cloud sync now (if Firebase already loaded) and also when it becomes ready later
+    loadCloudData();
+    window._onFirebaseReady = function() { loadCloudData(); };
 })();
