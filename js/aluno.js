@@ -2,6 +2,7 @@
 // Área do Mentorado — O Tom das Notas
 // Tabs: Plano (resources, notes, certificate), Agenda, Chat, Notifications
 // ========================================
+window._alunoLoaded = true;
 (function () {
     'use strict';
 
@@ -36,6 +37,10 @@
 
     let currentClientId = null;
     let cloudLoaded = false;
+
+    // Signal that JS loaded
+    var jsStatus = document.getElementById('jsStatus');
+    if (jsStatus) jsStatus.style.display = 'none';
 
     // Try to load users and leads from Firebase before anything else
     async function ensureCloudData() {

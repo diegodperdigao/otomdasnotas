@@ -37,6 +37,7 @@
                 <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
             <a href="index.html" class="aluno-back"><i class="fas fa-arrow-left"></i> Voltar ao site</a>
+            <p id="jsStatus" style="margin-top:12px;font-size:.7rem;color:red;">JavaScript não carregou. Limpe o cache.</p>
         </div>
     </div>
 
@@ -204,8 +205,22 @@
         </div>
     </div>
 
-    <!-- App (loads first, works without Firebase) -->
+    <!-- App -->
     <script src="js/aluno.js"></script>
+    <script>
+    // Fallback: if aluno.js failed to load, at least make logout work
+    if (!window._alunoLoaded) {
+        console.error('[O Tom] aluno.js did not load! Activating fallback.');
+        var lb = document.getElementById('btnAlunoLogout');
+        if (lb) lb.addEventListener('click', function() { localStorage.removeItem('otomdasnotas_session'); window.location.href = 'index.html'; });
+        var lf = document.getElementById('alunoLoginForm');
+        if (lf) lf.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var err = document.getElementById('alunoLoginError');
+            if (err) err.textContent = 'Erro ao carregar a página. Limpe o cache e tente novamente.';
+        });
+    }
+    </script>
 
     <!-- Firebase SDK (async, optional - enhances with cloud sync) -->
     <script>
