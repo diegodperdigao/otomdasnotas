@@ -208,17 +208,35 @@
     <!-- App -->
     <script src="js/aluno.js"></script>
     <script>
-    // Fallback: if aluno.js failed to load, at least make logout work
+    // Fallback: if aluno.js failed, provide basic functionality inline
     if (!window._alunoLoaded) {
-        console.error('[O Tom] aluno.js did not load! Activating fallback.');
+        document.getElementById('jsStatus').textContent = 'Erro: js/aluno.js nao carregou. Verifique o console.';
+        document.getElementById('jsStatus').style.display = 'block';
+        // Basic logout
         var lb = document.getElementById('btnAlunoLogout');
-        if (lb) lb.addEventListener('click', function() { localStorage.removeItem('otomdasnotas_session'); window.location.href = 'index.html'; });
+        if (lb) lb.onclick = function() { localStorage.removeItem('otomdasnotas_session'); window.location.href = 'index.html'; };
+        // Basic login
         var lf = document.getElementById('alunoLoginForm');
-        if (lf) lf.addEventListener('submit', function(e) {
+        if (lf) lf.onsubmit = function(e) {
             e.preventDefault();
+            var email = document.getElementById('alunoEmail').value.trim().toLowerCase();
+            var pass = document.getElementById('alunoPassword').value;
+            if (!email || !pass) return;
+            var users = []; try { users = JSON.parse(localStorage.getItem('otomdasnotas_users')) || []; } catch(x){}
+            var leads = []; try { leads = JSON.parse(localStorage.getItem('otomdasnotas_leads')) || []; } catch(x){}
+            var user = null;
+            for (var i=0;i<users.length;i++) { if (users[i].email && users[i].email.toLowerCase()===email && users[i].role==='aluno') { user=users[i]; break; } }
             var err = document.getElementById('alunoLoginError');
-            if (err) err.textContent = 'Erro ao carregar a página. Limpe o cache e tente novamente.';
-        });
+            if (!user) { err.textContent = 'E-mail nao encontrado (fallback). Users: '+users.length+', Leads: '+leads.length; return; }
+            if (user.password !== pass) { err.textContent = 'Senha incorreta.'; return; }
+            var lead = null;
+            for (var j=0;j<leads.length;j++) { if (leads[j].id===user.leadId || (leads[j].email&&leads[j].email.toLowerCase()===email)) { lead=leads[j]; break; } }
+            if (!lead) { err.textContent = 'Perfil nao vinculado.'; return; }
+            localStorage.setItem('otomdasnotas_session', JSON.stringify({role:'aluno',email:email,clientId:lead.id,time:Date.now()}));
+            document.getElementById('alunoLogin').style.display = 'none';
+            document.getElementById('alunoPortal').style.display = 'flex';
+            err.textContent = '';
+        };
     }
     </script>
 
