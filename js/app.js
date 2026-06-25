@@ -1398,11 +1398,117 @@
         saveMeetings();
     }
 
+    // Seed demo data for Teste Pucrs evaluation account
+    function seedPucrs() {
+        if (localStorage.getItem('otomdasnotas_pucrs_seeded')) return;
+        // Check if already exists
+        if (leads.find(function(l) { return l.email === 'mentorado@pucrs.com'; })) { localStorage.setItem('otomdasnotas_pucrs_seeded','1'); return; }
+
+        var pucrsLeadId = 'pucrs_' + Date.now();
+        var today = new Date();
+        var fmt2 = function(d) { return d.toISOString().split('T')[0]; };
+
+        // Lead
+        leads.push({
+            id: pucrsLeadId, name: 'Teste Pucrs', email: 'mentorado@pucrs.com', phone: '(51) 99999-0000',
+            segment: 'instrumentista', stage: 'fechamento', value: 3000, source: 'site',
+            instrument: 'Guitarra / Composição', notes: 'Mentorado de avaliação da PUCRS. Guitarrista e compositor buscando profissionalizar carreira.',
+            createdAt: new Date(today.getTime() - 20*86400000).toISOString(), updatedAt: today.toISOString()
+        });
+        saveLeads();
+
+        // User
+        users.push({
+            id: 'pucrs_user_' + Date.now(), name: 'Teste Pucrs', email: 'mentorado@pucrs.com',
+            password: '1234', role: 'aluno', leadId: pucrsLeadId,
+            createdAt: new Date(today.getTime() - 20*86400000).toISOString()
+        });
+        saveUsers();
+
+        // Plan with resources
+        plans.push({
+            id: 'pucrs_plan_' + Date.now(), clientId: pucrsLeadId,
+            title: 'Profissionalização Musical — Guitarra & Composição',
+            objective: 'Estruturar a carreira como guitarrista e compositor, criando fontes de receita diversificadas através de presença digital, aulas online e produção de conteúdo.',
+            steps: [
+                { text: 'Diagnóstico de carreira e definição de objetivos', days: 3, done: true, resources: [
+                    { type: 'video', title: 'Como definir metas para sua carreira musical', url: 'https://www.youtube.com/watch?v=ZXsQAXx_ao0' },
+                    { type: 'article', title: 'Guia: Planejamento de Carreira para Músicos', url: 'https://www.musicbusinessworldwide.com' }
+                ], notes: 'Definimos foco em ensino online + produção de conteúdo no Instagram.' },
+                { text: 'Criar perfil profissional no Instagram e LinkedIn', days: 5, done: true, resources: [
+                    { type: 'video', title: 'Instagram para Músicos — Estratégia Completa', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+                    { type: 'article', title: 'Otimização de perfil no LinkedIn para artistas', url: 'https://www.linkedin.com/pulse' }
+                ], notes: 'Perfil criado com bio profissional, highlights e link na bio.' },
+                { text: 'Produzir 5 vídeos curtos de técnicas de guitarra', days: 10, done: true, resources: [
+                    { type: 'video', title: 'Como gravar vídeos de guitarra em casa', url: 'https://www.youtube.com/watch?v=9bZkp7q19f0' },
+                    { type: 'podcast', title: 'Produção de Conteúdo Musical — Podcast MusicBiz', url: 'https://open.spotify.com/show/example' }
+                ], notes: 'Gravei 5 vídeos: Sweep Picking, Tapping, Bend Techniques, Chord Inversions, Fingerstyle.' },
+                { text: 'Estruturar pacote de aulas particulares online', days: 7, done: true, resources: [
+                    { type: 'article', title: 'Como precificar aulas de música', url: 'https://www.musicteachershelper.com' }
+                ], notes: 'Pacotes definidos: Avulsa R$80, Mensal 4x R$280, Trimestral 12x R$720.' },
+                { text: 'Montar página de vendas para o curso', days: 7, done: false, resources: [
+                    { type: 'video', title: 'Landing Page que Converte — Tutorial Completo', url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw' },
+                    { type: 'article', title: 'Templates de páginas de vendas para educadores', url: 'https://www.hotmart.com/blog' }
+                ], notes: '' },
+                { text: 'Configurar funil de captação de alunos (Instagram → WhatsApp → Matrícula)', days: 5, done: false, resources: [
+                    { type: 'video', title: 'Funil de Vendas para Músicos', url: 'https://www.youtube.com/watch?v=oHg5SJYRHA0' }
+                ], notes: '' },
+                { text: 'Lançar primeira turma e ativar campanha de divulgação', days: 7, done: false, resources: [
+                    { type: 'podcast', title: 'Estratégias de Lançamento — Music Business Podcast', url: 'https://open.spotify.com/show/example2' }
+                ], notes: '' },
+                { text: 'Analisar métricas, ajustar estratégia e planejar próximo ciclo', days: 10, done: false, resources: [
+                    { type: 'article', title: 'KPIs essenciais para músicos empreendedores', url: 'https://www.musicindustryhowto.com' }
+                ], notes: '' }
+            ],
+            createdAt: new Date(today.getTime() - 18*86400000).toISOString(),
+            updatedAt: today.toISOString()
+        });
+        savePlans();
+
+        // Meetings
+        meetings.push(
+            { id: 'pucrs_meet1_' + Date.now(), clientId: pucrsLeadId, title: 'Revisão de Progresso — Etapas 1 a 4', date: fmt2(new Date(today.getTime() + 2*86400000)), time: '15:00', type: 'online', link: 'https://meet.google.com/pucrs-otom-test', details: 'Revisão das 4 etapas concluídas e planejamento das próximas', createdAt: today.toISOString() },
+            { id: 'pucrs_meet2_' + Date.now(), clientId: pucrsLeadId, title: 'Workshop: Gravação de Vídeos para Redes Sociais', date: fmt2(new Date(today.getTime() + 7*86400000)), time: '10:00', type: 'presencial', link: '', details: 'Estúdio Central, Sala 2 — Av. Ipiranga, 6681, Porto Alegre', createdAt: today.toISOString() },
+            { id: 'pucrs_meet3_' + Date.now(), clientId: pucrsLeadId, title: 'Mentoria: Estratégia de Lançamento', date: fmt2(new Date(today.getTime() + 14*86400000)), time: '14:00', type: 'online', link: 'https://meet.google.com/pucrs-launch', details: 'Planejamento da campanha de divulgação da primeira turma', createdAt: today.toISOString() }
+        );
+        saveMeetings();
+
+        // Chat messages
+        chatMessages.push(
+            { id: 'pc1_'+Date.now(), clientId: pucrsLeadId, senderRole: 'admin', text: 'Olá! Bem-vindo à consultoria O Tom das Notas. Preparei seu plano de ação personalizado. Dá uma olhada e me diz o que achou!', time: new Date(today.getTime() - 15*86400000).toISOString(), readByAdmin: true },
+            { id: 'pc2_'+Date.now(), clientId: pucrsLeadId, senderRole: 'aluno', text: 'Muito bom! Gostei bastante das etapas. Já comecei a trabalhar no diagnóstico de carreira.', time: new Date(today.getTime() - 14*86400000).toISOString() },
+            { id: 'pc3_'+Date.now(), clientId: pucrsLeadId, senderRole: 'admin', text: 'Ótimo! Lembra de assistir os vídeos de referência que coloquei em cada etapa. Qualquer dúvida, me chama por aqui.', time: new Date(today.getTime() - 14*86400000).toISOString(), readByAdmin: true },
+            { id: 'pc4_'+Date.now(), clientId: pucrsLeadId, senderRole: 'aluno', text: 'Finalizei as 4 primeiras etapas! O perfil no Instagram já está no ar e gravei os 5 vídeos.', time: new Date(today.getTime() - 5*86400000).toISOString() },
+            { id: 'pc5_'+Date.now(), clientId: pucrsLeadId, senderRole: 'admin', text: 'Parabéns! 50% do plano concluído! Vamos revisar tudo na nossa reunião de quarta. Já agendei no seu calendário.', time: new Date(today.getTime() - 4*86400000).toISOString(), readByAdmin: true },
+            { id: 'pc6_'+Date.now(), clientId: pucrsLeadId, senderRole: 'aluno', text: 'Perfeito, vi o agendamento. Vou preparar algumas dúvidas sobre a página de vendas para discutirmos.', time: new Date(today.getTime() - 3*86400000).toISOString() }
+        );
+        saveChat();
+
+        // Feed posts
+        feedPosts.push(
+            { id: 'pf1_'+Date.now(), author: 'Teste Pucrs', authorRole: 'aluno', authorId: pucrsLeadId, category: 'ideia', title: 'Alguém já experimentou dar aulas pelo Zoom vs Google Meet?', content: 'Estou montando meu pacote de aulas online e estou na dúvida entre Zoom e Google Meet. Alguém tem experiência com os dois? Qual funciona melhor para aulas de instrumento?', link: '', upvotes: [], downvotes: [], comments: [{ id: 'fc1', author: 'Administrador', text: 'Para aulas de música, o Zoom tem menor latência de áudio. Recomendo!', time: new Date(today.getTime() - 2*86400000).toISOString() }], createdAt: new Date(today.getTime() - 3*86400000).toISOString(), updatedAt: today.toISOString() },
+            { id: 'pf2_'+Date.now(), author: 'Administrador', authorRole: 'admin', category: 'oportunidade', title: 'Festival de Música Independente — Inscrições Abertas', content: 'O Festival de Música Independente de Porto Alegre está com inscrições abertas para artistas solo e bandas. Prazo até o final do mês. Ótima oportunidade de networking!', link: 'https://www.festivalpoa.com.br', upvotes: [pucrsLeadId], downvotes: [], comments: [], createdAt: new Date(today.getTime() - 6*86400000).toISOString(), updatedAt: today.toISOString() },
+            { id: 'pf3_'+Date.now(), author: 'Administrador', authorRole: 'admin', category: 'dica', title: '3 apps gratuitos para editar vídeos de música no celular', content: 'Se você está começando a produzir conteúdo para redes sociais, esses apps são ótimos e gratuitos:\n\n1. CapCut — edição completa com efeitos\n2. InShot — rápido e intuitivo para stories\n3. BandLab — gravação e edição de áudio direto no celular', link: '', upvotes: [pucrsLeadId], downvotes: [], comments: [{ id: 'fc2', author: 'Teste Pucrs', text: 'CapCut é sensacional! Uso para todos os meus vídeos de guitarra.', time: new Date(today.getTime() - 7*86400000).toISOString() }], createdAt: new Date(today.getTime() - 8*86400000).toISOString(), updatedAt: today.toISOString() }
+        );
+        saveFeed();
+
+        // Notification
+        notifications.push(
+            { id: 'pn1_'+Date.now(), clientId: pucrsLeadId, type: 'meeting', message: 'Novo encontro agendado: Revisão de Progresso em ' + fmt2(new Date(today.getTime() + 2*86400000)), read: false, time: today.toISOString() },
+            { id: 'pn2_'+Date.now(), clientId: pucrsLeadId, type: 'content', message: 'Novos conteúdos adicionados à etapa 5 do seu plano', read: false, time: today.toISOString() }
+        );
+        save(NOTIF_KEY, notifications);
+        cloud('notifications', notifications);
+
+        localStorage.setItem('otomdasnotas_pucrs_seeded', '1');
+    }
+
     // ========== INIT ==========
     seed();
     seedPlans();
     seedUsers();
     seedMeetings();
+    seedPucrs();
     if (!SEEDED) localStorage.setItem('otomdasnotas_seeded_v3', '1');
     // Deduplicate ALL collections on startup
     leads = cleanCollection('leads', leads, 'email');
