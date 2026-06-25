@@ -31,6 +31,8 @@ window._alunoLoaded = true;
     let users = load(USERS_KEY) || [];
     const FEED_KEY = 'otomdasnotas_feed';
     let feedPosts = load(FEED_KEY) || [];
+    var CAT_LABELS = { oportunidade:'Oportunidade', ideia:'Ideia', dica:'Dica', discussao:'Discussão', evento:'Evento' };
+    var CAT_ICONS = { oportunidade:'fa-briefcase', ideia:'fa-lightbulb', dica:'fa-star', discussao:'fa-comments', evento:'fa-calendar' };
 
     const loginScreen = document.getElementById('alunoLogin');
     const portal = document.getElementById('alunoPortal');
@@ -361,9 +363,6 @@ window._alunoLoaded = true;
 
     // ========== COMMUNITY FEED ==========
     function saveFeed() { save(FEED_KEY, feedPosts); try { if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) DB.saveAll('feed', feedPosts); } catch(e) {} }
-
-    const CAT_LABELS = { oportunidade:'Oportunidade', ideia:'Ideia', dica:'Dica', discussao:'Discussão', evento:'Evento' };
-    const CAT_ICONS = { oportunidade:'fa-briefcase', ideia:'fa-lightbulb', dica:'fa-star', discussao:'fa-comments', evento:'fa-calendar' };
 
     function getClientName() {
         var client = leads.find(l => l.id === currentClientId);
