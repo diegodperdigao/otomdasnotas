@@ -37,13 +37,12 @@
                 <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
             <a href="index.html" class="aluno-back"><i class="fas fa-arrow-left"></i> Voltar ao site</a>
-            <p id="jsStatus" style="margin-top:12px;font-size:.7rem;color:red;">JavaScript não carregou. Limpe o cache.</p>
+            <p id="jsStatus" style="margin-top:12px;font-size:.7rem;color:red;display:none;"></p>
         </div>
     </div>
 
     <!-- Student Portal -->
     <div class="aluno-portal" id="alunoPortal" style="display:none;">
-        <!-- Top Bar -->
         <header class="aluno-topbar">
             <div class="aluno-topbar-left">
                 <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom" class="aluno-topbar-logo">
@@ -62,13 +61,11 @@
             </div>
         </header>
 
-        <!-- Notifications Dropdown -->
         <div class="notif-dropdown" id="notifDropdown" style="display:none">
             <div class="notif-dropdown-header"><h4>Notificações</h4><button id="notifClearAll">Limpar</button></div>
             <div class="notif-list" id="notifList"><p class="empty-state">Sem notificações.</p></div>
         </div>
 
-        <!-- Tab Navigation -->
         <nav class="aluno-tabs">
             <button class="aluno-tab active" data-tab="plano"><i class="fas fa-route"></i> Plano de Ação</button>
             <button class="aluno-tab" data-tab="agenda"><i class="fas fa-calendar-alt"></i> Agenda</button>
@@ -77,10 +74,7 @@
         </nav>
 
         <main class="aluno-main">
-
-            <!-- TAB: Plano de Ação -->
             <div class="aluno-tab-content active" id="tab-plano">
-                <!-- Welcome + Progress -->
                 <div class="aluno-welcome" id="alunoWelcome">
                     <div class="aluno-welcome-text">
                         <h1 id="alunoGreeting">Olá!</h1>
@@ -98,81 +92,50 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Stats -->
                 <div class="aluno-stats">
                     <div class="aluno-stat"><span class="aluno-stat-value" id="statTotal">0</span><span class="aluno-stat-label">Total</span></div>
                     <div class="aluno-stat"><span class="aluno-stat-value" id="statDone">0</span><span class="aluno-stat-label">Concluídas</span></div>
                     <div class="aluno-stat"><span class="aluno-stat-value" id="statPending">0</span><span class="aluno-stat-label">Pendentes</span></div>
                 </div>
-
-                <!-- Steps -->
                 <div class="aluno-plan-section">
                     <h2><i class="fas fa-route"></i> Seu Plano de Ação</h2>
-                    <div class="aluno-steps" id="alunoSteps">
-                        <p class="empty-state">Nenhum plano de ação encontrado.</p>
-                    </div>
+                    <div class="aluno-steps" id="alunoSteps"><p class="empty-state">Nenhum plano de ação encontrado.</p></div>
                 </div>
-
-                <!-- Certificate Banner (shows when 100%) -->
                 <div class="certificate-banner" id="certificateBanner" style="display:none">
                     <div class="certificate-banner-icon"><i class="fas fa-award"></i></div>
-                    <div>
-                        <h3>Parabéns! Plano 100% concluído!</h3>
-                        <p>Você completou todas as etapas do seu plano de ação.</p>
-                    </div>
+                    <div><h3>Parabéns! Plano 100% concluído!</h3><p>Você completou todas as etapas do seu plano de ação.</p></div>
                     <button class="btn btn-primary" id="btnViewCertificate"><i class="fas fa-certificate"></i> Ver Certificado</button>
                 </div>
-
-                <!-- No Plan State -->
                 <div class="aluno-no-plan" id="alunoNoPlan" style="display:none;">
                     <div class="aluno-no-plan-icon"><i class="fas fa-clipboard-list"></i></div>
                     <h3>Nenhum plano cadastrado ainda</h3>
                     <p>Seu consultor irá criar um plano de ação personalizado para você. Aguarde!</p>
                 </div>
             </div>
-
-            <!-- TAB: Agenda -->
             <div class="aluno-tab-content" id="tab-agenda">
                 <h2 class="tab-section-title"><i class="fas fa-calendar-alt"></i> Seus Encontros</h2>
-                <div class="aluno-meetings" id="alunoMeetings">
-                    <p class="empty-state">Nenhum encontro agendado pelo seu consultor.</p>
-                </div>
+                <div class="aluno-meetings" id="alunoMeetings"><p class="empty-state">Nenhum encontro agendado pelo seu consultor.</p></div>
             </div>
-
-            <!-- TAB: Chat -->
             <div class="aluno-tab-content" id="tab-chat">
                 <div class="aluno-chat-box">
-                    <div class="aluno-chat-header">
-                        <i class="fas fa-comments"></i>
-                        <span>Chat com seu consultor</span>
-                    </div>
-                    <div class="aluno-chat-messages" id="alunoChatMessages">
-                        <p class="empty-state">Nenhuma mensagem ainda. Envie a primeira!</p>
-                    </div>
+                    <div class="aluno-chat-header"><i class="fas fa-comments"></i><span>Chat com seu consultor</span></div>
+                    <div class="aluno-chat-messages" id="alunoChatMessages"><p class="empty-state">Nenhuma mensagem ainda. Envie a primeira!</p></div>
                     <form class="aluno-chat-input" id="alunoChatForm">
                         <input type="text" id="alunoChatText" placeholder="Digite sua mensagem..." required autocomplete="off">
                         <button type="submit"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
             </div>
-            <!-- TAB: Comunidade -->
             <div class="aluno-tab-content" id="tab-feed">
                 <h2 class="tab-section-title"><i class="fas fa-comments"></i> Comunidade</h2>
-                <div class="feed-container" id="alunoFeedContainer">
-                    <p class="empty-state">Nenhuma publicação ainda.</p>
-                </div>
+                <div class="feed-container" id="alunoFeedContainer"><p class="empty-state">Nenhuma publicação ainda.</p></div>
             </div>
         </main>
     </div>
 
-    <!-- Certificate Modal -->
     <div class="modal-overlay" id="certOverlay">
         <div class="modal certificate-modal">
-            <div class="modal-header">
-                <h3><i class="fas fa-award"></i> Certificado de Conclusão</h3>
-                <button class="modal-close" id="certClose">&times;</button>
-            </div>
+            <div class="modal-header"><h3><i class="fas fa-award"></i> Certificado de Conclusão</h3><button class="modal-close" id="certClose">&times;</button></div>
             <div class="certificate-content" id="certificateContent">
                 <div class="cert-body">
                     <img src="https://i.ibb.co/dXVPqQb/o-tom.png" alt="O Tom" class="cert-logo">
@@ -183,62 +146,62 @@
                     <h4 class="cert-plan" id="certPlan">—</h4>
                     <p class="cert-text">completando todas as etapas propostas na plataforma O Tom das Notas.</p>
                     <div class="cert-date" id="certDate">—</div>
-                    <div class="cert-footer">
-                        <div class="cert-signature">
-                            <div class="cert-line"></div>
-                            <span>O Tom das Notas</span>
-                        </div>
-                    </div>
+                    <div class="cert-footer"><div class="cert-signature"><div class="cert-line"></div><span>O Tom das Notas</span></div></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Resource Viewer Modal -->
     <div class="modal-overlay" id="resourceOverlay">
         <div class="modal modal-lg">
-            <div class="modal-header">
-                <h3 id="resourceTitle"><i class="fas fa-play-circle"></i> Conteúdo</h3>
-                <button class="modal-close" id="resourceClose">&times;</button>
-            </div>
+            <div class="modal-header"><h3 id="resourceTitle"><i class="fas fa-play-circle"></i> Conteúdo</h3><button class="modal-close" id="resourceClose">&times;</button></div>
             <div class="resource-content" id="resourceContent"></div>
         </div>
     </div>
 
-    <!-- App -->
     <script src="js/aluno.js"></script>
     <script>
-    // Fallback: if aluno.js failed to load, at least make logout work
     if (!window._alunoLoaded) {
-        console.error('[O Tom] aluno.js did not load! Activating fallback.');
+        var st = document.getElementById('jsStatus');
+        if (st) { st.textContent = 'Erro: js/aluno.js nao carregou.'; st.style.display = 'block'; }
         var lb = document.getElementById('btnAlunoLogout');
-        if (lb) lb.addEventListener('click', function() { localStorage.removeItem('otomdasnotas_session'); window.location.href = 'index.html'; });
+        if (lb) lb.onclick = function() { localStorage.removeItem('otomdasnotas_session'); window.location.href = 'index.html'; };
         var lf = document.getElementById('alunoLoginForm');
-        if (lf) lf.addEventListener('submit', function(e) {
+        if (lf) lf.onsubmit = function(e) {
             e.preventDefault();
+            var email = document.getElementById('alunoEmail').value.trim().toLowerCase();
+            var pass = document.getElementById('alunoPassword').value;
+            if (!email || !pass) return;
+            var users = []; try { users = JSON.parse(localStorage.getItem('otomdasnotas_users')) || []; } catch(x){}
+            var leads = []; try { leads = JSON.parse(localStorage.getItem('otomdasnotas_leads')) || []; } catch(x){}
+            var user = null;
+            for (var i=0;i<users.length;i++) { if (users[i].email && users[i].email.toLowerCase()===email && users[i].role==='aluno') { user=users[i]; break; } }
             var err = document.getElementById('alunoLoginError');
-            if (err) err.textContent = 'Erro ao carregar a página. Limpe o cache e tente novamente.';
-        });
+            if (!user) { err.textContent = 'E-mail nao encontrado. Users: '+users.length; return; }
+            if (user.password !== pass) { err.textContent = 'Senha incorreta.'; return; }
+            var lead = null;
+            for (var j=0;j<leads.length;j++) { if (leads[j].id===user.leadId || (leads[j].email&&leads[j].email.toLowerCase()===email)) { lead=leads[j]; break; } }
+            if (!lead) { err.textContent = 'Perfil nao vinculado.'; return; }
+            localStorage.setItem('otomdasnotas_session', JSON.stringify({role:'aluno',email:email,clientId:lead.id,time:Date.now()}));
+            document.getElementById('alunoLogin').style.display = 'none';
+            document.getElementById('alunoPortal').style.display = 'flex';
+            err.textContent = '';
+        };
     }
     </script>
-
-    <!-- Firebase SDK (async, optional - enhances with cloud sync) -->
     <script>
     (function(){
-        function loadScript(src, cb) {
+        function ls(src, cb) {
             var s = document.createElement('script');
-            s.src = src;
-            s.onload = cb;
-            s.onerror = function() { console.warn('[O Tom] Failed to load: ' + src); };
+            s.src = src; s.onload = cb; s.onerror = function() {};
             document.head.appendChild(s);
         }
-        var base = 'https://www.gstatic.com/firebasejs/10.12.0/';
-        loadScript(base + 'firebase-app-compat.js', function() {
-            loadScript(base + 'firebase-firestore-compat.js', function() {
-                loadScript(base + 'firebase-auth-compat.js', function() {
-                    loadScript('js/firebase-config.js', function() {
-                        loadScript('js/db.js', function() {
-                            console.log('[O Tom] Firebase loaded');
+        var b = 'https://www.gstatic.com/firebasejs/10.12.0/';
+        ls(b+'firebase-app-compat.js', function() {
+            ls(b+'firebase-firestore-compat.js', function() {
+                ls(b+'firebase-auth-compat.js', function() {
+                    ls('js/firebase-config.js', function() {
+                        ls('js/db.js', function() {
                             if (typeof window._onFirebaseReady === 'function') window._onFirebaseReady();
                         });
                     });
