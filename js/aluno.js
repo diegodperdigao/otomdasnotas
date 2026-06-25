@@ -29,6 +29,8 @@ window._alunoLoaded = true;
     let chatMessages = load(CHAT_KEY) || [];
     let notifications = load(NOTIF_KEY) || [];
     let users = load(USERS_KEY) || [];
+    const FEED_KEY = 'otomdasnotas_feed';
+    let feedPosts = load(FEED_KEY) || [];
 
     const loginScreen = document.getElementById('alunoLogin');
     const portal = document.getElementById('alunoPortal');
@@ -358,8 +360,6 @@ window._alunoLoaded = true;
     }
 
     // ========== COMMUNITY FEED ==========
-    const FEED_KEY = 'otomdasnotas_feed';
-    let feedPosts = load(FEED_KEY) || [];
     function saveFeed() { save(FEED_KEY, feedPosts); try { if (typeof DB !== 'undefined' && DB.FIREBASE_ENABLED) DB.saveAll('feed', feedPosts); } catch(e) {} }
 
     const CAT_LABELS = { oportunidade:'Oportunidade', ideia:'Ideia', dica:'Dica', discussao:'Discussão', evento:'Evento' };
